@@ -8,3 +8,5 @@ Primary python module for functions is scicam.py
 
 C-based routines can be compiled inside pdv_env with compile.py while on the camera server (mbirch@150.203.88.24)
 
+serial_command.py for sending and receiving serial communication found in PIRT-ICD. 
+
