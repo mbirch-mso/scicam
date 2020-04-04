@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import glob
 import scicam as cam
 
-
 #Create Histogram of file list 
 def group_hist(files):
     for k in range(len(files)):
@@ -23,7 +22,7 @@ def group_hist(files):
     plt.xlabel('Counts (ADUs)')
     plt.ylabel('# of Pixels')
     plt.show()
-    #Include analysis of hist curves 
+    #Include analysis of hist curves
 
 #Create image gallery of files
 def group_display(files):

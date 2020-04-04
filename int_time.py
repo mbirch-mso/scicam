@@ -12,3 +12,5 @@ if args.v:
 else:
     cam.set_int_time(args.i)
     
+#tester
+x = 5
