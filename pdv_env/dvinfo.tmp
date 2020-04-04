@@ -1,0 +1,33 @@
+opening pdv unit 0....
+pdv_flush_fifo() [cameralink]
+pdv_set_baud(9600) (baudreg 80) using NEW baud reg
+pdv_set_cam_width(1280)
+pdv_set_cam_height(1024)
+pdv_set_depth_extdepth_dpath(14, 14, 0f (0f))
+update_size
+pdv_get_pitch() 2560
+pdv_set_width(1280)
+pdv_set_roi(hskip 0 hactv 1280 vskip 0 vactv 1024)
+pdv_get_cam_width() 1280
+pdv_get_cam_height() 1024
+update_size
+pdv_get_pitch() 2560
+pdv_set_height(1024)
+pdv_set_roi(hskip 0 hactv 1280 vskip 0 vactv 1024)
+pdv_get_cam_width() 1280
+pdv_get_cam_height() 1024
+update_size
+pdv_get_pitch() 2560
+pdv_set_roi(hskip 0 hactv 1280 vskip 0 vactv 1024)
+pdv_get_cam_width() 1280
+pdv_get_cam_height() 1024
+pdv_setsize(1280, 1024)
+pdv_set_roi(hskip 0 hactv 1280 vskip 0 vactv 1024)
+pdv_get_cam_width() 1280
+pdv_get_cam_height() 1024
+update_size
+pdv_get_pitch() 2560
+pdv_set_waitchar(0, 00) returns 0
+pdv_auto_set_timeout(): current 1155 new 1155 exposure 500 pclock 5 pdiv 1 mult 1 user 0
+  setting picture timeout from 1155 to 1155
+done

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HistoWidget</class>
+ <widget class="QWidget" name="HistoWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>438</width>
+    <height>484</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Histogram</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_3" rowstretch="1,0,0,0">
+   <item row="1" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QRadioButton" name="redButton">
+       <property name="text">
+        <string>Red</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="greenButton">
+       <property name="text">
+        <string>Green</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="blueButton">
+       <property name="text">
+        <string>Blue</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0">
+     <item row="2" column="2">
+      <widget class="QLabel" name="medianLabel">
+       <property name="text">
+        <string>Median</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Mode Frequency</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Mode</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QLineEdit" name="medianEdit"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Standard Deviation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLineEdit" name="meanEdit"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLineEdit" name="sdEdit"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="meanLabel">
+       <property name="text">
+        <string>Mean</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="maxPixelLabel">
+       <property name="text">
+        <string>Max. Pixel Value</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="maxPixelEdit"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="nPixelLabel">
+       <property name="text">
+        <string>N Pixels</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nPixelEdit"/>
+     </item>
+     <item row="3" column="3">
+      <widget class="QLineEdit" name="modeFreqEdit"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="minPixelEdit"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="minPIxelLabel">
+       <property name="text">
+        <string>Min. Pixel Value</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="modeEdit"/>
+     </item>
+     <item row="4" column="3">
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <layout class="QGridLayout" name="gridLayout_2" rowstretch="0" columnstretch="1,2,1,4" rowminimumheight="0">
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="indexEdit"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="indexLabel">
+       <property name="text">
+        <string>Bin Index</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="freqLabel">
+       <property name="text">
+        <string>Frequency</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLineEdit" name="freqEdit"/>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="EdtQtPlotView" name="histoPlotView" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EdtQtPlotView</class>
+   <extends>QWidget</extends>
+   <header>EdtQtPlotView.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>HistoWidget</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>463</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1</x>
+     <y>296</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

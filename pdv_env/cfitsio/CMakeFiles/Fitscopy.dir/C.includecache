@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/mbirch/Downloads/cfit-3.47/cfitsio-3.47/fitscopy.c
+stdio.h
+-
+fitsio.h
+C:/Users/mbirch/Downloads/cfit-3.47/cfitsio-3.47/fitsio.h
+
+C:/Users/mbirch/Downloads/cfit-3.47/cfitsio-3.47/fitsio.h
+stdio.h
+-
+sys/types.h
+-
+stdlib.h
+-
+limits.h
+-
+longnam.h
+C:/Users/mbirch/Downloads/cfit-3.47/cfitsio-3.47/longnam.h
+
+C:/Users/mbirch/Downloads/cfit-3.47/cfitsio-3.47/longnam.h
+

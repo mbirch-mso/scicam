@@ -1,0 +1,3178 @@
+"dvinfo output" 
+------------------------------------------------------ 
+.\setdebug -v -u 0 
+------------------------------------------------------ 
+
+Library version 5.5.8.2 (05050802)
+
+pdv0:  Driver version 5.5.8.2 
+       Build 1031 Jul 15 2019 17:32:49 64 bit
+------------------------------------------------------ 
+.\pciload 
+------------------------------------------------------ 
+
+Library version 5.5.8.2
+pdv driver version 5.5.8.2
+pdv unit 0 (VisionLink F4):
+  ID 0xa3, 5cgtfd5c5 PCIe FPGA, Micron N25Q064A13ESE40G FPROM
+  s/n VLF400991, p/n 019-14856-21, i/f fpga (none), rev 21, clock 100 Mhz, opt FH/IRIG
+  PCIe negotiated link width x4, 2.5 Gbps
+  Sector 0 (BOOT)  <visionlinkf4-07.rpd 5CGTFD5C5U19C7 10/03/2018 14:11:02>
+
+------------------------------------------------------ 
+.\pciload -u 0 -c 
+------------------------------------------------------ 
+
+pdv unit 0 (VisionLink F4):
+  ID 0xa3, 5cgtfd5c5 PCIe FPGA, Micron N25Q064A13ESE40G FPROM
+  s/n VLF400991, p/n 019-14856-21, i/f fpga (none), rev 21, clock 100 Mhz, opt FH/IRIG
+  PCIe negotiated link width x4, 2.5 Gbps
+  Sector 0 (BOOT)  <visionlinkf4-07.rpd 5CGTFD5C5U19C7 10/03/2018 14:11:02>
+
+  Bitfile:  C:\EDT\pdv\flash\5cgtfd5c5\visionlinkf4.bit
+  File  id: <visionlinkf4-08.rpd 5CGTFD5C5U19C7 05/09/2019 17:35:51>
+
+  file ID and prom ID differ
+
+------------------------------------------------------ 
+------------------------------------------------------ 
+"==> (CHECK: board firmware is not up-to-date, or non-standard)" 
+------------------------------------------------------ 
+.\pciediag -u 0 -c 0 
+------------------------------------------------------ 
+
+PCI Express device configuration space status for EDT pdv unit 0
+
+Device ID: a3
+Vendor ID: 123d
+
+Bus master enable: 1
+
+********************************
+Device Capabilities Register:
+
+Max Payload Size Supported: 010 = 512 bytes
+Phantom Functions Supported: 00
+End Tag Field Supported: 0
+Endpoint L0 Acceptable Latency: 000
+Endpoint L1 Acceptable Latency: 000
+Attention Button Present: 0
+Attention Indicator Present: 0
+Power Indicator Present: 0
+Captured Slot Power Limit Value: 00101100
+Captured Slot Power Limit Scale: 00
+
+********************************
+Device Status Register:
+
+Correctable Error Detected: 1
+Non-Fatal Error Detected: 0
+Fatal Error Detected: 0
+Unsupported Request Detected: 0
+Aux Power Detected: 0
+Transactions Pending: 0
+
+********************************
+Device Control Register:
+
+Max Read Request Size: 010 = 512 byte max
+Max Payload Size: 000 = 128 byte max payload
+
+********************************
+LINK Capabilities Register:
+
+Max Link Speed Supported: 0010 = 5.0 Gbps
+
+********************************
+Link Status Register:
+
+Negotiated Link Speed: 0001 = 2.5 Gbps
+Negotiated Link Width: 000100 = x4
+Training Error: 0
+Link Training: 0
+Slot Clock Config: 1
+
+------------------------------------------------------ 
+type .\camsetup0_0.bat 
+------------------------------------------------------ 
+echo on
+.\initcam -u 0 -c 0 -f "camera_config/generic16cl-DV.cfg"
+Echo %errorlevel% >> camsetup0_0.out
+------------------------------------------------------ 
+.\initcam -V -O dvinfo.tmp -f "camera_config\generic16cl-DV.cfg" -u 0 -c 0 
+------------------------------------------------------ 
+edt_flash_prom_detect
+		edt_flash_prom_detect (MIC): stat 0134 id bits 01 0d, pal_ver 21, finding prom...
+
+edt_read_prom_data s0 addrs: maclist 7f010c optsn 7f00e0, xtrasize 7f0104, xtratag 7f0100,esn 7f00a0, osn 7f0080, id 7f0000
+------------------------------------------------------ 
+type .\dvinfo.tmp 
+------------------------------------------------------ 
+opening pdv unit 0....
+pdv_flush_fifo() [cameralink]
+pdv_set_baud(9600) (baudreg 80) using NEW baud reg
+pdv_set_cam_width(1280)
+pdv_set_cam_height(1024)
+pdv_set_depth_extdepth_dpath(14, 14, 0f (0f))
+update_size
+pdv_get_pitch() 2560
+pdv_set_width(1280)
+pdv_set_roi(hskip 0 hactv 1280 vskip 0 vactv 1024)
+pdv_get_cam_width() 1280
+pdv_get_cam_height() 1024
+update_size
+pdv_get_pitch() 2560
+pdv_set_height(1024)
+pdv_set_roi(hskip 0 hactv 1280 vskip 0 vactv 1024)
+pdv_get_cam_width() 1280
+pdv_get_cam_height() 1024
+update_size
+pdv_get_pitch() 2560
+pdv_set_roi(hskip 0 hactv 1280 vskip 0 vactv 1024)
+pdv_get_cam_width() 1280
+pdv_get_cam_height() 1024
+pdv_setsize(1280, 1024)
+pdv_set_roi(hskip 0 hactv 1280 vskip 0 vactv 1024)
+pdv_get_cam_width() 1280
+pdv_get_cam_height() 1024
+update_size
+pdv_get_pitch() 2560
+pdv_set_waitchar(0, 00) returns 0
+pdv_auto_set_timeout(): current 1155 new 1155 exposure 500 pclock 5 pdiv 1 mult 1 user 0
+  setting picture timeout from 1155 to 1155
+done
+------------------------------------------------------ 
+type camera_config\generic16cl-DV.cfg 
+------------------------------------------------------ 
+#
+# CAMERA_MODEL 	"Generic 16"
+#
+# This is a generic camera configuration file, intended as a starting 
+# place for creating a file for a new camera.  See the PCI DV User's
+# guide for general information on configuration files, and the Camera
+# Configuration Guide for detailed descriptions of the config file
+# directives and arguments.
+#
+# Unmodified, this file should work for a single-channel Camera-Link
+# camera that outputs data continuously (no trigger required) in
+# 1024x1024, 16-bits per pixel with the LSB on VD0 or MSB0.
+#
+# camera description, for camera selection GUI and apps
+# camera_class should be the manufacturer's name
+#
+camera_class:                  "Generic"
+camera_model:                  "Camera Link 14-bit"
+camera_info:                   "1280x1024 (single ch., freerun)"
+
+# actual width/height (total pixels) and depth of data from camera
+# to only grab high 8-bits, set depth to 8 but leave extdepth set
+# to actual depth, and adjust shift and mask accordingly
+#
+width:                         1280
+height:                        1024
+depth:                         14
+extdepth:                      14
+
+# mode control register bits (hex):
+# 0-3: on/off state of mode control lines
+# 4-7: which mode control line to send expose pulse for
+#      triggered exposure or pulse-width triggering.
+# this directive is usually set to 00 for free-running cameras,
+# or 10 for triggered or pulse-width cameras/modes
+#
+MODE_CNTL_NORM:                00
+
+# camera link data path register bits (argument is a 2-digit hex value):
+# sets the expected input data size and #taps
+# bits 0-3: number of bits per pixel minus 1
+# bits 4-7: number of taps minus 1
+#
+CL_DATA_PATH_NORM:             0f
+
+# camera link config register bits
+# (arg is a 2-digit hex value, hexval shown in parens):
+# 0 (01): RGB (set for RGB (except bayer). Applies to older/PCI, ignored on newer/PCIe)
+# 1 (02): ignore data valid (on for most cameras though not all)
+# 2 (04): generate an FVAL on every LVAL or vactv lines if bit 4 is set, for line scan cameras
+# 3 (08): disable ROI (rarely set)
+# 4 (10): generate an FVAL after every vactv lines if bit 2 is also set, for line scan cameras
+# 5 (20): data valid invert (rare)
+# 6 (40): RGB swap -- swap red/blue
+# 7 (80): enable roi pad: if ROI > img output, will pad missing bytes
+#
+CL_CFG_NORM:                   80
+
+# Re-arm the acquisition block as soon as FVAL goes low (needed
+# for small frame sizes at high frame rates--NOT NORMALLY NEEDED!):
+#CL_CFG2_NORM: 40
+
+# region of interest start and area
+# vskip/hskip is how many pixels to skip before ROI, vert and horiz
+# vactv/hactv is how many pixels to DMA to memory after skip
+#
+hskip: 0
+hactv: 1280
+vskip: 0
+vactv: 1024
+
+# htaps/vtaps: if dual channel flag is ON (see CL_CFG_NORM) we need to set
+# either htaps or vtaps to 2. Which one depends on whether the two pixels
+# that come out with each clock are both on the same line (uncomment
+# htaps: 2) or on adjacent lines (uncomment vtaps: 2) 
+#
+#htaps:	2
+#vtaps: 2
+
+# interlace method
+# only for interleaved and some dual channel cameras
+# determines how image is deinterleaved for display -- see *_INTLV
+# in pdv_dependent.h and camera configuration guide
+#
+#method_interlace:	WORD_INTLV
+"==> (Pixel clock OK)" 
+------------------------------------------------------ 
+.\take -v -u 0 -c 0 
+------------------------------------------------------ 
+reading image from Generic Camera Link 14-bit 1280x1024 (single ch., freerun)
+width 1280 height 1024 depth 14  total bytes 2621440
+99 05 47 05 6e 05 e4 05 03 06 2c 05 9d 05 1c 05 
+18 05 f5 04 a6 04 99 04 00 05 2d 05 fa 04 43 05 
+1 images 0 timeouts 0 overruns
+
+------------------------------------------------------ 
+.\setdebug -u 0 -g 
+------------------------------------------------------ 
+sizeof trbuf = 4096
+TraceBuf 2300f61 entrys idx 322
+ 0: 0601ac4 0995d52d
+ 0: 0601ac6 000000c1
+ 0: 0601ac8 START_BUF            : 2168 
+ 0: 0601acc SETUP_DMA
+ 0: 0601ace SETUP_RDY
+ 0: 0601ad0 00000000
+ 0: 0601ad2 TMSTAMP            :                    940.161535 (12940.161535)
+ 0: 0601ad8 SETUP_RDY_DONE
+ 0: 0601ada aaaa0000
+ 0: 0601adc aaaa0001
+ 0: 0601ade aaaa0002
+ 0: 0601ae0 aaaa0003
+ 0: 0601ae2 aaaa0004
+ 0: 0601ae4 SETUP_DMA_DONE
+ 0: 0601ae6 aaaa0005
+ 0: 0601ae8 ISR_START
+ 0: 0601aea     TMSTAMP        :                    940.194132 (0.032597)
+ 0: 0601af0     00009000
+ 0: 0601af2     ISR_END          : 0010c100 
+ 0: 0601af6 TMSTAMP            :                    940.194135 (0.000003)
+ 0: 0601afc DPC_START
+ 0: 0601afe TMSTAMP            :                    940.194137 (0.000002)
+ 0: 0601b04 DONE                 : 2155               940.194145 (0.000008)
+ 0: 0601b0e beadbead
+ 0: 0601b10 TMSTAMP            :                    940.194149 (0.000004)
+ 0: 0601b16 eeeaaa00
+ 0: 0601b18 00000001
+ 0: 0601b1a SETUP_DMA
+ 0: 0601b1c SETUP_RDY
+ 0: 0601b1e 00000000
+ 0: 0601b20 abcd0000
+ 0: 0601b22 LOAD_SG              : c5f88000 000002e0 0000100c
+ 0: 0601b2a 0000086d
+ 0: 0601b2c TMSTAMP            :                    940.194153 (0.000004)
+ 0: 0601b32 TMSTAMP            :                    940.194155 (0.000002)
+ 0: 0601b38 SETUP_RDY_DONE
+ 0: 0601b3a aaaa0000
+ 0: 0601b3c aaaa0001
+ 0: 0601b3e DOGRAB               : 2156 
+ 0: 0601b42 aaaa0002
+ 0: 0601b44 aaaa0003
+ 0: 0601b46 aaaa0004
+ 0: 0601b48 SETUP_DMA_DONE
+ 0: 0601b4a aaaa0005
+ 0: 0601b4c SETUP_RDY
+ 0: 0601b4e 00000000
+ 0: 0601b50 TMSTAMP            :                    940.194161 (0.000005)
+ 0: 0601b56 SETUP_RDY_DONE
+ 0: 0601b58 WAKEUP
+ 0: 0601b5a SETEVENT
+ 0: 0601b5c 00000002
+ 0: 0601b5e DPC_END
+ 0: 0601b60 TMSTAMP            :                    940.194165 (0.000005)
+ 0: 0601b66 000000c1
+ 0: 0601b68 START_BUF            : 2169 
+ 0: 0601b6c SETUP_DMA
+ 0: 0601b6e SETUP_RDY
+ 0: 0601b70 00000000
+ 0: 0601b72 TMSTAMP            :                    940.194204 (0.000038)
+ 0: 0601b78 SETUP_RDY_DONE
+ 0: 0601b7a aaaa0000
+ 0: 0601b7c aaaa0001
+ 0: 0601b7e aaaa0002
+ 0: 0601b80 aaaa0003
+ 0: 0601b82 aaaa0004
+ 0: 0601b84 SETUP_DMA_DONE
+ 0: 0601b86 aaaa0005
+ 0: 0601b88 ISR_START
+ 0: 0601b8a     TMSTAMP        :                    940.227467 (0.033263)
+ 0: 0601b90     00009000
+ 0: 0601b92     ISR_END          : 0010c100 
+ 0: 0601b96 TMSTAMP            :                    940.227470 (0.000003)
+ 0: 0601b9c DPC_START
+ 0: 0601b9e TMSTAMP            :                    940.227472 (0.000002)
+ 0: 0601ba4 DONE                 : 2156               940.227480 (0.000008)
+ 0: 0601bae beadbead
+ 0: 0601bb0 TMSTAMP            :                    940.227484 (0.000004)
+ 0: 0601bb6 eeeaaa00
+ 0: 0601bb8 00000001
+ 0: 0601bba SETUP_DMA
+ 0: 0601bbc SETUP_RDY
+ 0: 0601bbe 00000000
+ 0: 0601bc0 abcd0000
+ 0: 0601bc2 LOAD_SG              : c5f86000 00000298 0000100c
+ 0: 0601bca 0000086e
+ 0: 0601bcc TMSTAMP            :                    940.227489 (0.000005)
+ 0: 0601bd2 TMSTAMP            :                    940.227491 (0.000002)
+ 0: 0601bd8 SETUP_RDY_DONE
+ 0: 0601bda aaaa0000
+ 0: 0601bdc aaaa0001
+ 0: 0601bde DOGRAB               : 2157 
+ 0: 0601be2 aaaa0002
+ 0: 0601be4 aaaa0003
+ 0: 0601be6 aaaa0004
+ 0: 0601be8 SETUP_DMA_DONE
+ 0: 0601bea aaaa0005
+ 0: 0601bec SETUP_RDY
+ 0: 0601bee 00000000
+ 0: 0601bf0 TMSTAMP            :                    940.227496 (0.000005)
+ 0: 0601bf6 SETUP_RDY_DONE
+ 0: 0601bf8 WAKEUP
+ 0: 0601bfa SETEVENT
+ 0: 0601bfc 00000002
+ 0: 0601bfe DPC_END
+ 0: 0601c00 TMSTAMP            :                    940.227501 (0.000005)
+ 0: 0601c06 000000c1
+ 0: 0601c08 START_BUF            : 2170 
+ 0: 0601c0c SETUP_DMA
+ 0: 0601c0e SETUP_RDY
+ 0: 0601c10 00000000
+ 0: 0601c12 TMSTAMP            :                    940.227559 (0.000058)
+ 0: 0601c18 SETUP_RDY_DONE
+ 0: 0601c1a aaaa0000
+ 0: 0601c1c aaaa0001
+ 0: 0601c1e aaaa0002
+ 0: 0601c20 aaaa0003
+ 0: 0601c22 aaaa0004
+ 0: 0601c24 SETUP_DMA_DONE
+ 0: 0601c26 aaaa0005
+ 0: 0601c28 ISR_START
+ 0: 0601c2a     TMSTAMP        :                    940.260778 (0.033219)
+ 0: 0601c30     00009000
+ 0: 0601c32     ISR_END          : 0010c100 
+ 0: 0601c36 TMSTAMP            :                    940.260782 (0.000004)
+15: 0bb3078 d58a36f8
+ 0: 0601c3e TMSTAMP            :                    940.260785 (0.000003)
+ 0: 0601c44 DONE                 : 2157               940.260793 (0.000008)
+ 0: 0601c4e beadbead
+ 0: 0601c50 TMSTAMP            :                    940.260796 (0.000004)
+ 0: 0601c56 eeeaaa00
+ 0: 0601c58 00000001
+ 0: 0601c5a SETUP_DMA
+ 0: 0601c5c SETUP_RDY
+ 0: 0601c5e 00000000
+ 0: 0601c60 abcd0000
+ 0: 0601c62 LOAD_SG              : c5f84000 000002c0 0000100c
+ 0: 0601c6a 0000086f
+ 0: 0601c6c TMSTAMP            :                    940.260802 (0.000005)
+ 0: 0601c72 TMSTAMP            :                    940.260804 (0.000002)
+ 0: 0601c78 SETUP_RDY_DONE
+ 0: 0601c7a aaaa0000
+ 0: 0601c7c aaaa0001
+ 0: 0601c7e DOGRAB               : 2158 
+ 0: 0601c82 aaaa0002
+ 0: 0601c84 aaaa0003
+ 0: 0601c86 aaaa0004
+ 0: 0601c88 SETUP_DMA_DONE
+ 0: 0601c8a aaaa0005
+ 0: 0601c8c SETUP_RDY
+ 0: 0601c8e 00000000
+ 0: 0601c90 TMSTAMP            :                    940.260809 (0.000006)
+ 0: 0601c96 SETUP_RDY_DONE
+ 0: 0601c98 WAKEUP
+ 0: 0601c9a SETEVENT
+ 0: 0601c9c 00000002
+ 0: 0601c9e DPC_END
+ 0: 0601ca0 TMSTAMP            :                    940.260814 (0.000005)
+ 0: 0601ca6 000000c1
+ 0: 0601ca8 START_BUF            : 2171 
+ 0: 0601cac SETUP_DMA
+ 0: 0601cae SETUP_RDY
+ 0: 0601cb0 00000000
+ 0: 0601cb2 TMSTAMP            :                    940.261511 (0.000697)
+ 0: 0601cb8 SETUP_RDY_DONE
+ 0: 0601cba aaaa0000
+ 0: 0601cbc aaaa0001
+ 0: 0601cbe aaaa0002
+ 0: 0601cc0 aaaa0003
+ 0: 0601cc2 aaaa0004
+ 0: 0601cc4 SETUP_DMA_DONE
+ 0: 0601cc6 aaaa0005
+ 0: 0601cc8 ISR_START
+ 0: 0601cca     TMSTAMP        :                    940.294126 (0.032615)
+ 0: 0601cd0     00009000
+ 0: 0601cd2     ISR_END          : 0010c100 
+ 0: 0601cd6 TMSTAMP            :                    940.294130 (0.000004)
+ 0: 0601cdc DPC_START
+ 0: 0601cde TMSTAMP            :                    940.294132 (0.000002)
+ 0: 0601ce4 DONE                 : 2158               940.294140 (0.000008)
+ 0: 0601cee beadbead
+ 0: 0601cf0 TMSTAMP            :                    940.294144 (0.000004)
+ 0: 0601cf6 eeeaaa00
+ 0: 0601cf8 00000001
+ 0: 0601cfa SETUP_DMA
+ 0: 0601cfc SETUP_RDY
+ 0: 0601cfe 00000000
+ 0: 0601d00 abcd0000
+ 0: 0601d02 LOAD_SG              : c5f82000 000002b0 0000100c
+ 0: 0601d0a 00000870
+ 0: 0601d0c TMSTAMP            :                    940.294148 (0.000004)
+ 0: 0601d12 TMSTAMP            :                    940.294151 (0.000002)
+ 0: 0601d18 SETUP_RDY_DONE
+ 0: 0601d1a aaaa0000
+ 0: 0601d1c aaaa0001
+ 0: 0601d1e DOGRAB               : 2159 
+ 0: 0601d22 aaaa0002
+ 0: 0601d24 aaaa0003
+ 0: 0601d26 aaaa0004
+ 0: 0601d28 SETUP_DMA_DONE
+ 0: 0601d2a aaaa0005
+ 0: 0601d2c SETUP_RDY
+ 0: 0601d2e 00000000
+ 0: 0601d30 TMSTAMP            :                    940.294156 (0.000005)
+ 0: 0601d36 SETUP_RDY_DONE
+ 0: 0601d38 WAKEUP
+ 0: 0601d3a SETEVENT
+ 0: 0601d3c 00000002
+ 0: 0601d3e DPC_END
+ 0: 0601d40 TMSTAMP            :                    940.294160 (0.000004)
+ 0: 0601d46 000000c1
+ 0: 0601d48 START_BUF            : 2172 
+ 0: 0601d4c SETUP_DMA
+ 0: 0601d4e SETUP_RDY
+ 0: 0601d50 00000000
+ 0: 0601d52 TMSTAMP            :                    940.294860 (0.000700)
+ 0: 0601d58 SETUP_RDY_DONE
+ 0: 0601d5a aaaa0000
+ 0: 0601d5c aaaa0001
+ 0: 0601d5e aaaa0002
+ 0: 0601d60 aaaa0003
+ 0: 0601d62 aaaa0004
+ 0: 0601d64 SETUP_DMA_DONE
+ 0: 0601d66 aaaa0005
+ 0: 0601d68 cccccccc
+ 0: 0601d6a 00000000
+ 0: 0601d6c 00005aa5
+ 0: 0601d6e abababab
+ 0: 0601d70 c824a000
+ 0: 0601d72 00001400
+ 0: 0601d74 acacacac
+ 0: 0601d76 00000001
+ 0: 0601d78 c824a000
+ 0: 0601d7a 00001400
+ 0: 0601d7c abababab
+ 0: 0601d7e c75be000
+ 0: 0601d80 00001400
+ 0: 0601d82 acacacac
+ 0: 0601d84 00000001
+ 0: 0601d86 c75be000
+ 0: 0601d88 00001400
+ 0: 0601d8a abababab
+ 0: 0601d8c c75bc000
+ 0: 0601d8e 00001400
+ 0: 0601d90 acacacac
+ 0: 0601d92 00000001
+ 0: 0601d94 c75bc000
+ 0: 0601d96 00001400
+ 0: 0601d98 abababab
+ 0: 0601d9a c75ba000
+ 0: 0601d9c 00001400
+ 0: 0601d9e acacacac
+ 0: 0601da0 00000001
+ 0: 0601da2 c75ba000
+ 0: 0601da4 00001400
+ 0: 0601da6 00005aa5
+ 0: 0601da8 START_BUF            : 4    
+ 0: 0601dac SETUP_DMA
+ 0: 0601dae SETUP_RDY
+ 0: 0601db0 00000000
+ 0: 0601db2 abcd0000
+ 0: 0601db4 LOAD_SG              : c824a000 000002f8 0000100c
+ 0: 0601dbc 00000001
+ 0: 0601dbe TMSTAMP            :                    970.223837 (29.928977)
+ 0: 0601dc4 TMSTAMP            :                    970.223839 (0.000003)
+ 0: 0601dca SETUP_RDY_DONE
+ 0: 0601dcc aaaa0000
+ 0: 0601dce aaaa0001
+ 0: 0601dd0 DOGRAB               : 1    
+ 0: 0601dd4 aaaa0002
+ 0: 0601dd6 aaaa0003
+ 0: 0601dd8 aaaa0004
+ 0: 0601dda SETUP_DMA_DONE
+ 0: 0601ddc aaaa0005
+ 0: 0601dde ISR_START
+ 0: 0601de0     TMSTAMP        :                    970.224522 (0.000683)
+ 0: 0601de6     00009000
+ 0: 0601de8     ISR_END          : 0010c100 
+ 0: 0601dec TMSTAMP            :                    970.224525 (0.000003)
+ 0: 0601df2 DPC_START
+ 0: 0601df4 TMSTAMP            :                    970.224527 (0.000002)
+ 0: 0601dfa eeeaaa00
+ 0: 0601dfc 00000000
+ 0: 0601dfe SETUP_DMA
+ 0: 0601e00 SETUP_RDY
+ 0: 0601e02 00000000
+ 0: 0601e04 abcd0000
+ 0: 0601e06 LOAD_SG              : c75be000 000002b8 0000100c
+ 0: 0601e0e 00000002
+ 0: 0601e10 TMSTAMP            :                    970.224534 (0.000007)
+ 0: 0601e16 TMSTAMP            :                    970.224536 (0.000002)
+ 0: 0601e1c SETUP_RDY_DONE
+ 0: 0601e1e aaaa0000
+ 0: 0601e20 aaaa0001
+ 0: 0601e22 aaaa0002
+ 0: 0601e24 aaaa0003
+ 0: 0601e26 aaaa0004
+ 0: 0601e28 SETUP_DMA_DONE
+ 0: 0601e2a aaaa0005
+ 0: 0601e2c SETUP_RDY
+ 0: 0601e2e 00000000
+ 0: 0601e30 TMSTAMP            :                    970.224539 (0.000003)
+ 0: 0601e36 SETUP_RDY_DONE
+ 0: 0601e38 DPC_END
+ 0: 0601e3a TMSTAMP            :                    970.224542 (0.000002)
+ 0: 0601e40 000000c1
+ 0: 0601e42 ISR_START
+ 0: 0601e44     TMSTAMP        :                    970.260412 (0.035871)
+ 0: 0601e4a     00009000
+ 0: 0601e4c     ISR_END          : 0010c100 
+ 0: 0601e50 TMSTAMP            :                    970.260416 (0.000004)
+ 0: 0601e56 DPC_START
+ 0: 0601e58 TMSTAMP            :                    970.260418 (0.000002)
+ 0: 0601e5e DONE                 : 1                  970.260426 (0.000008)
+ 0: 0601e68 beadbead
+ 0: 0601e6a TMSTAMP            :                    970.260430 (0.000004)
+ 0: 0601e70 eeeaaa00
+ 0: 0601e72 00000001
+ 0: 0601e74 SETUP_DMA
+ 0: 0601e76 SETUP_RDY
+ 0: 0601e78 00000000
+ 0: 0601e7a abcd0000
+ 0: 0601e7c LOAD_SG              : c75bc000 000002a0 0000100c
+ 0: 0601e84 00000003
+ 0: 0601e86 TMSTAMP            :                    970.260435 (0.000005)
+ 0: 0601e8c TMSTAMP            :                    970.260437 (0.000002)
+ 0: 0601e92 SETUP_RDY_DONE
+ 0: 0601e94 aaaa0000
+ 0: 0601e96 aaaa0001
+ 0: 0601e98 DOGRAB               : 2    
+ 0: 0601e9c aaaa0002
+ 0: 0601e9e aaaa0003
+ 0: 0601ea0 aaaa0004
+ 0: 0601ea2 SETUP_DMA_DONE
+ 0: 0601ea4 aaaa0005
+ 0: 0601ea6 SETUP_RDY
+ 0: 0601ea8 00000000
+ 0: 0601eaa TMSTAMP            :                    970.260443 (0.000006)
+ 0: 0601eb0 SETUP_RDY_DONE
+ 0: 0601eb2 WAKEUP
+ 0: 0601eb4 SETEVENT
+ 0: 0601eb6 00000002
+ 0: 0601eb8 DPC_END
+ 0: 0601eba TMSTAMP            :                    970.260447 (0.000004)
+ 0: 0601ec0 000000c1
+------------------------------------------------------ 
+.\take -v -u 0 -c 0 -N 2 -l 2 
+------------------------------------------------------ 
+reading image from Generic Camera Link 14-bit 1280x1024 (single ch., freerun)
+width 1280 height 1024 depth 14  total bytes 2621440
+9a 05 6b 05 79 05 b5 05 f9 05 54 05 91 05 3f 05 
+40 05 10 05 b1 04 e0 04 35 05 4e 05 38 05 78 05 
+1 images 0 timeouts 0 overruns
+95 05 67 05 62 05 c9 05 0f 06 33 05 a7 05 2f 05 
+2c 05 0b 05 c4 04 ab 04 36 05 63 05 42 05 5b 05 
+2 images 0 timeouts 0 overruns
+
+------------------------------------------------------ 
+.\take -v -u 0 -c 0 -N 4 -l 5 
+------------------------------------------------------ 
+reading image from Generic Camera Link 14-bit 1280x1024 (single ch., freerun)
+width 1280 height 1024 depth 14  total bytes 2621440
+9b 05 60 05 96 05 ae 05 07 06 4f 05 a3 05 60 05 
+3f 05 fb 04 be 04 a7 04 39 05 3d 05 3e 05 79 05 
+1 images 0 timeouts 0 overruns
+98 05 5e 05 6e 05 b8 05 0a 06 3e 05 84 05 37 05 
+35 05 dc 04 83 04 96 04 05 05 01 05 f9 04 10 05 
+2 images 0 timeouts 0 overruns
+9b 05 93 05 84 05 cb 05 f3 05 57 05 c4 05 52 05 
+27 05 fd 04 b3 04 d6 04 2b 05 48 05 46 05 74 05 
+3 images 0 timeouts 0 overruns
+8c 05 6b 05 72 05 be 05 f0 05 36 05 77 05 5e 05 
+20 05 0e 05 8c 04 c0 04 42 05 21 05 03 05 59 05 
+4 images 0 timeouts 0 overruns
+94 05 53 05 89 05 af 05 0b 06 45 05 bf 05 4a 05 
+2d 05 d5 04 87 04 9c 04 fe 04 2d 05 f5 04 64 05 
+5 images 0 timeouts 0 overruns
+
+72888587.027811 bytes/sec
+27.804789 frames/sec
+------------------------------------------------------ 
+.\take -N 1 -u 0 -c 0 -f taketest.raw 
+------------------------------------------------------ 
+reading image from Generic Camera Link 14-bit 1280x1024 (single ch., freerun)
+width 1280 height 1024 depth 14  total bytes 2621440
+writing 1280x1024x14 raw file to taketest.raw (actual size 2621440)
+1 images 0 timeouts 0 overruns                                
+------------------------------------------------------ 
+.\countbits -w -o taketest.raw 
+------------------------------------------------------ 
+
+bit 00: 652110
+bit 01: 655647
+bit 02: 655183
+bit 03: 655923
+bit 04: 654690
+bit 05: 655307
+bit 06: 656312
+bit 07: 632742
+bit 08: 454809
+bit 09: 141266
+bit 10: 22053
+bit 11: 19294
+bit 12: 3944
+bit 13: 52
+bit 14: 0
+bit 15: 0
+------------------------------------------------------ 
+.\take -N 1 -e 10 -u 0 -c 0 -f taketest.raw 
+------------------------------------------------------ 
+reading image from Generic Camera Link 14-bit 1280x1024 (single ch., freerun)
+width 1280 height 1024 depth 14  total bytes 2621440
+writing 1280x1024x14 raw file to taketest.raw (actual size 2621440)
+1 images 0 timeouts 0 overruns                                
+------------------------------------------------------ 
+.\countbits -w -o taketest.raw 
+------------------------------------------------------ 
+
+bit 00: 653627
+bit 01: 654935
+bit 02: 654991
+bit 03: 654875
+bit 04: 655924
+bit 05: 656126
+bit 06: 655635
+bit 07: 632048
+bit 08: 449043
+bit 09: 131332
+bit 10: 28257
+bit 11: 24130
+bit 12: 2854
+bit 13: 58
+bit 14: 0
+bit 15: 0
+------------------------------------------------------ 
+.\take -N 1 -e 500 -u 0 -c 0 -f taketest.raw 
+------------------------------------------------------ 
+reading image from Generic Camera Link 14-bit 1280x1024 (single ch., freerun)
+width 1280 height 1024 depth 14  total bytes 2621440
+writing 1280x1024x14 raw file to taketest.raw (actual size 2621440)
+1 images 0 timeouts 0 overruns                                
+------------------------------------------------------ 
+.\countbits -w -o taketest.raw 
+------------------------------------------------------ 
+
+bit 00: 653305
+bit 01: 654435
+bit 02: 654733
+bit 03: 654560
+bit 04: 654082
+bit 05: 655295
+bit 06: 655485
+bit 07: 631978
+bit 08: 455813
+bit 09: 140862
+bit 10: 30025
+bit 11: 22634
+bit 12: 1872
+bit 13: 58
+bit 14: 0
+bit 15: 0
+------------------------------------------------------ 
+.\setdebug -d 0 -u 0 -c 0 
+------------------------------------------------------ 
+pdv 0 0 registers:
+00-03  DMA_CUR_ADDR        : c89a8000
+04-07  DMA_NXT_ADDR        : c89a7000
+08-0b  DMA_CUR_CNT         : 61c10000
+0c-0f  DMA_NXT_CNT         : 61c11000
+1c-1f  SG_NXT_CNT          : 61c102d8 NXTPG_INT MN_NXT_EMP MN_DMA_DONE MN_BURST_EN DMA_RDY DMA_DONE
+14-17  SG_NXT_ADDR         : cab31000
+18-1b  SG_CUR_CNT          : 61c10000
+10-13  SG_CUR_ADDR         : cab31200
+c4-c7  DMA_CFG             : 0010c101 RMT_EN_INTR PCI_EN_INTR
+c8-cb  DMA_STATUS          : 00000000
+c4-c7  DMA_CFG             : 0010c101
+       fifocnt             : 0
+c8-cb  DMA_STATUS          : 00000000
+01     PDV_STAT            : 00 
+02     PDV_CFG             : 00 
+04     PDV_SHUTTER_LEFT    : 00
+05     PDV_UTIL3           : 00 
+14-16  PDV_FRAME_PERIOD    : 676981
+06     PDV_DATA_PATH       : 01 EXT_DEPTH
+07     PDV_MODE_CNTL       : 00 
+08     PDV_DATA_MSB        : 00
+09     PDV_DATA_LSB        : 00
+0a     PDV_SERIAL_DATA     : 15
+0b     PDV_SERIAL_DATA_STAT: 42 TRANSMIT_RDY FVAL_INTA
+0c     PDV_SERIAL_DATA_CNTL: 17 EN_RX EN_TX EN_RX_INT EN_DEV_INT
+0d     PDV_SERIAL_CNTL2    : 00
+24     PDV_BRATE           : 80
+0f     PDV_BYTESWAP        : 00 
+00     PDV_REV             : 02
+10     PDV_UTIL2           : 00 
+11     PDV_SHIFT           : 00 
+12-13  PDV_MASK            : 0000
+17     PDV_ROICTL          : 00 
+00     PDV_REV             : 02
+18     PDV_XOPT            : 00
+34     PDV_LHS_CONTROL     : 00 
+30     PDV_LHS_DELAY       : 00
+31     PDV_LHS_PERIOD      : 00
+32     PDV_LHS_COUNT_LOW   : 00
+33     PDV_LHS_COUNT_HI    : 00
+28     PDV_CL_DATA_PATH    : 0f
+29     PDV_CL_CFG          : 80 
+35     PDV_CL_CFG2         : 08 PCLVFREE
+18-19  PDV_HSKIP           : 0000
+1a-1b  PDV_HACTV           : 04ff
+1c-1d  PDV_VSKIP           : 0000
+1e-1f  PDV_VACTV           : 03ff
+2a-2b  LINESPERFRAME       : 0400
+2c-2d  CLOCKSPERLINE       : a89f
+Interface bitfile   : 
+Interrupt mask:  RMT_EN_INTR PCI_EN_INTR
+
+xfer 0 bytes
+Second memory space size = 0x1000000 bytes
+------------------------------------------------------ 
+.\cl_speed -s -u 0 
+------------------------------------------------------ 
+reading image from Generic Camera Link 16-bit 1024x1024 (1-tap, freerun)
+width 1024 height 1024 depth 16  total bytes 2097152
+500 images 0 timeouts 0 overruns
+
+831667627.706141 bytes/sec
+396.570028 frames/sec
+
+
+Throughput was measured at 793.14 Megabytes per second.
+
+Indicates the board has adequate PCI Express bandwidth and is operating at
+the nominal speed for a board of this type
+
+------------------------------------------------------ 
+.\initcam -V -O dvinfo.tmp -f camera_config\generic16cl-DV.cfg -u 0 -c 0 
+------------------------------------------------------ 
+edt_flash_prom_detect
+		edt_flash_prom_detect (MIC): stat 0134 id bits 01 0d, pal_ver 21, finding prom...
+
+edt_read_prom_data s0 addrs: maclist 7f010c optsn 7f00e0, xtrasize 7f0104, xtratag 7f0100,esn 7f00a0, osn 7f0080, id 7f0000
+------------------------------------------------------ 
+.\win_sysinfo 
+------------------------------------------------------ 
+Screen: 1280 x 1024 Pixels, 32 Bits/Pixel
+Current user: mbirch
+Generic Platform: WinNT
+Specific Windows version: 6.2 (Build 9200) Platform: 1633212304. (Windows )
+Debugging kernel: no
+Secure system: no
+System:
+4 processors level 6 revision 2a07 - unknown Processor
+   (Intel64 Family 6 Model 42 Stepping 7, GenuineIntel)
+Slow machine: no
+addresses 0x10000 - 0xfffeffff, pages 4 KB, alloc chunks 64 KB
+35 percent of memory is in use.
+There are 8266680 total Kbytes of physical memory.
+There are 5325664 free Kbytes of physical memory.
+------------------------------------------------------ 
+type .\install_pdv.log 
+------------------------------------------------------ 
+Output folder: C:\EDT\pdv
+Extract: CHANGELOG_PDV.txt... 100%
+Extract: ConfigDataSet.c... 100%
+Extract: ConfigDataSet.h... 100%
+Extract: EDTtermsOfUse.txt... 100%
+Extract: README.Clink.Dual... 100%
+Extract: README.Clink.Dual.html... 100%
+Extract: README.clsiminit... 100%
+Extract: README.erase_flash... 100%
+Extract: README.free_compiler... 100%
+Extract: README.lnx_pkg_reqs... 100%
+Extract: README.pdv... 100%
+Extract: README.pdv.utils... 100%
+Extract: README.pdvcom.txt... 100%
+Extract: README.send_tiffs... 100%
+Extract: README.time... 100%
+Extract: README64.utils... 100%
+Extract: bayer_filter_asm.h... 100%
+Extract: bigread.c... 100%
+Extract: bin32.bat... 100%
+Extract: bin64.bat... 100%
+Extract: bitload.c... 100%
+Extract: blinkdva.c... 100%
+Extract: camconfighelp.h... 100%
+Extract: check_gap_cl.c... 100%
+Extract: check_gap_common.c... 100%
+Extract: check_gap_lib.c... 100%
+Extract: check_gap_lib.h... 100%
+Extract: checkcam.c... 100%
+Extract: chkbuf.c... 100%
+Extract: chkbuf.h... 100%
+Extract: cl_logic.c... 100%
+Extract: cl_logic_lib.c... 100%
+Extract: cl_logic_lib.h... 100%
+Extract: cl_speed.c... 100%
+Extract: clink_counters.c... 100%
+Extract: clink_tester.c... 100%
+Extract: clsim_lib.c... 100%
+Extract: clsim_lib.h... 100%
+Extract: clsiminit.c... 100%
+Extract: clsimvar.c... 100%
+Extract: countbits.c... 100%
+Extract: cpuid.h... 100%
+Extract: dumpit.c... 100%
+Extract: dvinfo.c... 100%
+Extract: edt_bitload.c... 100%
+Extract: edt_bitload.h... 100%
+Extract: edt_devid.h... 100%
+Extract: edt_error.c... 100%
+Extract: edt_error.h... 100%
+Extract: edt_flash.c... 100%
+Extract: edt_jpeg.c... 100%
+Extract: edt_jpeg.h... 100%
+Extract: edt_net_msg.c... 100%
+Extract: edt_net_msg.h... 100%
+Extract: edt_oc192.h... 100%
+Extract: edt_ocm.h... 100%
+Extract: edt_optstring.c... 100%
+Extract: edt_optstring.h... 100%
+Extract: edt_os_nt.c... 100%
+Extract: edt_os_nt.h... 100%
+Extract: edt_parts.xpn... 100%
+Extract: edt_si5338.c... 100%
+Extract: edt_si5338.h... 100%
+Extract: edt_si570.c... 100%
+Extract: edt_si570.h... 100%
+Extract: edt_ss_vco.h... 100%
+Extract: edt_sysinfo.c... 100%
+Extract: edt_threads.h... 100%
+Extract: edt_trace.c... 100%
+Extract: edt_trace.h... 100%
+Extract: edt_types.h... 100%
+Extract: edt_utils.h... 100%
+Extract: edt_vco.c... 100%
+Extract: edt_vco.h... 100%
+Extract: edtdef.h... 100%
+Extract: edtinc.h... 100%
+Extract: edtmactable.txt... 100%
+Extract: edtreg.h... 100%
+Extract: edtregbits.h... 100%
+Extract: gen_tiffs.c... 100%
+Extract: imagelist.txt... 100%
+Extract: includes.mk... 100%
+Extract: initcam.c... 100%
+Extract: initcam.h... 100%
+Extract: irigdump.c... 100%
+Extract: lib_two_wire.c... 100%
+Extract: lib_two_wire.h... 100%
+Extract: lib_xfp_sfp.h... 100%
+Extract: libdvu.c... 100%
+Extract: libdvu.h... 100%
+Extract: libedt.c... 100%
+Extract: libedt.h... 100%
+Extract: libedt_timing.c... 100%
+Extract: libedt_timing.h... 100%
+Extract: libedtdma.c... 100%
+Extract: libedtdma.h... 100%
+Extract: libpdv.c... 100%
+Extract: libpdv.h... 100%
+Extract: libsg.h... 100%
+Extract: load_arch.bat... 100%
+Extract: make.bat
+Extract: makeboth.bat... 100%
+Extract: makefile... 100%
+Extract: makefile.def... 100%
+Extract: msp430_load.c... 100%
+Extract: msp430_r15patch.txt... 100%
+Extract: msp430_r17patch.txt... 100%
+Extract: msp430_r23.txt... 100%
+Extract: msvc_stdint.h... 100%
+Extract: new_strobe.c... 100%
+Extract: optstr.c... 100%
+Extract: pciload.h... 100%
+Extract: pciload_4013e.c... 100%
+Extract: pciload_4013xla.c... 100%
+Extract: pciload_4028xla.c... 100%
+Extract: pciload_fn.c... 100%
+Extract: pciload_main.c... 100%
+Extract: pciload_sn.c... 100%
+Extract: pciload_spi.c... 100%
+Extract: pdb.c... 100%
+Extract: pdbcls10b.c... 100%
+Extract: pdv_bayer_filter.c... 100%
+Extract: pdv_dependent.h... 100%
+Extract: pdv_dmy_image.c... 100%
+Extract: pdv_initcam.c... 100%
+Extract: pdv_interlace.c... 100%
+Extract: pdv_interlace.h... 100%
+Extract: pdv_interlace_methods.h... 100%
+Extract: pdv_irig.c... 100%
+Extract: pdv_irig.h... 100%
+Extract: pdv_recplay.c... 100%
+Extract: pdv_recplay.h... 100%
+Extract: pdvcom.cpp... 100%
+Extract: pdvplayback.c... 100%
+Extract: pdvrecord.c... 100%
+Extract: pdvterm.c... 100%
+Extract: process_raw.c... 100%
+Extract: rcxload.c... 100%
+Extract: rcxmake.c... 100%
+Extract: readcfg.c... 100%
+Extract: sample.c... 100%
+Extract: sdvlib.h... 100%
+Extract: send_tiffs.c... 100%
+Extract: serial_cmd.c... 100%
+Extract: set_si5338.c... 100%
+Extract: setdebug.c... 100%
+Extract: setperiod.c... 100%
+Extract: si5338_register_map.h... 100%
+Extract: simple_bc.c... 100%
+Extract: simple_clsend.c... 100%
+Extract: simple_etrig.c... 100%
+Extract: simple_event.c... 100%
+Extract: simple_irig2.c... 100%
+Extract: simple_sequence.c... 100%
+Extract: simple_take.c... 100%
+Extract: simplemem.c... 100%
+Extract: simplest_take.c... 100%
+Extract: speedtest.c... 100%
+Extract: strobe.c... 100%
+Extract: take.c... 100%
+Extract: taketwo.c... 100%
+Extract: tiff30.c... 100%
+Extract: timing_test.c... 100%
+Extract: trace.c... 100%
+Extract: usps_test.c... 100%
+Extract: validate_install.sh... 100%
+Extract: validate_pdvdev.sh... 100%
+Extract: validate_pdvsim.sh... 100%
+Extract: version
+Extract: waitevent.c... 100%
+Extract: watchstat.c... 100%
+Extract: win_sysinfo.c... 100%
+Extract: wr_aero.c... 100%
+Extract: xtest.c... 100%
+Output folder: C:\EDT\pdv\bin
+Output folder: C:\EDT\pdv\bin\amd64
+Extract: bigread.exe... 100%
+Extract: bitload.exe... 100%
+Extract: check_gap_cl.exe... 100%
+Extract: checkcam.exe... 100%
+Extract: cl_logic.exe... 100%
+Extract: cl_speed.exe... 100%
+Extract: clink_counters.exe... 100%
+Extract: clink_tester.exe... 100%
+Extract: clseredt.dll... 100%
+Extract: clsiminit.exe... 100%
+Extract: clsimvar.exe... 100%
+Extract: countbits.exe... 100%
+Extract: dumpit.exe... 100%
+Extract: dvinfo.exe... 100%
+Extract: edt_sysinfo.exe... 100%
+Extract: gen_tiffs.exe... 100%
+Extract: initcam.exe... 100%
+Extract: irigdump.exe... 100%
+Extract: msp430_load.exe... 100%
+Extract: new_strobe.exe... 100%
+Extract: optstr.exe... 100%
+Extract: pciediag.exe... 100%
+Extract: pciload.exe... 100%
+Extract: pdb.exe... 100%
+Extract: pdbcls10b.exe... 100%
+Extract: pdvcom.exe... 100%
+Extract: pdvlib.dll... 100%
+Extract: pdvplayback.exe... 100%
+Extract: pdvrecord.exe... 100%
+Extract: pdvshow.exe... 100%
+Extract: pdvterm.exe... 100%
+Extract: rcxload.exe... 100%
+Extract: rcxmake.exe... 100%
+Extract: sample.exe... 100%
+Extract: send_tiffs.exe... 100%
+Extract: serial_cmd.exe... 100%
+Extract: set_si5338.exe... 100%
+Extract: setdebug.exe... 100%
+Extract: setperiod.exe... 100%
+Extract: simple_bc.exe... 100%
+Extract: simple_clsend.exe... 100%
+Extract: simple_etrig.exe... 100%
+Extract: simple_event.exe... 100%
+Extract: simple_irig2.exe... 100%
+Extract: simple_sequence.exe... 100%
+Extract: simple_take.exe... 100%
+Extract: simplemem.exe... 100%
+Extract: simplest_take.exe... 100%
+Extract: speedtest.exe... 100%
+Extract: strobe.exe... 100%
+Extract: take.exe... 100%
+Extract: taketwo.exe... 100%
+Extract: timing_test.exe... 100%
+Extract: trace.exe... 100%
+Extract: usps_test.exe... 100%
+Extract: vlviewer.exe... 100%
+Extract: waitevent.exe... 100%
+Extract: watchstat.exe... 100%
+Extract: win_sysinfo.exe... 100%
+Extract: xtest.exe... 100%
+Output folder: C:\EDT\pdv\bin\x86
+Extract: bigread.exe... 100%
+Extract: bitload.exe... 100%
+Extract: check_gap_cl.exe... 100%
+Extract: checkcam.exe... 100%
+Extract: cl_logic.exe... 100%
+Extract: cl_speed.exe... 100%
+Extract: clink_counters.exe... 100%
+Extract: clink_tester.exe... 100%
+Extract: clseredt.dll... 100%
+Extract: clsiminit.exe... 100%
+Extract: clsimvar.exe... 100%
+Extract: countbits.exe... 100%
+Extract: dumpit.exe... 100%
+Extract: dvinfo.exe... 100%
+Extract: edt_sysinfo.exe... 100%
+Extract: gen_tiffs.exe... 100%
+Extract: initcam.exe... 100%
+Extract: irigdump.exe... 100%
+Extract: msp430_load.exe... 100%
+Extract: new_strobe.exe... 100%
+Extract: optstr.exe... 100%
+Extract: pciediag.exe... 100%
+Extract: pciload.exe... 100%
+Extract: pdb.exe... 100%
+Extract: pdbcls10b.exe... 100%
+Extract: pdvcom.exe... 100%
+Extract: pdvlib.dll... 100%
+Extract: pdvplayback.exe... 100%
+Extract: pdvrecord.exe... 100%
+Extract: pdvshow.exe... 100%
+Extract: pdvterm.exe... 100%
+Extract: rcxload.exe... 100%
+Extract: rcxmake.exe... 100%
+Extract: sample.exe... 100%
+Extract: send_tiffs.exe... 100%
+Extract: serial_cmd.exe... 100%
+Extract: set_si5338.exe... 100%
+Extract: setdebug.exe... 100%
+Extract: setperiod.exe... 100%
+Extract: simple_bc.exe... 100%
+Extract: simple_clsend.exe... 100%
+Extract: simple_etrig.exe... 100%
+Extract: simple_event.exe... 100%
+Extract: simple_irig2.exe... 100%
+Extract: simple_sequence.exe... 100%
+Extract: simple_take.exe... 100%
+Extract: simplemem.exe... 100%
+Extract: simplest_take.exe... 100%
+Extract: speedtest.exe... 100%
+Extract: strobe.exe... 100%
+Extract: take.exe... 100%
+Extract: taketwo.exe... 100%
+Extract: timing_test.exe... 100%
+Extract: trace.exe... 100%
+Extract: usps_test.exe... 100%
+Extract: vlviewer.exe... 100%
+Extract: waitevent.exe... 100%
+Extract: watchstat.exe... 100%
+Extract: win_sysinfo.exe... 100%
+Extract: xtest.exe... 100%
+Output folder: C:\EDT\pdv\camera_config
+Extract: Lil-Joe-1024CL.cfg... 100%
+Extract: Lil-Joe-26x26.cfg... 100%
+Extract: Lil-Joe-64.cfg... 100%
+Extract: Lil-Joe-80x40.cfg... 100%
+Extract: Lil-Joe-80x80.cfg... 100%
+Extract: Lil-Joe-80x800.cfg... 100%
+Extract: Lil-Joe-80x80cl.cfg... 100%
+Extract: adimec1000m-10cl_dual.cfg... 100%
+Extract: adimec1000m-8cl.cfg... 100%
+Extract: adimec1600md_10cl_cd.cfg... 100%
+Extract: adimec1600md_10cl_cs.cfg... 100%
+Extract: adimec1600md_8cl_cd.cfg... 100%
+Extract: adimec1600md_8cl_cs.cfg... 100%
+Extract: adimec1600ms_10cl_cd.cfg... 100%
+Extract: adimec1600ms_10cl_cs.cfg... 100%
+Extract: adimec1600ms_8cl_cd.cfg... 100%
+Extract: adimec1600ms_8cl_cs.cfg... 100%
+Extract: adimec4020m_2048x1024x10.cfg... 100%
+Extract: ar112.cfg... 100%
+Extract: ar116.cfg... 100%
+Extract: ar18.cfg... 100%
+Extract: aviivam4_2k_8cs.cfg... 100%
+Extract: aviivasm2_2k_12cd.cfg... 100%
+Extract: aviivasm2_2k_12cs.cfg... 100%
+Extract: aviivasm2_2k_12cs_1l.cfg... 100%
+Extract: aviivasm2_2k_12cs_5k.cfg... 100%
+Extract: aviivasm2_2k_12pw.cfg... 100%
+Extract: aviivasm2_2k_12tr.cfg... 100%
+Extract: aviivasm2_2k_8cs_1l.cfg... 100%
+Extract: aviivasm2_2k_8pw_1l.cfg... 100%
+Extract: avt_bonito_1160x1726_386fps.cfg... 100%
+Extract: avt_bonito_2320x1666_199fps.cfg... 100%
+Extract: avt_bonito_2320x1726_193fps.cfg... 100%
+Extract: basler104k_8d.cfg... 100%
+Extract: basler104k_8s.cfg... 100%
+Extract: basler202k_10f.cfg... 100%
+Extract: basler202k_10l.cfg... 100%
+Extract: basler202k_10p.cfg... 100%
+Extract: basler202k_8f.cfg... 100%
+Extract: basler202k_8l.cfg... 100%
+Extract: basler202k_8p.cfg... 100%
+Extract: basler504k.cfg... 100%
+Extract: basler504k_11k.cfg... 100%
+Extract: basler504k_11k_et.cfg... 100%
+Extract: basler504k_et.cfg... 100%
+Extract: basler_102k_8f.cfg... 100%
+Extract: basler_ava1000-120kc_12f.cfg... 100%
+Extract: basler_ava1000-120kc_8f.cfg... 100%
+Extract: basler_ava1000-120km_12f.cfg... 100%
+Extract: basler_ava1000-120km_8f.cfg... 100%
+Extract: basler_raL4096-80km_10x8t.cfg... 100%
+Extract: basler_raL4096-80km_4x12t.cfg... 100%
+Extract: basler_raL4096-80km_8x8t.cfg... 100%
+Extract: basler_spL4096-39km_2x8f.cfg... 100%
+Extract: basler_spL4096-39km_2x8t.cfg... 100%
+Extract: baslera402kc_8f.cfg... 100%
+Extract: baslerace_2000-340kc_2x8f.cfg... 100%
+Extract: baslerace_2040-180km_10x8f.cfg... 100%
+Extract: baslerace_2040-180km_2x8f.cfg... 100%
+Extract: baslerace_2040-180km_4x8f.cfg... 100%
+Extract: baslerace_2040-180km_8x10f.cfg... 100%
+Extract: baslerace_2040-180km_8x8f.cfg... 100%
+Extract: basleravi_1900-60km_2x10f.cfg... 100%
+Extract: basleravi_1900-60km_2x12f.cfg... 100%
+Extract: basleravi_1900-60km_2x8f.cfg... 100%
+Extract: baslerl301kc_rgb.cfg... 100%
+Extract: baumerhxc13_1024_10x8f.cfg... 100%
+Extract: baumerhxc13_1024_2x10f.cfg... 100%
+Extract: baumerhxc13_1024_2x8f.cfg... 100%
+Extract: baumerhxc13_1024_4x10f.cfg... 100%
+Extract: baumerhxc13_1024_8x8f.cfg... 100%
+Extract: baumerhxc13_480_10x8f.cfg... 100%
+Extract: baumerhxc13_480_2x10f.cfg... 100%
+Extract: baumerhxc13_480_2x8f.cfg... 100%
+Extract: baumerhxc13_480_4x10f.cfg... 100%
+Extract: baumerhxc13_480_8x8f.cfg... 100%
+Extract: baumerhxc40_2048_3x8f.cfg... 100%
+Extract: boeing_ir2000b.cfg... 100%
+Extract: cameratest.cfg... 100%
+Extract: camfst.cfg... 100%
+Extract: camsim.cfg... 100%
+Extract: ceir160-12.cfg... 100%
+Extract: ceir160-12_8.cfg... 100%
+Extract: ceir160_d.cfg... 100%
+Extract: ceir256st-12.cfg... 100%
+Extract: ceir256st-12_8.cfg... 100%
+Extract: ceirc160-12.cfg... 100%
+Extract: ceirc160-12_8.cfg... 100%
+Extract: cesim.cfg... 100%
+Extract: clstest256.cfg... 100%
+Extract: cohu7700_10f.cfg... 100%
+Extract: cohu7700_8f.cfg... 100%
+Extract: cohu7822_8f.cfg... 100%
+Extract: d6tester.cfg... 100%
+Extract: dalsa1m15p-12_2x2c.cfg... 100%
+Extract: dalsa1m15p-12_2x2s.cfg... 100%
+Extract: dalsa1m15p-12_2x2t.cfg... 100%
+Extract: dalsa1m15p-12_8_2x2c.cfg... 100%
+Extract: dalsa1m15p-12_8_2x2s.cfg... 100%
+Extract: dalsa1m15p-12_8_2x2t.cfg... 100%
+Extract: dalsa1m15p-12_8c.cfg... 100%
+Extract: dalsa1m15p-12_8s.cfg... 100%
+Extract: dalsa1m15p-12_8t.cfg... 100%
+Extract: dalsa1m15p-12c.cfg... 100%
+Extract: dalsa1m15p-12c_ipx.cfg... 100%
+Extract: dalsa1m15p-12s.cfg... 100%
+Extract: dalsa1m15p-12t.cfg... 100%
+Extract: dalsa4m30_8et.cfg... 100%
+Extract: dalsa4m30_8f.cfg... 100%
+Extract: dalsa4m30_8t.cfg... 100%
+Extract: dalsa4m30b65_8et.cfg... 100%
+Extract: dalsa4m30b65_8f.cfg... 100%
+Extract: dalsa4m30b65_8t.cfg... 100%
+Extract: dalsa4m30b_8et.cfg... 100%
+Extract: dalsa4m30b_8f.cfg... 100%
+Extract: dalsa4m30b_8t.cfg... 100%
+Extract: dalsa_14M100_10f.cfg... 100%
+Extract: dalsa_14M100_8f.cfg... 100%
+Extract: dalsa_1m28_8.cfg... 100%
+Extract: dalsa_1m60.cfg... 100%
+Extract: dalsa_1m75.cfg... 100%
+Extract: dalsa_2m30C.cfg... 100%
+Extract: dalsa_2m30c_8m.cfg... 100%
+Extract: dalsa_2m30m.cfg... 100%
+Extract: dalsa_f2_12m.cfg... 100%
+Extract: dalsa_f2_12m_8bits.cfg... 100%
+Extract: dalsa_f2_12m_raw.cfg... 100%
+Extract: dalsa_smd1m30p-12_2x2c.cfg... 100%
+Extract: dalsa_smd1m30p-12_2x2s.cfg... 100%
+Extract: dalsa_smd1m30p-12_2x2t.cfg... 100%
+Extract: dalsa_smd1m30p-12_8_2x2c.cfg... 100%
+Extract: dalsa_smd1m30p-12_8c.cfg... 100%
+Extract: dalsa_smd1m30p-12_8s.cfg... 100%
+Extract: dalsa_smd1m30p-12_8t.cfg... 100%
+Extract: dalsa_smd1m30p-12c.cfg... 100%
+Extract: dalsa_smd1m30p-12s.cfg... 100%
+Extract: dalsa_smd1m30p-12t-o.cfg... 100%
+Extract: dalsa_smd1m30p-12t.cfg... 100%
+Extract: dalsa_smd4m4-12.cfg... 100%
+Extract: dalsa_smd4m4-12_2x2.cfg... 100%
+Extract: dalsa_smd4m4-12_4x4.cfg... 100%
+Extract: dalsa_smd4m4-12_8.cfg... 100%
+Extract: dalsa_smd4m4-12s.cfg... 100%
+Extract: dalsa_smdbt25-12.cfg... 100%
+Extract: dalsa_smdbt25-12_8.cfg... 100%
+Extract: dclc31024a-8.cfg... 100%
+Extract: dclc31024a.cfg... 100%
+Extract: dclc31024n.cfg... 100%
+Extract: dcldp2.cfg
+Extract: dcldp2a.cfg... 100%
+Extract: dcle22048a.cfg... 100%
+Extract: dd10032t_pw.cfg... 100%
+Extract: dd10032t_tr.cfg... 100%
+Extract: dd10064a.cfg... 100%
+Extract: dd10064ac.cfg... 100%
+Extract: dd10064t-8.cfg... 100%
+Extract: dd10064t-8c.cfg... 100%
+Extract: dd10064t.cfg... 100%
+Extract: dd10064tc.cfg... 100%
+Extract: dd10128a.cfg... 100%
+Extract: dd10128t-8.cfg... 100%
+Extract: dd10128t.cfg... 100%
+Extract: dd10256a.cfg... 100%
+Extract: dd10256t-8.cfg... 100%
+Extract: dd10256t.cfg... 100%
+Extract: dd2000-12.cfg... 100%
+Extract: dd41024a-8.cfg... 100%
+Extract: dd41024a-8b.cfg... 100%
+Extract: dd41024a-8bf.cfg... 100%
+Extract: dd41024a-8f.cfg... 100%
+Extract: dd41044a-8.cfg... 100%
+Extract: dd41044a-8b.cfg... 100%
+Extract: dd41044a-8bf.cfg... 100%
+Extract: dd41044a-8f.cfg... 100%
+Extract: dd60256w-8.cfg... 100%
+Extract: dd60512w.cfg... 100%
+Extract: dd6m3p-12s.cfg... 100%
+Extract: dd6m3p-12ss.cfg... 100%
+Extract: dd71024a-8.cfg... 100%
+Extract: dd71024t-12.cfg... 100%
+Extract: dd71024t-12_8.cfg... 100%
+Extract: dd71024t-12_bin.cfg... 100%
+Extract: dd80512w-8.cfg... 100%
+Extract: dd80512w-8f.cfg... 100%
+Extract: dp2-04k40cal.cfg... 100%
+Extract: dp2-04k40et.cfg... 100%
+Extract: dp2-04k40fr.cfg... 100%
+Extract: dp3-80-08k40-12.cfg... 100%
+Extract: dp3-80-08k40-8.cfg... 100%
+Extract: dp3-80-08k40-8x4et.cfg... 100%
+Extract: dp3-80-08k40-8x4fr.cfg... 100%
+Extract: dp3-80-08k40cal.cfg... 100%
+Extract: dpc30-02k60et.cfg... 100%
+Extract: dpc30-02k60fr.cfg... 100%
+Extract: dpc30-04k80et.cfg... 100%
+Extract: dpc30-04k80fr.cfg... 100%
+Extract: dpc30-04kcal.cfg... 100%
+Extract: dpir2k.cfg... 100%
+Extract: dpir2k2t_8.cfg... 100%
+Extract: dpir2k2t_8et.cfg... 100%
+Extract: dpir2kraw.cfg... 100%
+Extract: dpir4k2t_8.cfg... 100%
+Extract: dpir4k2t_8f.cfg... 100%
+Extract: dpir6k.cfg... 100%
+Extract: dpir6kraw.cfg... 100%
+Extract: dpir8k2t_8.cfg... 100%
+Extract: drs-nytech-u6000-12.cfg... 100%
+Extract: dsp14.cfg... 100%
+Extract: dspyii2k1t_10et.cfg... 100%
+Extract: dspyii2k1t_8et.cfg... 100%
+Extract: dt1100-30.cfg... 100%
+Extract: dt1100-30t.cfg... 100%
+Extract: dt1100.cfg... 100%
+Extract: dt1100t.cfg... 100%
+Extract: dt2100-30.cfg... 100%
+Extract: dt2100-30t.cfg... 100%
+Extract: dt2100.cfg... 100%
+Extract: dt2100t.cfg... 100%
+Extract: dt2150-30.cfg... 100%
+Extract: dt2150-30t.cfg... 100%
+Extract: dt2150-32.cfg... 100%
+Extract: dt2150-32t.cfg... 100%
+Extract: dt2150.cfg... 100%
+Extract: dt2150t.cfg... 100%
+Extract: dt3100-30.cfg... 100%
+Extract: dt3100-30t.cfg... 100%
+Extract: dt3100.cfg... 100%
+Extract: dt3100t.cfg... 100%
+Extract: dt4000-30.cfg... 100%
+Extract: dt4000-30t.cfg... 100%
+Extract: dt4000.cfg... 100%
+Extract: dt4000t.cfg... 100%
+Extract: dt4100-32.cfg... 100%
+Extract: dt4100-32t.cfg... 100%
+Extract: dt4100cir-24.cfg... 100%
+Extract: dt4100cir-24t.cfg... 100%
+Extract: dt4100cir-30.cfg... 100%
+Extract: dt4100cir-30t.cfg... 100%
+Extract: dt4100rgb-24.cfg... 100%
+Extract: dt4100rgb-24t.cfg... 100%
+Extract: dt4100rgb-30.cfg... 100%
+Extract: dt4100rgb-30t.cfg... 100%
+Extract: dtr3302k25.cfg... 100%
+Extract: dvc1310c-10.cfg... 100%
+Extract: dvc1310c_44-rgb.cfg... 100%
+Extract: dvc1312-12-cd.cfg... 100%
+Extract: dvc1312-12.cfg... 100%
+Extract: dvc1312-cl.cfg... 100%
+Extract: dvc1412-cl-2x2.cfg... 100%
+Extract: dvc1412-cl-4x4.cfg... 100%
+Extract: dvc1412-cl-8x8.cfg... 100%
+Extract: dvc1412-cl-cd.cfg... 100%
+Extract: dvc1412-cl.cfg... 100%
+Extract: dvc1412c_44-rgb.cfg... 100%
+Extract: dvc4000_20m.cfg... 100%
+Extract: dvktest.cfg... 100%
+Extract: e2v_aviivam4_2k_8cs.cfg... 100%
+Extract: e2v_aviivasm2_2k_12cd.cfg... 100%
+Extract: e2v_aviivasm2_2k_12cs.cfg... 100%
+Extract: e2v_aviivasm2_2k_12cs_1l.cfg... 100%
+Extract: e2v_aviivasm2_2k_12cs_5k.cfg... 100%
+Extract: e2v_aviivasm2_2k_12pw.cfg... 100%
+Extract: e2v_aviivasm2_2k_12tr.cfg... 100%
+Extract: e2v_aviivasm2_2k_8cs_1l.cfg... 100%
+Extract: e2v_aviivasm2_2k_8pw_1l.cfg... 100%
+Extract: edt_validate_658x501x10x1.cfg... 100%
+Extract: edt_validate_658x501x10x2.cfg... 100%
+Extract: es1020-10s_cs.cfg... 100%
+Extract: es1020-10s_tr.cfg... 100%
+Extract: es11000_sc.cfg... 100%
+Extract: es11000_sc_2x2.cfg... 100%
+Extract: es11000_sc_3x3.cfg... 100%
+Extract: es11000cs.cfg... 100%
+Extract: es11000cs_8.cfg... 100%
+Extract: es11000cs_bayer10.cfg... 100%
+Extract: es11000cs_bayer12.cfg... 100%
+Extract: es11000cs_bayer8.cfg... 100%
+Extract: es11000cs_bayer8_sc.cfg... 100%
+Extract: es11000cs_rgb.cfg... 100%
+Extract: es11000ol_8.cfg... 100%
+Extract: es11000pw.cfg... 100%
+Extract: es11000pw_8.cfg... 100%
+Extract: es11000tr.cfg... 100%
+Extract: es11000tr_8.cfg... 100%
+Extract: es16000_sc.cfg... 100%
+Extract: es16000_sc_2x2.cfg... 100%
+Extract: es16000_sc_3x3.cfg... 100%
+Extract: es16000cs.cfg... 100%
+Extract: es16000cs_8.cfg... 100%
+Extract: es16000cs_bayer10.cfg... 100%
+Extract: es16000cs_bayer12.cfg... 100%
+Extract: es16000cs_bayer8.cfg... 100%
+Extract: es16000cs_bayer8_sc.cfg... 100%
+Extract: es16000cs_rgb.cfg... 100%
+Extract: es16000ol_8.cfg... 100%
+Extract: es16000pw.cfg... 100%
+Extract: es16000pw_8.cfg... 100%
+Extract: es2020cs.cfg... 100%
+Extract: es2020cs_12.cfg... 100%
+Extract: es2020cs_bayer12.cfg... 100%
+Extract: es2020pw_12.cfg... 100%
+Extract: es2020pw_8_2x2.cfg... 100%
+Extract: es2020pw_8_4x4.cfg... 100%
+Extract: es2020pw_bayer_8_sc.cfg... 100%
+Extract: es3200_12et.cfg... 100%
+Extract: es3200_12st.cfg... 100%
+Extract: es4020_sc.cfg... 100%
+Extract: es4020_sc_2x2.cfg... 100%
+Extract: es4020_sc_3x3.cfg... 100%
+Extract: es4020cs.cfg... 100%
+Extract: es4020cs_8.cfg... 100%
+Extract: es4020cs_bayer10.cfg... 100%
+Extract: es4020cs_bayer12.cfg... 100%
+Extract: es4020cs_bayer8.cfg... 100%
+Extract: es4020cs_bayer8_sc.cfg... 100%
+Extract: es4020cs_rgb.cfg... 100%
+Extract: es4020ol_8.cfg... 100%
+Extract: es4020pw.cfg... 100%
+Extract: es4020pw_12.cfg... 100%
+Extract: es4020pw_8.cfg... 100%
+Extract: es4020pw_8_2x2.cfg... 100%
+Extract: es4020pw_8_4x4.cfg... 100%
+Extract: es4020pw_bayer_8_sc.cfg... 100%
+Extract: es4020tr.cfg... 100%
+Extract: es4020tr_8.cfg... 100%
+Extract: exp2.cfg... 100%
+Extract: exp24.cfg... 100%
+Extract: exp2big.cfg... 100%
+Extract: exp32.cfg... 100%
+Extract: f12drum.cfg... 100%
+Extract: f12drum_2ch.cfg... 100%
+Extract: fci1600_sim.cfg... 100%
+Extract: fci4.cfg... 100%
+Extract: fciusps.cfg... 100%
+Extract: generic10.cfg... 100%
+Extract: generic10bcl.cfg... 100%
+Extract: generic10cl.cfg... 100%
+Extract: generic10x2cl.cfg... 100%
+Extract: generic12.cfg... 100%
+Extract: generic12cl.cfg... 100%
+Extract: generic12x2cl.cfg... 100%
+Extract: generic14.cfg... 100%
+Extract: generic14cl.cfg... 100%
+Extract: generic16.cfg... 100%
+Extract: generic16cl.cfg... 100%
+Extract: generic24cl.cfg... 100%
+Extract: generic8.cfg... 100%
+Extract: generic8bcl.cfg... 100%
+Extract: generic8cl.cfg... 100%
+Extract: generic8x2cl.cfg... 100%
+Extract: genericras.cfg... 100%
+Extract: gs_dt1100-30.cfg... 100%
+Extract: gs_dt1100-30t.cfg... 100%
+Extract: gs_dt1100.cfg... 100%
+Extract: gs_dt1100t.cfg... 100%
+Extract: gs_dt2100-30.cfg... 100%
+Extract: gs_dt2100-30t.cfg... 100%
+Extract: gs_dt2100.cfg... 100%
+Extract: gs_dt2100t.cfg... 100%
+Extract: gs_dt2150-30.cfg... 100%
+Extract: gs_dt2150-30t.cfg... 100%
+Extract: gs_dt2150-32.cfg... 100%
+Extract: gs_dt2150-32t.cfg... 100%
+Extract: gs_dt2150.cfg... 100%
+Extract: gs_dt2150t.cfg... 100%
+Extract: gs_dt3100-30.cfg... 100%
+Extract: gs_dt3100-30t.cfg... 100%
+Extract: gs_dt3100.cfg... 100%
+Extract: gs_dt3100t.cfg... 100%
+Extract: gs_dt4000-30.cfg... 100%
+Extract: gs_dt4000-30t.cfg... 100%
+Extract: gs_dt4000.cfg... 100%
+Extract: gs_dt4000t.cfg... 100%
+Extract: gs_dt4100-32.cfg... 100%
+Extract: gs_dt4100-32t.cfg... 100%
+Extract: gs_dt4100cir-24.cfg... 100%
+Extract: gs_dt4100cir-24t.cfg... 100%
+Extract: gs_dt4100cir-30.cfg... 100%
+Extract: gs_dt4100cir-30t.cfg... 100%
+Extract: gs_dt4100rgb-24.cfg... 100%
+Extract: gs_dt4100rgb-24t.cfg... 100%
+Extract: gs_dt4100rgb-30.cfg... 100%
+Extract: gs_dt4100rgb-30t.cfg... 100%
+Extract: gs_dtr3302k25.cfg... 100%
+Extract: gs_ms4000-30.cfg... 100%
+Extract: gs_ms4000-30t.cfg... 100%
+Extract: gs_ms4000.cfg... 100%
+Extract: gs_ms4000t.cfg... 100%
+Extract: hama_orcaflash2.8_1440_12f.cfg... 100%
+Extract: hama_orcaflash4.0_5x16f.cfg... 100%
+Extract: han24rss.cfg... 100%
+Extract: han24ss.cfg... 100%
+Extract: han8rss.cfg... 100%
+Extract: han8ss.cfg... 100%
+Extract: hc4742-95-10.cfg... 100%
+Extract: hc4742-95-10e.cfg... 100%
+Extract: hc4742-95-10f.cfg... 100%
+Extract: hc4742-95-10pw.cfg... 100%
+Extract: hc4742-95-12-2x2bin.cfg... 100%
+Extract: hc4742-95-12-4x4bin.cfg... 100%
+Extract: hc4742-95-12.cfg... 100%
+Extract: hc4742-95-12e.cfg... 100%
+Extract: hc4742-95-12f.cfg... 100%
+Extract: hc4742-95-12pw.cfg... 100%
+Extract: hc4742-95-8.cfg... 100%
+Extract: hc4742-95-8f.cfg... 100%
+Extract: hc4742-98-12.cfg... 100%
+Extract: hc4742-98-12e.cfg... 100%
+Extract: hc4742-98-12pw.cfg... 100%
+Extract: hc4880-10.cfg... 100%
+Extract: hc4880-10_8.cfg... 100%
+Extract: hc4880-12.cfg... 100%
+Extract: hc4880-12_8.cfg... 100%
+Extract: hc4880-81-10_8.cfg... 100%
+Extract: hc4880-81-10_8t.cfg... 100%
+Extract: hc4880-81.cfg... 100%
+Extract: hc4880-81_2x2bin.cfg... 100%
+Extract: hc4880-81_8_2x2bin.cfg... 100%
+Extract: hc4880-81t.cfg... 100%
+Extract: hc4880-81t_2x2bin.cfg... 100%
+Extract: hc4880-82-12_8.cfg... 100%
+Extract: hc4880-82.cfg... 100%
+Extract: hc4880-82_2x2bin.cfg... 100%
+Extract: hc7942-12.cfg... 100%
+Extract: hc7942-12_2x2bin.cfg... 100%
+Extract: hc7942-12_4x4bin.cfg... 100%
+Extract: hc8484-12.cfg... 100%
+Extract: hc8484-12f.cfg... 100%
+Extract: hc9312sk-12p.cfg... 100%
+Extract: hkpf100-10-8.cfg... 100%
+Extract: hkpf100-10-8_cc.cfg... 100%
+Extract: hkpf100-10.cfg... 100%
+Extract: hkpf100-10_cc.cfg... 100%
+Extract: hkpf100-10_cc_dvk.cfg... 100%
+Extract: hkpf100acl.cfg... 100%
+Extract: hkpf500scl_12f.cfg... 100%
+Extract: hkpf500scl_8f.cfg... 100%
+Extract: hvduo3_24rsc.cfg... 100%
+Extract: hvduo3_24rss.cfg... 100%
+Extract: hvduo3_8rsc.cfg... 100%
+Extract: hvduo3_8rss.cfg... 100%
+Extract: icc_mbc100-12.cfg... 100%
+Extract: icc_mbc200-12.cfg... 100%
+Extract: icc_mbc200-12_demo.cfg... 100%
+Extract: icc_mbc200-14.cfg... 100%
+Extract: idtm5c.cfg... 100%
+Extract: idtm5m.cfg... 100%
+Extract: illunis2000-10-cd.cfg... 100%
+Extract: illunis2000-10-s.cfg... 100%
+Extract: illunis2000-10-t.cfg... 100%
+Extract: illunis2000-10.cfg... 100%
+Extract: illxmv11000_12.cfg... 100%
+Extract: illxmv11000_24.cfg... 100%
+Extract: illxmv16000c_12f.cfg... 100%
+Extract: illxmv16000c_12f_sc.cfg... 100%
+Extract: illxmv16000c_12p.cfg... 100%
+Extract: illxmv16000c_12p_sc.cfg... 100%
+Extract: illxmv16000c_12t.cfg... 100%
+Extract: illxmv16000c_12t_sc.cfg... 100%
+Extract: illxmv16000c_8f.cfg... 100%
+Extract: illxmv16000m_12f.cfg... 100%
+Extract: illxmv16000m_12f_sc.cfg... 100%
+Extract: illxmv16000m_12p.cfg... 100%
+Extract: illxmv16000m_12p_sc.cfg... 100%
+Extract: illxmv16000m_12t.cfg... 100%
+Extract: illxmv16000m_12t_sc.cfg... 100%
+Extract: illxmv4020c_12f.cfg... 100%
+Extract: illxmv4020c_12f_sc.cfg... 100%
+Extract: illxmv4020c_12p.cfg... 100%
+Extract: illxmv4020c_12p_sc.cfg... 100%
+Extract: illxmv4020c_12t.cfg... 100%
+Extract: illxmv4020c_12t_sc.cfg... 100%
+Extract: illxmv4020c_8f.cfg... 100%
+Extract: illxmv4020m_12f.cfg... 100%
+Extract: illxmv4020m_12f_sc.cfg... 100%
+Extract: illxmv4020m_12p.cfg... 100%
+Extract: illxmv4020m_12p_sc.cfg... 100%
+Extract: illxmv4020m_12t.cfg... 100%
+Extract: illxmv4020m_12t_sc.cfg... 100%
+Extract: imb2040_12f.cfg... 100%
+Extract: imb2040_8f.cfg... 100%
+Extract: imc2040_12f.cfg... 100%
+Extract: imc2040_8f.cfg... 100%
+Extract: imperx10.cfg... 100%
+Extract: imperx10_t.cfg... 100%
+Extract: imperx10rgb.cfg... 100%
+Extract: imperx10rgb_t.cfg... 100%
+Extract: imperx_b3320m_14f.cfg... 100%
+Extract: imperx_b3320m_14t.cfg... 100%
+Extract: imperx_b3320m_2x10f.cfg... 100%
+Extract: imperx_b3320m_2x12f.cfg... 100%
+Extract: imperx_b3320m_2x8f.cfg... 100%
+Extract: imperx_b3320m_8f.cfg... 100%
+Extract: indigo-12.cfg... 100%
+Extract: indigo-12_8.cfg... 100%
+Extract: indigo-14.cfg... 100%
+Extract: intevac3010c_10f.cfg... 100%
+Extract: ipx11m5l_12.cfg... 100%
+Extract: ipx1m48l_10.cfg... 100%
+Extract: ipx1m48l_12.cfg... 100%
+Extract: ipx1m48l_8.cfg... 100%
+Extract: ipx1m48lc_10.cfg... 100%
+Extract: ipx1m48lc_12.cfg... 100%
+Extract: ipx1m48lc_8.cfg... 100%
+Extract: ipx2m30l_10.cfg... 100%
+Extract: ipx2m30l_12.cfg... 100%
+Extract: ipx2m30l_12s.cfg... 100%
+Extract: ipx2m30l_8.cfg... 100%
+Extract: ipx2m30lc_10.cfg... 100%
+Extract: ipx2m30lc_12.cfg... 100%
+Extract: ipx2m30lc_12s.cfg... 100%
+Extract: ipx2m30lc_8.cfg... 100%
+Extract: ipx4m15l_10.cfg... 100%
+Extract: ipx4m15l_10s.cfg... 100%
+Extract: ipx4m15l_12.cfg... 100%
+Extract: ipx4m15l_12s.cfg... 100%
+Extract: ipx4m15l_8.cfg... 100%
+Extract: ipx4m15l_8s.cfg... 100%
+Extract: ipx4m15lc_10.cfg... 100%
+Extract: ipx4m15lc_12.cfg... 100%
+Extract: ipx4m15lc_8.cfg... 100%
+Extract: ipxvga210l_10.cfg... 100%
+Extract: ipxvga210l_10t.cfg... 100%
+Extract: ipxvga210l_12.cfg... 100%
+Extract: ipxvga210l_12_ext_tr.cfg... 100%
+Extract: ipxvga210l_12s.cfg... 100%
+Extract: ipxvga210l_12t.cfg... 100%
+Extract: ipxvga210l_12ts.cfg... 100%
+Extract: ipxvga210l_8.cfg... 100%
+Extract: ipxvga210l_8t.cfg... 100%
+Extract: ipxvga210l_8ts.cfg... 100%
+Extract: ipxvga210lc_10.cfg... 100%
+Extract: ipxvga210lc_10t.cfg... 100%
+Extract: ipxvga210lc_12.cfg... 100%
+Extract: ipxvga210lc_12s.cfg... 100%
+Extract: ipxvga210lc_12t.cfg... 100%
+Extract: ipxvga210lc_12ts.cfg... 100%
+Extract: ipxvga210lc_8.cfg... 100%
+Extract: ipxvga210lc_8s.cfg... 100%
+Extract: ipxvga210lc_8t.cfg... 100%
+Extract: ipxvga210lc_8ts.cfg... 100%
+Extract: ipxvga210m_10b2t.cfg... 100%
+Extract: ipxvga210m_8b2t.cfg... 100%
+Extract: jaiAM800CL_12C.cfg... 100%
+Extract: jaiBM500CL_10f.cfg... 100%
+Extract: jaiBM500CL_12f.cfg... 100%
+Extract: jaiBM500CL_8f.cfg... 100%
+Extract: jai_cv-l107cl-24.cfg... 100%
+Extract: jai_cv-l107cl-30.cfg... 100%
+Extract: jai_ptm1010-10.cfg... 100%
+Extract: jai_ptm1010-10_8.cfg... 100%
+Extract: jai_ptm1010-10c.cfg... 100%
+Extract: jai_ptm1020-15cl.cfg... 100%
+Extract: jai_ptm1020-ext.cfg... 100%
+Extract: jai_ptm1020c.cfg... 100%
+Extract: jai_ptm1040-8.cfg... 100%
+Extract: jai_ptm1040.cfg... 100%
+Extract: jai_ptm1300-8.cfg... 100%
+Extract: jai_ptm1320-15cl.cfg... 100%
+Extract: jai_ptm1400cl.cfg... 100%
+Extract: jai_ptm1400cl_tr0.cfg... 100%
+Extract: jai_ptm1400cl_tr1.cfg... 100%
+Extract: jai_ptm4000-8cl.cfg... 100%
+Extract: jai_ptm4000cl.cfg... 100%
+Extract: jai_ptm6700cl.cfg... 100%
+Extract: jai_ptm6710.cfg... 100%
+Extract: jai_ptm6710_asy.cfg... 100%
+Extract: jai_ptm6710_pw.cfg... 100%
+Extract: jai_ptm6710cl.cfg... 100%
+Extract: jai_ptm6710cl_opto_pw.cfg... 100%
+Extract: jai_ptm6740_10f.cfg... 100%
+Extract: jai_ptm6740_8f.cfg... 100%
+Extract: jai_ptm9701_m1-8.cfg... 100%
+Extract: jai_ptm9701_m9.cfg... 100%
+Extract: jai_ptm9730cl.cfg... 100%
+Extract: kac10.cfg... 100%
+Extract: kac10_8.cfg... 100%
+Extract: kai12.cfg... 100%
+Extract: kai12_8.cfg... 100%
+Extract: km14-8.cfg... 100%
+Extract: km14i-8.cfg... 100%
+Extract: km16-10-cd.cfg... 100%
+Extract: km16-10.cfg... 100%
+Extract: km16-10_8.cfg... 100%
+Extract: km168i-10.cfg... 100%
+Extract: km168i-10_8.cfg... 100%
+Extract: km16i-10-cd.cfg... 100%
+Extract: km16i-10.cfg... 100%
+Extract: km16i-10_8.cfg... 100%
+Extract: km16i-10s.cfg... 100%
+Extract: km42-10-cd.cfg... 100%
+Extract: km42-10.cfg... 100%
+Extract: km42-10_8.cfg... 100%
+Extract: km42-8.cfg... 100%
+Extract: km42i-10-cd.cfg... 100%
+Extract: km42i-10.cfg... 100%
+Extract: km42i-10_8.cfg... 100%
+Extract: km42i-10s.cfg... 100%
+Extract: km42i-8-cd.cfg... 100%
+Extract: km42i-8.cfg... 100%
+Extract: km42old-8.cfg... 100%
+Extract: km63i-10-cd.cfg... 100%
+Extract: km63i-10.cfg... 100%
+Extract: km63i-10s.cfg... 100%
+Extract: km63i-8.cfg... 100%
+Extract: kmes10-10-8-dual-cs.cfg... 100%
+Extract: kmes10-10-8-dual.cfg... 100%
+Extract: kmes10-10-8-single.cfg... 100%
+Extract: kmes10-10-dual-cd.cfg... 100%
+Extract: kmes10-10-dual-cs.cfg... 100%
+Extract: kmes10-10-dual.cfg... 100%
+Extract: kmes10-10-single-cd.cfg... 100%
+Extract: kmes10-10-single.cfg... 100%
+Extract: kmes10-8-24.cfg... 100%
+Extract: kmes10-8-dual-cd.cfg... 100%
+Extract: kmes10-8-dual-tde.cfg... 100%
+Extract: kmes10-8-dual.cfg... 100%
+Extract: kmes10-8-dualcont.cfg... 100%
+Extract: kmes10-8-single-cd.cfg... 100%
+Extract: kmes10-8-single.cfg... 100%
+Extract: kmes10-8-singlecont.cfg... 100%
+Extract: kmes10-8-skip.cfg... 100%
+Extract: kmes10sc-8-cd.cfg... 100%
+Extract: kmes10sc-8.cfg... 100%
+Extract: kmes24.cfg... 100%
+Extract: kmes24_gen.cfg... 100%
+Extract: kmes310.cfg... 100%
+Extract: kmes310t-cd.cfg... 100%
+Extract: kmes310t-cs.cfg... 100%
+Extract: kmes310t-tr.cfg... 100%
+Extract: kmes40-12-dual-cd.cfg... 100%
+Extract: kmes40-12-dual.cfg... 100%
+Extract: kmes40-8-dual-cd.cfg... 100%
+Extract: kmes40-8-dual.cfg... 100%
+Extract: kmxhf-8-232.cfg... 100%
+Extract: kmxhf-8.cfg... 100%
+Extract: kmxhf-8x2-232.cfg... 100%
+Extract: kmxhf-8x2.cfg... 100%
+Extract: kmxhf-8x2fast-232.cfg... 100%
+Extract: kmxhf-8x2fast.cfg... 100%
+Extract: mikrotron1362.cfg... 100%
+Extract: ms4000-30.cfg... 100%
+Extract: ms4000-30t.cfg... 100%
+Extract: ms4000.cfg... 100%
+Extract: ms4000t.cfg... 100%
+Extract: nar12cl.cfg... 100%
+Extract: nar12cl_s.cfg... 100%
+Extract: pantera11m4fr.cfg... 100%
+Extract: pantera11m4fr_dual.cfg... 100%
+Extract: pantera11m4pw.cfg... 100%
+Extract: pantera11m4pw_dual.cfg... 100%
+Extract: pantera6m8fr.cfg... 100%
+Extract: pantera6m8fr_dual.cfg... 100%
+Extract: pantera6m8pw.cfg... 100%
+Extract: pantera6m8pw_dual.cfg... 100%
+Extract: pcdsim.cfg... 100%
+Extract: pco.edge_modeA_1920.cfg... 100%
+Extract: pco.edge_modeD_1920.cfg... 100%
+Extract: pco.edge_modeD_2560.cfg... 100%
+Extract: pco1600_40.cfg... 100%
+Extract: pco1600_80.cfg... 100%
+Extract: pf1024-28.cfg... 100%
+Extract: pf1024-80.cfg... 100%
+Extract: photccir-8.cfg... 100%
+Extract: photccir.cfg... 100%
+Extract: photonics.cfg... 100%
+Extract: photonics_8.cfg... 100%
+Extract: phs0400-12.cfg... 100%
+Extract: phs0400-12_8.cfg... 100%
+Extract: phs1400-12.cfg... 100%
+Extract: phs1400-12_8.cfg... 100%
+Extract: phs1600-12.cfg... 100%
+Extract: phs1600-12_8.cfg... 100%
+Extract: pkgsort.cfg... 100%
+Extract: ptm1010-10.cfg... 100%
+Extract: ptm1010-10_8.cfg... 100%
+Extract: ptm1010-10c.cfg... 100%
+Extract: ptm1020-15cl.cfg... 100%
+Extract: ptm1020-ext.cfg... 100%
+Extract: ptm1020c.cfg... 100%
+Extract: ptm1040-8.cfg... 100%
+Extract: ptm1040.cfg... 100%
+Extract: ptm1300-8.cfg... 100%
+Extract: ptm1320-15cl.cfg... 100%
+Extract: ptm1400cl.cfg... 100%
+Extract: ptm1400cl_tr0.cfg... 100%
+Extract: ptm1400cl_tr1.cfg... 100%
+Extract: ptm4000-8cl.cfg... 100%
+Extract: ptm4000cl.cfg... 100%
+Extract: ptm6700cl.cfg... 100%
+Extract: ptm6710.cfg... 100%
+Extract: ptm6710_asy.cfg... 100%
+Extract: ptm6710_pw.cfg... 100%
+Extract: ptm6710cl.cfg... 100%
+Extract: ptm6710cl_opto_pw.cfg... 100%
+Extract: ptm6740_10f.cfg... 100%
+Extract: ptm6740_8f.cfg... 100%
+Extract: ptm9701_m1-8.cfg... 100%
+Extract: ptm9701_m9.cfg... 100%
+Extract: ptm9730cl.cfg... 100%
+Extract: redlake_es40-dual-cs.cfg... 100%
+Extract: redlake_es40_12c.cfg... 100%
+Extract: redlake_es40_12t.cfg... 100%
+Extract: redlake_es40cl_12-8c.cfg... 100%
+Extract: redlake_es40cl_12c.cfg... 100%
+Extract: redlake_es40cl_12d.cfg... 100%
+Extract: redlake_es40cl_12p.cfg... 100%
+Extract: redlake_es40cl_12t.cfg... 100%
+Extract: redlake_km14-8.cfg... 100%
+Extract: redlake_km14i-8.cfg... 100%
+Extract: redlake_km16-10-cd.cfg... 100%
+Extract: redlake_km16-10.cfg... 100%
+Extract: redlake_km16-10_8.cfg... 100%
+Extract: redlake_km168i-10.cfg... 100%
+Extract: redlake_km168i-10_8.cfg... 100%
+Extract: redlake_km16i-10-cd.cfg... 100%
+Extract: redlake_km16i-10.cfg... 100%
+Extract: redlake_km16i-10_8.cfg... 100%
+Extract: redlake_km16i-10s.cfg... 100%
+Extract: redlake_km42-10-cd.cfg... 100%
+Extract: redlake_km42-10.cfg... 100%
+Extract: redlake_km42-10_8.cfg... 100%
+Extract: redlake_km42-8.cfg... 100%
+Extract: redlake_km42i-10-cd.cfg... 100%
+Extract: redlake_km42i-10.cfg... 100%
+Extract: redlake_km42i-10_8.cfg... 100%
+Extract: redlake_km42i-10s.cfg... 100%
+Extract: redlake_km42i-8-cd.cfg... 100%
+Extract: redlake_km42i-8.cfg... 100%
+Extract: redlake_km42old-8.cfg... 100%
+Extract: redlake_km63i-10-cd.cfg... 100%
+Extract: redlake_km63i-10.cfg... 100%
+Extract: redlake_km63i-10s.cfg... 100%
+Extract: redlake_km63i-8.cfg... 100%
+Extract: redlake_kmes10-10-8-dual-cs.cfg... 100%
+Extract: redlake_kmes10-10-8-dual.cfg... 100%
+Extract: redlake_kmes10-10-8-single.cfg... 100%
+Extract: redlake_kmes10-10-dual-cd.cfg... 100%
+Extract: redlake_kmes10-10-dual-cs.cfg... 100%
+Extract: redlake_kmes10-10-dual.cfg... 100%
+Extract: redlake_kmes10-10-single-cd.cfg... 100%
+Extract: redlake_kmes10-10-single.cfg... 100%
+Extract: redlake_kmes10-8-24.cfg... 100%
+Extract: redlake_kmes10-8-dual-cd.cfg... 100%
+Extract: redlake_kmes10-8-dual-tde.cfg... 100%
+Extract: redlake_kmes10-8-dual.cfg... 100%
+Extract: redlake_kmes10-8-dualcont.cfg... 100%
+Extract: redlake_kmes10-8-single-cd.cfg... 100%
+Extract: redlake_kmes10-8-single.cfg... 100%
+Extract: redlake_kmes10-8-singlecont.cfg... 100%
+Extract: redlake_kmes10-8-skip.cfg... 100%
+Extract: redlake_kmes10sc-8-cd.cfg... 100%
+Extract: redlake_kmes10sc-8.cfg... 100%
+Extract: redlake_kmes24.cfg... 100%
+Extract: redlake_kmes24_gen.cfg... 100%
+Extract: redlake_kmes310.cfg... 100%
+Extract: redlake_kmes310t-cd.cfg... 100%
+Extract: redlake_kmes310t-cs.cfg... 100%
+Extract: redlake_kmes310t-tr.cfg... 100%
+Extract: redlake_kmes40-12-dual-cd.cfg... 100%
+Extract: redlake_kmes40-12-dual.cfg... 100%
+Extract: redlake_kmes40-8-dual-cd.cfg... 100%
+Extract: redlake_kmes40-8-dual.cfg... 100%
+Extract: redlake_kmxhf-8-232.cfg... 100%
+Extract: redlake_kmxhf-8.cfg... 100%
+Extract: redlake_kmxhf-8x2-232.cfg... 100%
+Extract: redlake_kmxhf-8x2.cfg... 100%
+Extract: redlake_kmxhf-8x2fast-232.cfg... 100%
+Extract: redlake_kmxhf-8x2fast.cfg... 100%
+Extract: sbf.cfg... 100%
+Extract: si4000.cfg... 100%
+Extract: si561_cmds.txt
+Extract: si561_ser.cfg... 100%
+Extract: si600-142_0.txt
+Extract: si600-142_1.txt
+Extract: si600-142_2.txt
+Extract: si600-142_3.txt
+Extract: si620-142_ext0.cfg... 100%
+Extract: si620-142_ext1.cfg... 100%
+Extract: si620-142_ext2.cfg... 100%
+Extract: si620-142_ext3.cfg... 100%
+Extract: si620-142_ser0.cfg... 100%
+Extract: si620-142_ser1.cfg... 100%
+Extract: si620-142_ser2.cfg... 100%
+Extract: si620-142_ser3.cfg... 100%
+Extract: si800cl.cfg... 100%
+Extract: sicommands.txt
+Extract: siimg480m_128_f.cfg... 100%
+Extract: siimg480m_f.cfg... 100%
+Extract: siimg480m_t.cfg... 100%
+Extract: silicon8cl.cfg... 100%
+Extract: silicon8cl_rgb.cfg... 100%
+Extract: siliconcl.cfg... 100%
+Extract: siliconcl_rgb.cfg... 100%
+Extract: sisim.cfg... 100%
+Extract: smd1m30p-12_2x2c.cfg... 100%
+Extract: smd1m30p-12_2x2s.cfg... 100%
+Extract: smd1m30p-12_2x2t.cfg... 100%
+Extract: smd1m30p-12_8_2x2c.cfg... 100%
+Extract: smd1m30p-12_8c.cfg... 100%
+Extract: smd1m30p-12_8s.cfg... 100%
+Extract: smd1m30p-12_8t.cfg... 100%
+Extract: smd1m30p-12c.cfg... 100%
+Extract: smd1m30p-12s.cfg... 100%
+Extract: smd1m30p-12t-o.cfg... 100%
+Extract: smd1m30p-12t.cfg... 100%
+Extract: smd4m4-12.cfg... 100%
+Extract: smd4m4-12_2x2.cfg... 100%
+Extract: smd4m4-12_4x4.cfg... 100%
+Extract: smd4m4-12_8.cfg... 100%
+Extract: smd4m4-12s.cfg... 100%
+Extract: smdbt25-12.cfg... 100%
+Extract: smdbt25-12_8.cfg... 100%
+Extract: smns_amis8.cfg... 100%
+Extract: stanford_mega10.cfg... 100%
+Extract: stc-clc232a-10f.cfg... 100%
+Extract: stc-clc232a-8f.cfg... 100%
+Extract: strobe.cfg... 100%
+Extract: su320m17r5-12c.cfg... 100%
+Extract: su320msw17rt-12c.cfg... 100%
+Extract: su640sdv17rt-14c.cfg... 100%
+Extract: svs204_10f.cfg... 100%
+Extract: svs_hr29050m_12f.cfg... 100%
+Extract: svs_hr29050m_8f.cfg... 100%
+Extract: tcsf4m12-8m.cfg... 100%
+Extract: tcsf4m12m-cd.cfg... 100%
+Extract: tcsf4m12m-s.cfg... 100%
+Extract: tcsf4m12m.cfg... 100%
+Extract: tcsf8m12-8m.cfg... 100%
+Extract: tcsf8m12m-cd.cfg... 100%
+Extract: tcsf8m12m-s.cfg... 100%
+Extract: tcsf8m12m.cfg... 100%
+Extract: thomson1k10-8.cfg... 100%
+Extract: thomson1k10.cfg... 100%
+Extract: thomson512_10-8.cfg... 100%
+Extract: thomson512_10.cfg... 100%
+Extract: timc1001pf-8.cfg... 100%
+Extract: timc1001pf.cfg... 100%
+Extract: tosh_cs3960dcl_10f.cfg... 100%
+Extract: tosh_cs3960dcl_12f.cfg... 100%
+Extract: tosh_cs3960dcl_8f.cfg... 100%
+Extract: tosh_iksx1-cd.cfg... 100%
+Extract: tosh_iksx1-cs.cfg... 100%
+Extract: tosh_iksx1-tr.cfg... 100%
+Extract: up610-10.cfg... 100%
+Extract: up685f.cfg... 100%
+Extract: up685p.cfg... 100%
+Extract: up685t.cfg... 100%
+Extract: va8m16-mf10_1t12f.cfg... 100%
+Extract: va8m16-mf10_2t12f.cfg... 100%
+Extract: va8m16-mf10_4t12f.cfg... 100%
+Extract: va8m16-mf10_4t12tf.cfg... 100%
+Extract: vh5m16-mc10_12f.cfg... 100%
+Extract: vh5m16-mc10_12tf.cfg... 100%
+Extract: vh5m16-mc10_8f.cfg... 100%
+Extract: vh5m16-mc10_8tf.cfg... 100%
+Extract: vm16m3-mf10_12f.cfg... 100%
+Extract: vm16m3-mf10_12tf.cfg... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dv
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dv\4005
+Extract: afrl.bit... 100%
+Extract: aiaext.bit... 100%
+Extract: aiaext14.bit... 100%
+Extract: aiaextskip.bit... 100%
+Extract: aiag.bit... 100%
+Extract: aiag_2ch.bit... 100%
+Extract: aiagce.bit... 100%
+Extract: aiags.bit... 100%
+Extract: camtest.bit... 100%
+Extract: ham4742_95.bit... 100%
+Extract: irc160.bit... 100%
+Extract: irris.bit... 100%
+Extract: irris_256st.bit... 100%
+Extract: kodak37.bit... 100%
+Extract: pulnix9700.bit... 100%
+Extract: testgen.bit... 100%
+Extract: xtest.bit... 100%
+Extract: xybion.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dv\4010
+Extract: aiaaoi.bit... 100%
+Extract: aiaext.bit... 100%
+Extract: aiag.bit... 100%
+Extract: aiag_.bit... 100%
+Extract: aiag_2ch.bit... 100%
+Extract: aiagce.bit... 100%
+Extract: aiagenrgb.bit... 100%
+Extract: aiagi.bit... 100%
+Extract: aiags.bit... 100%
+Extract: async.bit... 100%
+Extract: camtest.bit... 100%
+Extract: dalsa_d6.bit... 100%
+Extract: ham4742_95.bit... 100%
+Extract: kodak37.bit... 100%
+Extract: kp_f100_dt.bit... 100%
+Extract: testgen.bit... 100%
+Extract: xillix14.bit... 100%
+Extract: xtest.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dv\4013
+Extract: aiaext.bit... 100%
+Extract: aiag.bit... 100%
+Extract: aiag_.bit... 100%
+Extract: aiag_2ch.bit... 100%
+Extract: aiag_async.bit... 100%
+Extract: aiagce.bit... 100%
+Extract: aiagce_delay.bit... 100%
+Extract: aiagi.bit... 100%
+Extract: aiags.bit... 100%
+Extract: camtest.bit... 100%
+Extract: dalsa_d6.bit... 100%
+Extract: ham4742_95.bit... 100%
+Extract: kp_f100_dt.bit... 100%
+Extract: kp_f100_rev01.bit... 100%
+Extract: testgen.bit... 100%
+Extract: xillix14.bit... 100%
+Extract: xtest.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dv\4036
+Extract: dvktest.bit... 100%
+Extract: toucan_1ch.bit... 100%
+Extract: toucan_2ch.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dva
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dva\xc2s100e
+Extract: aiag.bit... 100%
+Extract: aiag24.bit... 100%
+Extract: aiag_2ch.bit... 100%
+Extract: aiag_d.bit... 100%
+Extract: aiag_indigo.bit... 100%
+Extract: aiag_trgb.bit... 100%
+Extract: aiags.bit... 100%
+Extract: dalsa_d6.bit... 100%
+Extract: kp_f100_dt.bit... 100%
+Extract: usps_sim_02.bit... 100%
+Extract: xtest.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dva\xc2s600e
+Extract: aiag.bit... 100%
+Extract: aiags.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvaero
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvaero\4013
+Extract: aero.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvcl2
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvcl2\xc2s400e
+Extract: clsim.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvfox
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvfox\xc2s400e
+Extract: aiag1.bit... 100%
+Extract: aiag4.bit... 100%
+Extract: aiag_2ch.bit... 100%
+Extract: aiagcl1.bit... 100%
+Extract: aiagcl4.bit... 100%
+Extract: aiagcl4_trl.bit... 100%
+Extract: dvfcl4_05hb.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvfox\xc2vp2
+Extract: aiagcl4.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvk
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvk\4005
+Extract: aiaext.bit... 100%
+Extract: aiag.bit... 100%
+Extract: camtest.bit... 100%
+Extract: testgen.bit... 100%
+Extract: xybion.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvk\4010
+Extract: aiaext.bit... 100%
+Extract: aiaext10.bit... 100%
+Extract: aiag.bit... 100%
+Extract: aiag_.bit... 100%
+Extract: aiag_2ch.bit... 100%
+Extract: aiagce.bit... 100%
+Extract: aiagenrgb.bit... 100%
+Extract: aiagi.bit... 100%
+Extract: aiags.bit... 100%
+Extract: aiargb.bit... 100%
+Extract: async.bit... 100%
+Extract: camtest.bit... 100%
+Extract: es10_10bit.bit... 100%
+Extract: testgen.bit... 100%
+Output folder: C:\EDT\pdv\camera_config\bitfiles\dvk\4013
+Extract: aiaext.bit... 100%
+Extract: aiag.bit... 100%
+Extract: aiag_.bit... 100%
+Extract: aiag_2ch.bit... 100%
+Extract: aiag_indigo.bit... 100%
+Extract: aiagce.bit... 100%
+Extract: aiagce_delay.bit... 100%
+Extract: aiagi.bit... 100%
+Extract: aiags.bit... 100%
+Extract: camtest.bit... 100%
+Extract: ham4742_95.bit... 100%
+Extract: kp_f100_dt.bit... 100%
+Extract: kp_f100_rev01.bit... 100%
+Extract: testgen.bit... 100%
+Extract: xtest.bit... 100%
+Output folder: C:\EDT\pdv\dispatch
+Extract: EdtCmdPort.h... 100%
+Extract: EdtDataValue.cpp... 100%
+Extract: EdtDataValue.h... 100%
+Extract: EdtLogStreambuf.h... 100%
+Extract: ErrorHandler.cpp... 100%
+Extract: ErrorHandler.h... 100%
+Extract: ParmObject.cpp... 100%
+Extract: ParmObject.h... 100%
+Extract: SocketConnection.cpp... 100%
+Extract: SocketConnection.h... 100%
+Extract: StringUtils.cpp... 100%
+Extract: StringUtils.h... 100%
+Extract: dispatch.vcproj... 100%
+Extract: makefile... 100%
+Output folder: C:\EDT\pdv\edt_camlink
+Extract: StdAfx.cpp... 100%
+Extract: StdAfx.h... 100%
+Extract: edt_camlink.cpp... 100%
+Extract: edt_camlink.h... 100%
+Extract: edt_camlink.vcproj... 100%
+Extract: make.bat
+Extract: makefile... 100%
+Output folder: C:\EDT\pdv\edtimage
+Extract: BufferTimerData.cpp... 100%
+Extract: BufferTimerData.h... 100%
+Extract: ColorBalance.cpp... 100%
+Extract: ColorBalance.h... 100%
+Extract: EdtBGSubtractor.cpp... 100%
+Extract: EdtBGSubtractor.h... 100%
+Extract: EdtBufHeader.cpp... 100%
+Extract: EdtBufHeader.h... 100%
+Extract: EdtBufferSize.h... 100%
+Extract: EdtCmdPort.h... 100%
+Extract: EdtDataHeader.cpp... 100%
+Extract: EdtDataHeader.h... 100%
+Extract: EdtHistogram.cpp... 100%
+Extract: EdtHistogram.h... 100%
+Extract: EdtImage.cpp... 100%
+Extract: EdtImage.h... 100%
+Extract: EdtImageData.cpp... 100%
+Extract: EdtImageData.h... 100%
+Extract: EdtImageDescr.h... 100%
+Extract: EdtImgArith.cpp... 100%
+Extract: EdtImgArith.h... 100%
+Extract: EdtImgDyadOp.cpp... 100%
+Extract: EdtImgDyadOp.h... 100%
+Extract: EdtImgFilter.cpp... 100%
+Extract: EdtImgFilter.h... 100%
+Extract: EdtImgMinMax.cpp... 100%
+Extract: EdtImgMinMax.h... 100%
+Extract: EdtImgOp.cpp... 100%
+Extract: EdtImgOp.h... 100%
+Extract: EdtImgProfile.cpp... 100%
+Extract: EdtImgProfile.h... 100%
+Extract: EdtImgStats.h... 100%
+Extract: EdtList.h... 100%
+Extract: EdtLut.cpp... 100%
+Extract: EdtLut.h... 100%
+Extract: EdtRect.h... 100%
+Extract: EdtRowOps.h... 100%
+Extract: EdtScaledLut.cpp... 100%
+Extract: EdtScaledLut.h... 100%
+Extract: ZoomData.h... 100%
+Extract: makefile... 100%
+Output folder: C:\EDT\pdv\flash
+Output folder: C:\EDT\pdv\flash\4013e
+Extract: pcidv.bit... 100%
+Extract: pcifoi.bit... 100%
+Extract: pdvk.bit... 100%
+Output folder: C:\EDT\pdv\flash\4013xla
+Extract: aero_3v.bit... 100%
+Extract: aero_5v.bit... 100%
+Extract: pcidv44_3v.bit... 100%
+Extract: pcidv44_5v.bit... 100%
+Extract: pcidv_3v.bit... 100%
+Extract: pcidv_5v.bit... 100%
+Extract: pdvk_3v.bit... 100%
+Extract: pdvk_5v.bit... 100%
+Extract: pdvkkla_3v.bit... 100%
+Extract: pdvkkla_5v.bit... 100%
+Output folder: C:\EDT\pdv\flash\4028xla
+Extract: pcidv_3v.bit... 100%
+Extract: pcidv_5v.bit... 100%
+Output folder: C:\EDT\pdv\flash\5cgtfd5c5
+Extract: visionlinkf1.bit... 100%
+Extract: visionlinkf4.bit... 100%
+Output folder: C:\EDT\pdv\flash\rcx
+Extract: fx12.rcx... 100%
+Extract: fyz12.rcx... 100%
+Extract: my12.rcx... 100%
+Extract: rgb08.rcx... 100%
+Extract: rgb11d.rcx... 100%
+Output folder: C:\EDT\pdv\flash\xc2s100
+Extract: fciusps01_3v.bit... 100%
+Extract: fciusps01_5v.bit... 100%
+Extract: fciusps02_3v.bit... 100%
+Extract: fciusps02_5v.bit... 100%
+Output folder: C:\EDT\pdv\flash\xc2s150
+Extract: pcifoi_3v.bit... 100%
+Extract: pcifoi_5v.bit... 100%
+Extract: pdvcamlk_3v.bit... 100%
+Extract: pdvcamlk_5v.bit... 100%
+Output folder: C:\EDT\pdv\flash\xc2s200
+Extract: camlkla_3v.bit... 100%
+Extract: camlkla_5v.bit... 100%
+Extract: dva1_3v.bit... 100%
+Extract: dva1_5v.bit... 100%
+Extract: dva4_3v.bit... 100%
+Extract: dva4_5v.bit... 100%
+Extract: dvcl4_3v.bit... 100%
+Extract: dvcl4_5v.bit... 100%
+Extract: dvtlk1_3v.bit... 100%
+Extract: dvtlk1_5v.bit... 100%
+Extract: dvtlk4_3v.bit... 100%
+Extract: dvtlk4_5v.bit... 100%
+Extract: dvtlk4_pmcdvf_3v.bit... 100%
+Extract: dvtlk4_pmcdvf_5v.bit... 100%
+Extract: pdvcamlk26_7k_3v.bit... 100%
+Extract: pdvcamlk26_7k_5v.bit... 100%
+Extract: pdvcamlk2_3v.bit... 100%
+Extract: pdvcamlk2_5v.bit... 100%
+Extract: pdvcamlk2_pp_3v.bit... 100%
+Extract: pdvcamlk2_pp_5v.bit... 100%
+Extract: pdvcamlk7k_3v.bit... 100%
+Extract: pdvcamlk7k_5v.bit... 100%
+Extract: pdvcamlk_3v.bit... 100%
+Extract: pdvcamlk_5v.bit... 100%
+Extract: pdvcamlk_dlylv_3v.bit... 100%
+Extract: pdvcamlk_dlylv_5v.bit... 100%
+Extract: pdvcamlk_dual_3v.bit... 100%
+Extract: pdvcamlk_dual_5v.bit... 100%
+Extract: pdvcamlk_iln_3v.bit... 100%
+Extract: pdvcamlk_iln_5v.bit... 100%
+Extract: pdvcamlk_lhs_3v.bit... 100%
+Extract: pdvcamlk_lhs_5v.bit... 100%
+Extract: pdvcamlk_lse_3v.bit... 100%
+Extract: pdvcamlk_lse_5v.bit... 100%
+Extract: pdvcamlk_pir_3v.bit... 100%
+Extract: pdvcamlk_pir_5v.bit... 100%
+Extract: pdvcamlk_pp_3v.bit... 100%
+Extract: pdvcamlk_pp_5v.bit... 100%
+Output folder: C:\EDT\pdv\flash\xc3s1200e
+Extract: pe4dvcamlk32_mm.bit... 100%
+Extract: pe4dvcamlk32_mmrgb.bit... 100%
+Extract: pedvcamlk.bit... 100%
+Extract: pedvcamlk32.bit... 100%
+Extract: pedvcamlk32_ltrig.bit... 100%
+Extract: pedvcamlk64.bit... 100%
+Extract: pedvclsim.bit... 100%
+Output folder: C:\EDT\pdv\flash\xc5vlx30t
+Extract: pe4dvacamlk.bit... 100%
+Extract: pe4dvacamlk_fm.bit... 100%
+Extract: pe4dvacamlk_fm_tsi.bit... 100%
+Extract: pe4dvafox.bit... 100%
+Extract: pe8dvacamlk.bit... 100%
+Extract: pe8dvacamlk_fm.bit... 100%
+Extract: pe8dvacamlk_t06.bit... 100%
+Extract: pe8dvacamlkddr_fm.bit... 100%
+Extract: pe8dvaclsim.bit... 100%
+Extract: pe8dvaclsim128b.bit... 100%
+Extract: pe8dvaclsim_fm.bit... 100%
+Extract: pe8dvcamlk.bit... 100%
+Extract: pe8dvcamlk2.bit... 100%
+Extract: pe8dvcamlk2_fm.bit... 100%
+Extract: pe8dvcamlk_fm.bit... 100%
+Extract: pe8dvclsim.bit... 100%
+Extract: pe8dvclsim_fm.bit... 100%
+Output folder: C:\EDT\pdv\flash\xc5vlx50t
+Extract: pe4dvafox.bit... 100%
+Output folder: C:\EDT\pdv\images
+Extract: edticon64.ico... 100%
+Extract: edtinstall.ico... 100%
+Extract: installsplash.bmp... 100%
+Extract: welcomesplash.bmp... 100%
+Output folder: C:\EDT\pdv\imgfiles
+Extract: Imagefiletiff.cpp... 100%
+Extract: Imagefiletiff.h... 100%
+Extract: imagefile.cpp... 100%
+Extract: imagefile.h... 100%
+Extract: imagefilebmp.cpp... 100%
+Extract: imagefilebmp.h... 100%
+Extract: imagefilejpeg.cpp... 100%
+Extract: imagefilejpeg.h... 100%
+Extract: imagefilemgr.cpp... 100%
+Extract: imagefilemgr.h... 100%
+Extract: imagefileraw.cpp... 100%
+Extract: imagefileraw.h... 100%
+Extract: imagefiletype.cpp... 100%
+Extract: imagefiletype.h... 100%
+Extract: makefile... 100%
+Output folder: C:\EDT\pdv\jpeg-6b
+Extract: Makefile... 100%
+Extract: README... 100%
+Extract: ansi2knr.1... 100%
+Extract: ansi2knr.c... 100%
+Extract: cderror.h... 100%
+Extract: cdjpeg.c... 100%
+Extract: cdjpeg.h... 100%
+Extract: change.log... 100%
+Extract: cjpeg.1... 100%
+Extract: cjpeg.c... 100%
+Extract: ckconfig.c... 100%
+Extract: coderules.doc... 100%
+Extract: config.guess... 100%
+Extract: config.sub... 100%
+Extract: configure... 100%
+Extract: djpeg.1... 100%
+Extract: djpeg.c... 100%
+Extract: example.c... 100%
+Extract: filelist.doc... 100%
+Extract: install-sh... 100%
+Extract: install.doc... 100%
+Extract: jcapimin.c... 100%
+Extract: jcapistd.c... 100%
+Extract: jccoefct.c... 100%
+Extract: jccolor.c... 100%
+Extract: jcdctmgr.c... 100%
+Extract: jchuff.c... 100%
+Extract: jchuff.h... 100%
+Extract: jcinit.c... 100%
+Extract: jcmainct.c... 100%
+Extract: jcmarker.c... 100%
+Extract: jcmaster.c... 100%
+Extract: jcomapi.c... 100%
+Extract: jconfig.bcc... 100%
+Extract: jconfig.cfg... 100%
+Extract: jconfig.dj... 100%
+Extract: jconfig.doc... 100%
+Extract: jconfig.edtlnx... 100%
+Extract: jconfig.edtwin... 100%
+Extract: jconfig.h... 100%
+Extract: jconfig.mac... 100%
+Extract: jconfig.manx... 100%
+Extract: jconfig.mc6... 100%
+Extract: jconfig.sas... 100%
+Extract: jconfig.st... 100%
+Extract: jconfig.vc... 100%
+Extract: jconfig.vms... 100%
+Extract: jconfig.wat... 100%
+Extract: jcparam.c... 100%
+Extract: jcphuff.c... 100%
+Extract: jcprepct.c... 100%
+Extract: jcsample.c... 100%
+Extract: jctrans.c... 100%
+Extract: jdapimin.c... 100%
+Extract: jdapistd.c... 100%
+Extract: jdatadst.c... 100%
+Extract: jdatasrc.c... 100%
+Extract: jdcoefct.c... 100%
+Extract: jdcolor.c... 100%
+Extract: jdct.h... 100%
+Extract: jddctmgr.c... 100%
+Extract: jdhuff.c... 100%
+Extract: jdhuff.h... 100%
+Extract: jdinput.c... 100%
+Extract: jdmainct.c... 100%
+Extract: jdmarker.c... 100%
+Extract: jdmaster.c... 100%
+Extract: jdmerge.c... 100%
+Extract: jdosaobj.doc... 100%
+Extract: jdphuff.c... 100%
+Extract: jdpostct.c... 100%
+Extract: jdsample.c... 100%
+Extract: jdtrans.c... 100%
+Extract: jerror.c... 100%
+Extract: jerror.h... 100%
+Extract: jfdctflt.c... 100%
+Extract: jfdctfst.c... 100%
+Extract: jfdctint.c... 100%
+Extract: jidctflt.c... 100%
+Extract: jidctfst.c... 100%
+Extract: jidctint.c... 100%
+Extract: jidctred.c... 100%
+Extract: jinclude.h... 100%
+Extract: jmemansi.c... 100%
+Extract: jmemdos.c... 100%
+Extract: jmemdosa.asm... 100%
+Extract: jmemmac.c... 100%
+Extract: jmemmgr.c... 100%
+Extract: jmemname.c... 100%
+Extract: jmemnobs.c... 100%
+Extract: jmemsys.h... 100%
+Extract: jmorecfg.h... 100%
+Extract: jpeg-6b.vcproj... 100%
+Extract: jpegint.h... 100%
+Extract: jpeglib.h... 100%
+Extract: jpegtran.1... 100%
+Extract: jpegtran.c... 100%
+Extract: jquant1.c... 100%
+Extract: jquant2.c... 100%
+Extract: jutils.c... 100%
+Extract: jversion.h... 100%
+Extract: libjpeg.doc... 100%
+Extract: ltconfig... 100%
+Extract: ltmain.sh... 100%
+Extract: makcjpeg.st... 100%
+Extract: makdjpeg.st... 100%
+Extract: makeapps.ds... 100%
+Extract: makefile.ansi... 100%
+Extract: makefile.bcc... 100%
+Extract: makefile.cfg... 100%
+Extract: makefile.dj... 100%
+Extract: makefile.manx... 100%
+Extract: makefile.mc6... 100%
+Extract: makefile.mms... 100%
+Extract: makefile.sas... 100%
+Extract: makefile.unix... 100%
+Extract: makefile.vc... 100%
+Extract: makefile.vms... 100%
+Extract: makefile.wat... 100%
+Extract: makelib.ds... 100%
+Extract: makeproj.mac... 100%
+Extract: makljpeg.st... 100%
+Extract: maktjpeg.st... 100%
+Extract: makvms.opt... 100%
+Extract: rdbmp.c... 100%
+Extract: rdcolmap.c... 100%
+Extract: rdgif.c... 100%
+Extract: rdjpgcom.1... 100%
+Extract: rdjpgcom.c... 100%
+Extract: rdppm.c... 100%
+Extract: rdrle.c... 100%
+Extract: rdswitch.c... 100%
+Extract: rdtarga.c... 100%
+Extract: readme.dos... 100%
+Extract: structure.doc... 100%
+Extract: testimg.bmp... 100%
+Extract: testimg.jpg... 100%
+Extract: testimg.ppm... 100%
+Extract: testimgp.jpg... 100%
+Extract: testorig.jpg... 100%
+Extract: testprog.jpg... 100%
+Extract: transupp.c... 100%
+Extract: transupp.h... 100%
+Extract: usage.doc... 100%
+Extract: wizard.doc... 100%
+Extract: wrbmp.c... 100%
+Extract: wrgif.c... 100%
+Extract: wrjpgcom.1... 100%
+Extract: wrjpgcom.c... 100%
+Extract: wrppm.c... 100%
+Extract: wrrle.c... 100%
+Extract: wrtarga.c... 100%
+Output folder: C:\EDT\pdv\lib
+Output folder: C:\EDT\pdv\lib\amd64
+Extract: clseredt.lib... 100%
+Extract: edtimage.lib... 100%
+Extract: imgfiles.lib... 100%
+Extract: libtiff.lib... 100%
+Extract: pdvlib.lib... 100%
+Extract: pdvplus.lib... 100%
+Output folder: C:\EDT\pdv\lib\x86
+Extract: clseredt.lib... 100%
+Extract: edtimage.lib... 100%
+Extract: imgfiles.lib... 100%
+Extract: libtiff.lib... 100%
+Extract: pdvlib.lib... 100%
+Extract: pdvplus.lib... 100%
+Output folder: C:\EDT\pdv\pciediag_src
+Extract: makefile... 100%
+Extract: pciecfg.cpp... 100%
+Extract: pciecfg.h... 100%
+Extract: pciediag.cpp... 100%
+Output folder: C:\EDT\pdv\pdv_qtlib
+Extract: AppSettings.cpp... 100%
+Extract: AppSettings.h... 100%
+Extract: CamSelectTree.cpp... 100%
+Extract: CamSelectTree.h... 100%
+Extract: CamSelectTreeItem.cpp... 100%
+Extract: CamSelectTreeItem.h... 100%
+Extract: CamSerialDlg.cpp... 100%
+Extract: CamSerialDlg.h... 100%
+Extract: CamSerialDlg.ui... 100%
+Extract: CamSettingsDlg.cpp... 100%
+Extract: CamSettingsDlg.h... 100%
+Extract: CamSettingsDlg.ui... 100%
+Extract: DevInfoMsgBox.cpp... 100%
+Extract: DevInfoMsgBox.h... 100%
+Extract: DevSelectTree.cpp... 100%
+Extract: DevSelectTree.h... 100%
+Extract: DevSelectTreeItem.cpp... 100%
+Extract: DevSelectTreeItem.h... 100%
+Extract: DisplayContrast.cpp... 100%
+Extract: DisplayContrast.h... 100%
+Extract: DisplaySkip.cpp... 100%
+Extract: DisplaySkip.h... 100%
+Extract: DisplaySkip.ui... 100%
+Extract: EdtIntervalData.cpp... 100%
+Extract: EdtIntervalData.h... 100%
+Extract: EdtQtContrastCanvas.cpp... 100%
+Extract: EdtQtContrastCanvas.h... 100%
+Extract: EdtQtDeviceDlg.cpp... 100%
+Extract: EdtQtDeviceDlg.h... 100%
+Extract: EdtQtDeviceDlg.ui... 100%
+Extract: EdtQtFileInfo.cpp... 100%
+Extract: EdtQtFileInfo.h... 100%
+Extract: EdtQtGraphicsItem.cpp... 100%
+Extract: EdtQtGraphicsItem.h... 100%
+Extract: EdtQtHistoCanvas.cpp... 100%
+Extract: EdtQtHistoCanvas.h... 100%
+Extract: EdtQtHistogramItem.cpp... 100%
+Extract: EdtQtHistogramItem.h... 100%
+Extract: EdtQtImageItem.cpp... 100%
+Extract: EdtQtImageItem.h... 100%
+Extract: EdtQtImageScene.cpp... 100%
+Extract: EdtQtImageScene.h... 100%
+Extract: EdtQtImageView.cpp... 100%
+Extract: EdtQtImageView.h... 100%
+Extract: EdtQtImageViewer.cpp... 100%
+Extract: EdtQtImageViewer.h... 100%
+Extract: EdtQtImageWindow.cpp... 100%
+Extract: EdtQtImageWindow.h... 100%
+Extract: EdtQtImageWindow.ui... 100%
+Extract: EdtQtLiveDisplay.cpp... 100%
+Extract: EdtQtLiveDisplay.h... 100%
+Extract: EdtQtPixelDlg.cpp... 100%
+Extract: EdtQtPixelDlg.h... 100%
+Extract: EdtQtPixelDlg.ui... 100%
+Extract: EdtQtPixelTable.cpp... 100%
+Extract: EdtQtPixelTable.h... 100%
+Extract: EdtQtPlotCanvas.cpp... 100%
+Extract: EdtQtPlotCanvas.h... 100%
+Extract: EdtQtPlotCurve.cpp... 100%
+Extract: EdtQtPlotCurve.h... 100%
+Extract: EdtQtPlotView.cpp... 100%
+Extract: EdtQtPlotView.h... 100%
+Extract: EdtQtProfileCanvas.cpp... 100%
+Extract: EdtQtProfileCanvas.h... 100%
+Extract: EdtQtRegisterDlg.cpp... 100%
+Extract: EdtQtRegisterDlg.h... 100%
+Extract: EdtQwtPlot.cpp... 100%
+Extract: EdtQwtPlot.h... 100%
+Extract: HelpDlg.cpp... 100%
+Extract: HelpDlg.h... 100%
+Extract: HelpDlg.ui... 100%
+Extract: contrastwidget.cpp... 100%
+Extract: contrastwidget.h... 100%
+Extract: contrastwidget.ui... 100%
+Extract: edtqtplotcurve.ui... 100%
+Extract: histowidget.cpp... 100%
+Extract: histowidget.h... 100%
+Extract: histowidget.ui... 100%
+Extract: make.bat
+Extract: makefile... 100%
+Extract: pdv_qtlib.pro... 100%
+Extract: pdv_qtlib.qrc... 100%
+Extract: pdv_qtlib.vcproj... 100%
+Extract: profilewidget.cpp... 100%
+Extract: profilewidget.h... 100%
+Extract: profilewidget.ui... 100%
+Extract: qtcamselect.cpp... 100%
+Extract: qtcamselect.h... 100%
+Extract: qtcamselect.qrc... 100%
+Extract: qtcamselect.ui... 100%
+Output folder: C:\EDT\pdv\pdv_qtlib\Resources
+Extract: ROI.png
+Extract: bggr.bmp... 100%
+Extract: binning.bmp... 100%
+Extract: board_icon.png
+Extract: brighter.bmp... 100%
+Extract: camconfig.png
+Extract: camselect.png
+Extract: camset.png
+Extract: capture.png
+Extract: checkbox.png
+Extract: colors.png
+Extract: contrast.png
+Extract: darker.bmp... 100%
+Extract: devselect.png
+Extract: devselect1.png
+Extract: devselect2.png
+Extract: disable_box.bmp... 100%
+Extract: disable_line.bmp... 100%
+Extract: display_frequency.bmp... 100%
+Extract: draw_box.png
+Extract: draw_line.png
+Extract: edticon.png
+Extract: edticon64.bmp... 100%
+Extract: filenew.png
+Extract: fstop.png
+Extract: gbrg.bmp... 100%
+Extract: grbg.bmp... 100%
+Extract: histogram.png
+Extract: imagenew.png
+Extract: imageopen.png
+Extract: invert.png
+Extract: pci_dv_c-link.png
+Extract: pcie4_dva_c-link.png
+Extract: pcie8_dva_c-link.png
+Extract: pixel_counter.png
+Extract: pixel_text.png
+Extract: process-stop.png
+Extract: profile.png
+Extract: reset_cursor.bmp... 100%
+Extract: reset_cursor.png
+Extract: reset_zoom.bmp... 100%
+Extract: rggb.bmp... 100%
+Extract: save.bmp... 100%
+Extract: saveimg.png
+Extract: serial1.png
+Extract: single_shot.png
+Extract: snap.bmp... 100%
+Extract: start.png
+Extract: visionlink_f1.png
+Extract: visionlink_f4.png
+Extract: vlvhelp.html... 100%
+Extract: vlvhelp_footer.png... 100%
+Extract: vlvhelp_menu_toolbar.png... 100%
+Extract: vlvhelp_top_bar.jpg... 100%
+Extract: zoom.png
+Extract: zoom_normal.png
+Extract: zoom_out.png
+Extract: zoompanel.bmp... 100%
+Output folder: C:\EDT\pdv\pdvplus
+Extract: ImageEventFunc.h... 100%
+Extract: PdvConfig.cpp... 100%
+Extract: PdvConfig.h... 100%
+Extract: PdvConfigSet.cpp... 100%
+Extract: PdvConfigSet.h... 100%
+Extract: PdvDevice.cpp... 100%
+Extract: PdvDevice.h... 100%
+Extract: PdvDeviceSet.cpp... 100%
+Extract: PdvDeviceSet.h... 100%
+Extract: PdvInput.cpp... 100%
+Extract: PdvInput.h... 100%
+Extract: edtdefines.h... 100%
+Extract: makefile... 100%
+Output folder: C:\EDT\pdv\pdvshow
+Extract: BGSubtractDlg.cpp... 100%
+Extract: BGSubtractDlg.h... 100%
+Extract: BinningDlg.cpp... 100%
+Extract: BinningDlg.h... 100%
+Extract: CamSelectDialog.cpp... 100%
+Extract: CamSelectDialog.h... 100%
+Extract: ConfigDataSet.c... 100%
+Extract: ConfigDataSet.h... 100%
+Extract: DVCControlButtonsDlg.cpp... 100%
+Extract: DVCControlButtonsDlg.h... 100%
+Extract: DVCControlDlg.cpp... 100%
+Extract: DVCControlDlg.h... 100%
+Extract: DVCSetupDlg.cpp... 100%
+Extract: DVCSetupDlg.h... 100%
+Extract: DalsaCameraControl.cpp... 100%
+Extract: DalsaCameraControl.h... 100%
+Extract: DataPanelDlg.cpp... 100%
+Extract: DataPanelDlg.h... 100%
+Extract: DisplaySkipDlg.cpp... 100%
+Extract: DisplaySkipDlg.h... 100%
+Extract: EdtImageFrame.cpp... 100%
+Extract: EdtImageFrame.h... 100%
+Extract: EdtImageWin.cpp... 100%
+Extract: EdtImageWin.h... 100%
+Extract: EdtLiveFrame.cpp... 100%
+Extract: EdtLiveFrame.h... 100%
+Extract: KeyboardInput.cpp... 100%
+Extract: KeyboardInput.h... 100%
+Extract: LedButton.cpp... 100%
+Extract: LedButton.h... 100%
+Extract: LimitSingleInstance.h... 100%
+Extract: LiveDisplay.cpp... 100%
+Extract: LiveDisplay.h... 100%
+Extract: MainFrm.cpp... 100%
+Extract: MainFrm.h... 100%
+Extract: MsWindowPaint.cpp... 100%
+Extract: MsWindowPaint.h... 100%
+Extract: RGBLut.cpp... 100%
+Extract: RGBLut.h... 100%
+Extract: RecordLogDlg.cpp... 100%
+Extract: RecordLogDlg.h... 100%
+Extract: RoiDlg.cpp... 100%
+Extract: RoiDlg.h... 100%
+Extract: SoftwareRGBDlg.cpp... 100%
+Extract: SoftwareRGBDlg.h... 100%
+Extract: WaterfallControl.cpp... 100%
+Extract: WaterfallControl.h... 100%
+Extract: WhiteBalanceSetup.cpp... 100%
+Extract: WhiteBalanceSetup.h... 100%
+Extract: WindowPaint.cpp... 100%
+Extract: WindowPaint.h... 100%
+Extract: ZoomDialog.cpp... 100%
+Extract: ZoomDialog.h... 100%
+Extract: camcontroldlg.cpp... 100%
+Extract: camcontroldlg.h... 100%
+Extract: camprogramdlg.cpp... 100%
+Extract: camprogramdlg.h... 100%
+Extract: camsavedlg.cpp... 100%
+Extract: camsavedlg.h... 100%
+Extract: camsetupdlg.cpp... 100%
+Extract: camsetupdlg.h... 100%
+Extract: childfrm.cpp... 100%
+Extract: childfrm.h... 100%
+Extract: contrastdlg.cpp... 100%
+Extract: contrastdlg.h... 100%
+Extract: dirname.cpp... 100%
+Extract: dirname.h... 100%
+Extract: edtcamdll.cpp... 100%
+Extract: edtcamdll.h... 100%
+Extract: edtimagetext.cpp... 100%
+Extract: edtimagetext.h... 100%
+Extract: edtimagetextdlg.cpp... 100%
+Extract: edtimagetextdlg.h... 100%
+Extract: edtimagewindow.cpp... 100%
+Extract: edtimagewindow.h... 100%
+Extract: edtplotwindow.cpp... 100%
+Extract: edtplotwindow.h... 100%
+Extract: gammadialog.cpp... 100%
+Extract: gammadialog.h... 100%
+Extract: histdialog.cpp... 100%
+Extract: histdialog.h... 100%
+Extract: imagewindowdata.cpp... 100%
+Extract: imagewindowdata.h... 100%
+Extract: makefile... 100%
+Extract: pdvshow.cpp... 100%
+Extract: pdvshow.h... 100%
+Extract: pdvshow.rc... 100%
+Extract: pdvshowdoc.cpp... 100%
+Extract: pdvshowdoc.h... 100%
+Extract: pdvshowview.cpp... 100%
+Extract: pdvshowview.h... 100%
+Extract: profiledialog.cpp... 100%
+Extract: profiledialog.h... 100%
+Extract: resource.h... 100%
+Extract: stdafx.cpp... 100%
+Extract: stdafx.h... 100%
+Output folder: C:\EDT\pdv\pdvshow\res
+Extract: bmp00001.bmp... 100%
+Extract: bmp00002.bmp... 100%
+Extract: bmp00003.bmp... 100%
+Extract: crop.cur... 100%
+Extract: cursor1.cur... 100%
+Extract: edtcam.ico... 100%
+Extract: edtcam2.ico... 100%
+Extract: edtcamdo.ico... 100%
+Extract: edtcamdo2.ico... 100%
+Extract: edtcamdo_sv.ico... 100%
+Extract: here.cur... 100%
+Extract: mainfram.bmp... 100%
+Extract: pdvshow.ico... 100%
+Extract: pdvshow.rc2... 100%
+Extract: pdvshow2.ico... 100%
+Extract: pdvshowdoc.ico... 100%
+Extract: toolbar.bmp... 100%
+Output folder: C:\EDT\pdv\projects.vs2008
+Extract: PdvPlus.vcproj... 100%
+Extract: bigread.vcproj... 100%
+Extract: bigread.vcproj.user... 100%
+Extract: bitload.vcproj... 100%
+Extract: bitload.vcproj.user... 100%
+Extract: check_gap_cl.vcproj... 100%
+Extract: check_gap_cl.vcproj.user... 100%
+Extract: checkcam.vcproj... 100%
+Extract: checkcam.vcproj.user... 100%
+Extract: cl_logic.vcproj... 100%
+Extract: cl_logic.vcproj.user... 100%
+Extract: cl_speed.vcproj... 100%
+Extract: cl_speed.vcproj.user... 100%
+Extract: clink_counters.vcproj... 100%
+Extract: clink_counters.vcproj.user... 100%
+Extract: clink_tester.vcproj... 100%
+Extract: clink_tester.vcproj.user... 100%
+Extract: clsiminit.vcproj... 100%
+Extract: clsiminit.vcproj.user... 100%
+Extract: clsimvar.vcproj... 100%
+Extract: clsimvar.vcproj.user... 100%
+Extract: countbits.vcproj... 100%
+Extract: countbits.vcproj.user... 100%
+Extract: dumpit.vcproj... 100%
+Extract: dumpit.vcproj.user... 100%
+Extract: dvinfo.vcproj... 100%
+Extract: dvinfo.vcproj.user... 100%
+Extract: edt_sysinfo.vcproj... 100%
+Extract: edt_sysinfo.vcproj.user... 100%
+Extract: edtimagelib.vcproj... 100%
+Extract: gen_tiffs.vcproj... 100%
+Extract: gen_tiffs.vcproj.user... 100%
+Extract: imgfiles.vcproj... 100%
+Extract: initcam.vcproj... 100%
+Extract: initcam.vcproj.user... 100%
+Extract: irigdump.vcproj... 100%
+Extract: irigdump.vcproj.user... 100%
+Extract: libtiff.vcproj... 100%
+Extract: msp430_load.vcproj... 100%
+Extract: msp430_load.vcproj.user... 100%
+Extract: new_strobe.vcproj... 100%
+Extract: new_strobe.vcproj.user... 100%
+Extract: optstr.vcproj... 100%
+Extract: optstr.vcproj.user... 100%
+Extract: pdb.vcproj... 100%
+Extract: pdb.vcproj.user... 100%
+Extract: pdbcls10b.vcproj... 100%
+Extract: pdbcls10b.vcproj.user... 100%
+Extract: pdvapps.sln... 100%
+Extract: pdvlib.vcproj... 100%
+Extract: pdvplayback.vcproj... 100%
+Extract: pdvplayback.vcproj.user... 100%
+Extract: pdvrecord.vcproj... 100%
+Extract: pdvrecord.vcproj.user... 100%
+Extract: pdvshow.sln... 100%
+Extract: pdvshow.vcproj... 100%
+Extract: pdvterm.vcproj... 100%
+Extract: pdvterm.vcproj.user... 100%
+Extract: rcxload.vcproj... 100%
+Extract: rcxload.vcproj.user... 100%
+Extract: rcxmake.vcproj... 100%
+Extract: rcxmake.vcproj.user... 100%
+Extract: sample.vcproj... 100%
+Extract: sample.vcproj.user... 100%
+Extract: send_tiffs.vcproj... 100%
+Extract: send_tiffs.vcproj.user... 100%
+Extract: serial_cmd.vcproj... 100%
+Extract: serial_cmd.vcproj.user... 100%
+Extract: set_si5338.vcproj... 100%
+Extract: set_si5338.vcproj.user... 100%
+Extract: setdebug.vcproj... 100%
+Extract: setdebug.vcproj.user... 100%
+Extract: setperiod.vcproj... 100%
+Extract: setperiod.vcproj.user... 100%
+Extract: simple_bc.vcproj... 100%
+Extract: simple_bc.vcproj.user... 100%
+Extract: simple_clsend.vcproj... 100%
+Extract: simple_clsend.vcproj.user... 100%
+Extract: simple_etrig.vcproj... 100%
+Extract: simple_etrig.vcproj.user... 100%
+Extract: simple_event.vcproj... 100%
+Extract: simple_event.vcproj.user... 100%
+Extract: simple_irig2.vcproj... 100%
+Extract: simple_irig2.vcproj.user... 100%
+Extract: simple_sequence.vcproj... 100%
+Extract: simple_sequence.vcproj.user... 100%
+Extract: simple_take.vcproj... 100%
+Extract: simple_take.vcproj.user... 100%
+Extract: simplemem.vcproj... 100%
+Extract: simplemem.vcproj.user... 100%
+Extract: simplest_take.vcproj... 100%
+Extract: simplest_take.vcproj.user... 100%
+Extract: speedtest.vcproj... 100%
+Extract: speedtest.vcproj.user... 100%
+Extract: strobe.vcproj... 100%
+Extract: strobe.vcproj.user... 100%
+Extract: take.vcproj... 100%
+Extract: take.vcproj.user... 100%
+Extract: taketwo.vcproj... 100%
+Extract: taketwo.vcproj.user... 100%
+Extract: timing_test.vcproj... 100%
+Extract: timing_test.vcproj.user... 100%
+Extract: trace.vcproj... 100%
+Extract: trace.vcproj.user... 100%
+Extract: usps_test.vcproj... 100%
+Extract: usps_test.vcproj.user... 100%
+Extract: waitevent.vcproj... 100%
+Extract: waitevent.vcproj.user... 100%
+Extract: watchstat.vcproj... 100%
+Extract: watchstat.vcproj.user... 100%
+Extract: xtest.vcproj... 100%
+Extract: xtest.vcproj.user... 100%
+Output folder: C:\EDT\pdv\redist
+Extract: vcredist_x64.exe... 100%
+Extract: vcredist_x86.exe... 100%
+Output folder: C:\EDT\pdv\tiff
+Extract: nmake.opt... 100%
+Output folder: C:\EDT\pdv\tiff\libtiff
+Extract: Makefile.vc... 100%
+Extract: makefile.edtwin... 100%
+Extract: mkg3states.c... 100%
+Extract: t4.h... 100%
+Extract: tif_acorn.c... 100%
+Extract: tif_apple.c... 100%
+Extract: tif_atari.c... 100%
+Extract: tif_aux.c... 100%
+Extract: tif_close.c... 100%
+Extract: tif_codec.c... 100%
+Extract: tif_color.c... 100%
+Extract: tif_compress.c... 100%
+Extract: tif_config.h... 100%
+Extract: tif_config.h.vc... 100%
+Extract: tif_dir.c... 100%
+Extract: tif_dir.h... 100%
+Extract: tif_dirinfo.c... 100%
+Extract: tif_dirread.c... 100%
+Extract: tif_dirwrite.c... 100%
+Extract: tif_dumpmode.c... 100%
+Extract: tif_error.c... 100%
+Extract: tif_extension.c... 100%
+Extract: tif_fax3.c... 100%
+Extract: tif_fax3.h... 100%
+Extract: tif_fax3sm.c... 100%
+Extract: tif_flush.c... 100%
+Extract: tif_getimage.c... 100%
+Extract: tif_jpeg.c... 100%
+Extract: tif_luv.c... 100%
+Extract: tif_lzw.c... 100%
+Extract: tif_msdos.c... 100%
+Extract: tif_next.c... 100%
+Extract: tif_ojpeg.c... 100%
+Extract: tif_open.c... 100%
+Extract: tif_packbits.c... 100%
+Extract: tif_pixarlog.c... 100%
+Extract: tif_predict.c... 100%
+Extract: tif_predict.h... 100%
+Extract: tif_print.c... 100%
+Extract: tif_read.c... 100%
+Extract: tif_stream.cxx... 100%
+Extract: tif_strip.c... 100%
+Extract: tif_swab.c... 100%
+Extract: tif_thunder.c... 100%
+Extract: tif_tile.c... 100%
+Extract: tif_unix.c... 100%
+Extract: tif_version.c... 100%
+Extract: tif_warning.c... 100%
+Extract: tif_win3.c... 100%
+Extract: tif_win32.c... 100%
+Extract: tif_write.c... 100%
+Extract: tif_zip.c... 100%
+Extract: tiff.h... 100%
+Extract: tiffconf.h... 100%
+Extract: tiffconf.h.vc... 100%
+Extract: tiffio.h... 100%
+Extract: tiffiop.h... 100%
+Extract: tiffvers.h... 100%
+Extract: uvcode.h... 100%
+Extract: zconf.h... 100%
+Extract: zlib.h... 100%
+Output folder: C:\EDT\pdv\tiffs256
+Extract: num0.tif... 100%
+Extract: num1.tif... 100%
+Extract: num2.tif... 100%
+Extract: num3.tif... 100%
+Extract: num4.tif... 100%
+Extract: num5.tif... 100%
+Extract: num6.tif... 100%
+Extract: num7.tif... 100%
+Extract: num8.tif... 100%
+Extract: num9.tif... 100%
+Output folder: C:\EDT\pdv\vlv
+Extract: main.cpp... 100%
+Extract: make.bat... 100%
+Extract: makefile... 100%
+Extract: vlviewer.cpp... 100%
+Extract: vlviewer.h... 100%
+Extract: vlviewer.pro... 100%
+Extract: vlviewer.rc... 100%
+Extract: vlviewer.sln... 100%
+Extract: vlviewer.ui... 100%
+Extract: vlviewer.vcproj... 100%
+Extract: vlviewer.vcproj.user... 100%
+Extract: vlviewer.vcxproj... 100%
+Extract: vlviewer.vcxproj.user... 100%
+Output folder: C:\EDT\pdv\vlv\Resources
+Extract: edtutils.ico... 100%
+Extract: edtutils_black.ico... 100%
+Extract: pdvshow.ico... 100%
+Extract: pdvutils.ico... 100%
+Extract: pdvutils_black.ico... 100%
+Extract: vlviewer.ico... 100%
+Output folder: C:\EDT\pdv\wbin
+Output folder: C:\EDT\pdv\wbin\amd64
+Extract: QtCore4.dll... 100%
+Extract: QtCored4.dll... 100%
+Extract: QtGui4.dll... 100%
+Extract: QtGuid4.dll... 100%
+Extract: QtSvg4.dll... 100%
+Extract: QtSvgd4.dll... 100%
+Output folder: C:\EDT\pdv\wbin\x86
+Extract: QtCore4.dll... 100%
+Extract: QtCored4.dll... 100%
+Extract: QtGui4.dll... 100%
+Extract: QtGuid4.dll... 100%
+Extract: QtSvg4.dll... 100%
+Extract: QtSvgd4.dll... 100%
+Output folder: C:\EDT\pdv\wdf
+Extract: reload32.bat... 100%
+Extract: reload64.bat... 100%
+Extract: remove_edtinf.bat... 100%
+Extract: remove_pdvwdf.bat... 100%
+Extract: wdf_reload.exe... 100%
+Extract: wdf_reload64.exe... 100%
+Output folder: C:\EDT\pdv\wdf\install
+Extract: EDTpdv_install_silent.bat... 100%
+Extract: EDTpdv_uninstall_silent.bat... 100%
+Output folder: C:\EDT\pdv\wdf\install\amd64
+Extract: WdfCoInstaller01009.dll... 100%
+Extract: pdvwdf.cat... 100%
+Extract: pdvwdf.inf... 100%
+Extract: pdvwdf.sys... 100%
+Output folder: C:\EDT\pdv\wdf\install\win10_amd64
+Extract: WdfCoInstaller01009.dll... 100%
+Extract: pdvwdf.cat... 100%
+Extract: pdvwdf.inf... 100%
+Extract: pdvwdf.sys... 100%
+Output folder: C:\EDT\pdv\wdf\install\win10_x86
+Extract: WdfCoInstaller01009.dll... 100%
+Extract: pdvwdf.cat... 100%
+Extract: pdvwdf.inf... 100%
+Extract: pdvwdf.sys... 100%
+Output folder: C:\EDT\pdv\wdf\install\x86
+Extract: WdfCoInstaller01009.dll... 100%
+Extract: pdvwdf.cat... 100%
+Extract: pdvwdf.inf... 100%
+Extract: pdvwdf.sys... 100%
+Output folder: C:\EDT\pdv\wlib
+Output folder: C:\EDT\pdv\wlib\amd64
+Extract: QtCore4.lib... 100%
+Extract: QtCored4.lib... 100%
+Extract: QtGui4.lib... 100%
+Extract: QtGuid4.lib... 100%
+Extract: QtSvg4.lib... 100%
+Extract: QtSvgd4.lib... 100%
+Extract: qtmain.lib... 100%
+Extract: qtmaind.lib... 100%
+Output folder: C:\EDT\pdv\wlib\x86
+Extract: QtCore4.lib... 100%
+Extract: QtCored4.lib... 100%
+Extract: QtGui4.lib... 100%
+Extract: QtGuid4.lib... 100%
+Extract: QtSvg4.lib... 100%
+Extract: QtSvgd4.lib... 100%
+Extract: qtmain.lib... 100%
+Extract: qtmaind.lib... 100%
+Output folder: C:\EDT\pdv
+
+C:\EDT\pdv>set
+ALLUSERSPROFILE=C:\ProgramData
+APPDATA=C:\Users\jamies\AppData\Roaming
+CommonProgramFiles=C:\Program Files (x86)\Common Files
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+CommonProgramW6432=C:\Program Files\Common Files
+COMPUTERNAME=DESKTOP-A2APPNI
+ComSpec=C:\WINDOWS\system32\cmd.exe
+DriverData=C:\Windows\System32\Drivers\DriverData
+HOMEDRIVE=C:
+HOMEPATH=\Users\jamies
+LOCALAPPDATA=C:\Users\jamies\AppData\Local
+LOGONSERVER=\\DESKTOP-A2APPNI
+NUMBER_OF_PROCESSORS=4
+OneDrive=C:\Users\jamies\OneDrive
+OS=Windows_NT
+Path=C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\jamies\AppData\Local\Microsoft\WindowsApps
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+PROCESSOR_ARCHITECTURE=x86
+PROCESSOR_ARCHITEW6432=AMD64
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 42 Stepping 7, GenuineIntel
+PROCESSOR_LEVEL=6
+PROCESSOR_REVISION=2a07
+ProgramData=C:\ProgramData
+ProgramFiles=C:\Program Files (x86)
+ProgramFiles(x86)=C:\Program Files (x86)
+ProgramW6432=C:\Program Files
+PROMPT=$P$G
+PSModulePath=C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+PUBLIC=C:\Users\Public
+SystemDrive=C:
+SystemRoot=C:\WINDOWS
+TEMP=C:\Users\jamies\AppData\Local\Temp
+TMP=C:\Users\jamies\AppData\Local\Temp
+USERDOMAIN=DESKTOP-A2APPNI
+USERDOMAIN_ROAMINGPROFILE=DESKTOP-A2APPNI
+USERNAME=jamies
+USERPROFILE=C:\Users\jamies
+windir=C:\WINDOWS
+__COMPAT_LAYER=DetectorsWin7
+"Copying 64-bit binaries into parent dir"
+
+C:\EDT\pdv>copy bin\amd64\*.* . 
+bin\amd64\bigread.exe
+bin\amd64\bitload.exe
+bin\amd64\checkcam.exe
+bin\amd64\check_gap_cl.exe
+bin\amd64\clink_counters.exe
+bin\amd64\clink_tester.exe
+bin\amd64\clseredt.dll
+bin\amd64\clsiminit.exe
+bin\amd64\clsimvar.exe
+bin\amd64\cl_logic.exe
+bin\amd64\cl_speed.exe
+bin\amd64\countbits.exe
+bin\amd64\dumpit.exe
+bin\amd64\dvinfo.exe
+bin\amd64\edt_sysinfo.exe
+bin\amd64\gen_tiffs.exe
+bin\amd64\initcam.exe
+bin\amd64\irigdump.exe
+bin\amd64\msp430_load.exe
+bin\amd64\new_strobe.exe
+bin\amd64\optstr.exe
+bin\amd64\pciediag.exe
+bin\amd64\pciload.exe
+bin\amd64\pdb.exe
+bin\amd64\pdbcls10b.exe
+bin\amd64\pdvcom.exe
+bin\amd64\pdvlib.dll
+bin\amd64\pdvplayback.exe
+bin\amd64\pdvrecord.exe
+bin\amd64\pdvshow.exe
+bin\amd64\pdvterm.exe
+bin\amd64\rcxload.exe
+bin\amd64\rcxmake.exe
+bin\amd64\sample.exe
+bin\amd64\send_tiffs.exe
+bin\amd64\serial_cmd.exe
+bin\amd64\setdebug.exe
+bin\amd64\setperiod.exe
+bin\amd64\set_si5338.exe
+bin\amd64\simplemem.exe
+bin\amd64\simplest_take.exe
+bin\amd64\simple_bc.exe
+bin\amd64\simple_clsend.exe
+bin\amd64\simple_etrig.exe
+bin\amd64\simple_event.exe
+bin\amd64\simple_irig2.exe
+bin\amd64\simple_sequence.exe
+bin\amd64\simple_take.exe
+bin\amd64\speedtest.exe
+bin\amd64\strobe.exe
+bin\amd64\take.exe
+bin\amd64\taketwo.exe
+bin\amd64\timing_test.exe
+bin\amd64\trace.exe
+bin\amd64\usps_test.exe
+bin\amd64\vlviewer.exe
+bin\amd64\waitevent.exe
+bin\amd64\watchstat.exe
+bin\amd64\win_sysinfo.exe
+bin\amd64\xtest.exe
+       60 file(s) copied.
+
+C:\EDT\pdv>copy lib\amd64\*.* . 
+lib\amd64\clseredt.lib
+lib\amd64\edtimage.lib
+lib\amd64\imgfiles.lib
+lib\amd64\libtiff.lib
+lib\amd64\pdvlib.lib
+lib\amd64\pdvplus.lib
+        6 file(s) copied.
+
+C:\EDT\pdv>copy wbin\amd64\*.* . 
+wbin\amd64\QtCore4.dll
+wbin\amd64\QtCored4.dll
+wbin\amd64\QtGui4.dll
+wbin\amd64\QtGuid4.dll
+wbin\amd64\QtSvg4.dll
+wbin\amd64\QtSvgd4.dll
+        6 file(s) copied.
+
+C:\EDT\pdv\wdf>ver   | findstr /C:"Version 10" 
+Microsoft Windows [Version 10.0.17134.677]
+
+C:\EDT\pdv\wdf>if errorlevel 1 (wdf_reload64 install\amd64 pdv )  else (wdf_reload64 install\win10_amd64 pdv ) 
+inffile install\win10_amd64\pdvwdf.inf
+tmpid = PCI\VEN_123D&DEV_0010
+PCI\VEN_8086&DEV_1C20&SUBSYS_047E1028&REV_04
+PCI\VEN_8086&DEV_1C3D&SUBSYS_047E1028&REV_04
+PCI\VEN_123D&DEV_00A3&SUBSYS_00A3123D&REV_01
+PCI\VEN_8086&DEV_1C4E&SUBSYS_047E1028&REV_04
+PCI\VEN_8086&DEV_1C3A&SUBSYS_047E1028&REV_04
+PCI\VEN_8086&DEV_0100&SUBSYS_047E1028&REV_09
+PCI\VEN_8086&DEV_1C10&SUBSYS_047E1028&REV_B4
+PCI\VEN_8086&DEV_1C22&SUBSYS_047E1028&REV_04
+PCI\VEN_8086&DEV_1C02&SUBSYS_047E1028&REV_04
+PCI\VEN_8086&DEV_0102&SUBSYS_047E1028&REV_09
+PCI\VEN_8086&DEV_1502&SUBSYS_047E1028&REV_04
+PCI\VEN_8086&DEV_1C2D&SUBSYS_047E1028&REV_04
+PCI\VEN_8086&DEV_244E&SUBSYS_047E1028&REV_A4
+PCI\VEN_8086&DEV_1C14&SUBSYS_047E1028&REV_B4
+PCI\VEN_8086&DEV_1C26&SUBSYS_047E1028&REV_04
+PCI\VEN_8086&DEV_0101&SUBSYS_047E1028&REV_09
+PCI\VEN_165A&DEV_EB01&SUBSYS_29085C10&REV_01
+123d:00a3
+installing PCI\VEN_123D&DEV_00a3 install\win10_amd64\pdvwdf.inf
+
+C:\EDT\pdv\wdf>exit 0 
+load_arch done, return code 0
+Create folder: C:\Program Files\CameraLink\Serial
+CopyFiles C:\EDT\pdv\bin\amd64\clseredt.dll C:\Program Files\CameraLink\Serial
+Copy to C:\Program Files\CameraLink\Serial
+Create folder: C:\Program Files (x86)\CameraLink\Serial
+CopyFiles C:\EDT\pdv\bin\x86\clseredt.dll C:\Program Files (x86)\CameraLink\Serial
+Copy to C:\Program Files (x86)\CameraLink\Serial
+Create shortcut: C:\Users\Public\Desktop\vlviewer.lnk
+Create shortcut: C:\Users\Public\Desktop\Pdv Utilities.lnk
+Created uninstaller: C:\EDT\pdv\Uninstall_pdv.exe

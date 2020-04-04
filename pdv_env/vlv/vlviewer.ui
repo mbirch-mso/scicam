@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mainWindow</class>
+ <widget class="QMainWindow" name="mainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>952</width>
+    <height>627</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>EDT vlviewer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>images/edticon.png</normaloff>images/edticon.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="EdtQtImageView" name="ImageView"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>952</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNewImage"/>
+    <addaction name="actionOpenImage"/>
+    <addaction name="actionClose"/>
+    <addaction name="actionSaveImage"/>
+    <addaction name="actionSaveImageAs"/>
+    <addaction name="separator"/>
+    <addaction name="actionCamera_File_Capture"/>
+    <addaction name="actionAutoNumber"/>
+    <addaction name="separator"/>
+    <addaction name="actionRecent_FIle"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionTool_Bar"/>
+    <addaction name="actionStatus_Bar"/>
+    <addaction name="separator"/>
+    <addaction name="actionHistogram"/>
+    <addaction name="actionProfile"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelect_Region"/>
+    <addaction name="actionSelect_Line"/>
+    <addaction name="actionReset_Selection"/>
+    <addaction name="separator"/>
+    <addaction name="actionZoom_In"/>
+    <addaction name="actionZoom_Out"/>
+    <addaction name="actionNormal_Size"/>
+    <addaction name="separator"/>
+    <addaction name="actionContrast"/>
+    <addaction name="actionBayer"/>
+    <addaction name="separator"/>
+    <addaction name="actionDisplay_Skip"/>
+   </widget>
+   <widget class="QMenu" name="menuCamera">
+    <property name="title">
+     <string>Camera</string>
+    </property>
+    <addaction name="actionSelect_Camera"/>
+    <addaction name="actionCamera_Settings"/>
+    <addaction name="actionCamera_Serial"/>
+    <addaction name="separator"/>
+    <addaction name="actionCapture_One_Image"/>
+    <addaction name="actionContinuous_Capture"/>
+    <addaction name="actionSet_ROI"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionVlviewer_Help"/>
+    <addaction name="actionAbout_vlviewer"/>
+   </widget>
+   <widget class="QMenu" name="menuDevice">
+    <property name="title">
+     <string>Device</string>
+    </property>
+    <addaction name="actionHardware_invert"/>
+    <addaction name="actionFirst_pixel_counter"/>
+    <addaction name="actionDevice_info"/>
+    <addaction name="actionSelect_Device"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuDevice"/>
+   <addaction name="menuView"/>
+   <addaction name="menuCamera"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNewImage">
+   <property name="text">
+    <string>New Image</string>
+   </property>
+   <property name="toolTip">
+    <string>New Image</string>
+   </property>
+  </action>
+  <action name="actionOpenImage">
+   <property name="text">
+    <string>Open Image...</string>
+   </property>
+   <property name="toolTip">
+    <string>OpenImage</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionSaveImageAs">
+   <property name="text">
+    <string>Save Image As...</string>
+   </property>
+   <property name="toolTip">
+    <string>SaveImage</string>
+   </property>
+  </action>
+  <action name="actionSaveImage">
+   <property name="text">
+    <string>Save Image</string>
+   </property>
+  </action>
+  <action name="actionCamera_File_Capture">
+   <property name="text">
+    <string>Camera File Capture</string>
+   </property>
+   <property name="toolTip">
+    <string>Camera File Capture</string>
+   </property>
+  </action>
+  <action name="actionAutoNumber">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>AutoNumber</string>
+   </property>
+  </action>
+  <action name="actionRecent_FIle">
+   <property name="text">
+    <string>Recent FIle</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionX2">
+   <property name="text">
+    <string>X2</string>
+   </property>
+  </action>
+  <action name="actionX4">
+   <property name="text">
+    <string>x4</string>
+   </property>
+  </action>
+  <action name="actionX2_2">
+   <property name="text">
+    <string>x2</string>
+   </property>
+  </action>
+  <action name="actionX4_2">
+   <property name="text">
+    <string>x4</string>
+   </property>
+  </action>
+  <action name="actionX2_3">
+   <property name="text">
+    <string>x2</string>
+   </property>
+  </action>
+  <action name="actionX4_3">
+   <property name="text">
+    <string>x4</string>
+   </property>
+  </action>
+  <action name="actionToolBar">
+   <property name="text">
+    <string>ToolBar</string>
+   </property>
+  </action>
+  <action name="actionTool_Bar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tool Bar</string>
+   </property>
+  </action>
+  <action name="actionStatus_Bar">
+   <property name="text">
+    <string>Status Bar</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actionTime_Display">
+   <property name="text">
+    <string>Time Display</string>
+   </property>
+  </action>
+  <action name="actionHistogram">
+   <property name="text">
+    <string>Histogram...</string>
+   </property>
+  </action>
+  <action name="actionProfile">
+   <property name="text">
+    <string>Profile...</string>
+   </property>
+  </action>
+  <action name="actionSelect_Region">
+   <property name="text">
+    <string>Select Region</string>
+   </property>
+  </action>
+  <action name="actionReset_Selection">
+   <property name="text">
+    <string>Reset Selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Reset Selection</string>
+   </property>
+  </action>
+  <action name="actionZoom_Panel">
+   <property name="text">
+    <string>Zoom Panel</string>
+   </property>
+  </action>
+  <action name="actionPan">
+   <property name="text">
+    <string>Pan</string>
+   </property>
+  </action>
+  <action name="actionX2_4">
+   <property name="text">
+    <string>x2</string>
+   </property>
+  </action>
+  <action name="actionX4_4">
+   <property name="text">
+    <string>x4</string>
+   </property>
+  </action>
+  <action name="actionX2_5">
+   <property name="text">
+    <string>x2</string>
+   </property>
+  </action>
+  <action name="actionX4_5">
+   <property name="text">
+    <string>x4</string>
+   </property>
+  </action>
+  <action name="actionNormal_Size">
+   <property name="text">
+    <string>Normal Size</string>
+   </property>
+  </action>
+  <action name="actionContrast">
+   <property name="text">
+    <string>Contrast...</string>
+   </property>
+  </action>
+  <action name="actionDisplay_Skip">
+   <property name="text">
+    <string>Display Skip...</string>
+   </property>
+  </action>
+  <action name="actionSetuo">
+   <property name="text">
+    <string>Setuo</string>
+   </property>
+  </action>
+  <action name="actionSelect_Camera">
+   <property name="text">
+    <string>Select Camera...</string>
+   </property>
+  </action>
+  <action name="actionCamera_Settings">
+   <property name="text">
+    <string>Camera Settings...</string>
+   </property>
+   <property name="toolTip">
+    <string>Camera Settings</string>
+   </property>
+  </action>
+  <action name="actionCamera_Serial">
+   <property name="text">
+    <string>Camera Serial...</string>
+   </property>
+   <property name="toolTip">
+    <string>Camera Serial</string>
+   </property>
+  </action>
+  <action name="actionIncrease_Exposure_Time">
+   <property name="text">
+    <string>Increase Exposure Time</string>
+   </property>
+  </action>
+  <action name="actionDecrease_Exposure_Time">
+   <property name="text">
+    <string>Decrease Exposure Time</string>
+   </property>
+  </action>
+  <action name="actionCapture_One_Image">
+   <property name="text">
+    <string>Capture One Image</string>
+   </property>
+  </action>
+  <action name="actionContinuous_Capture">
+   <property name="text">
+    <string>Start Continuous Capture</string>
+   </property>
+  </action>
+  <action name="actionAlways_Show_Latest">
+   <property name="text">
+    <string>Always Show Latest</string>
+   </property>
+  </action>
+  <action name="actionDraw_From_Thread">
+   <property name="text">
+    <string>Draw From Thread</string>
+   </property>
+  </action>
+  <action name="actionCheck_For_Overrun">
+   <property name="text">
+    <string>Check For Overrun</string>
+   </property>
+  </action>
+  <action name="actionShow_Single_Frame">
+   <property name="text">
+    <string>Show Single Frame</string>
+   </property>
+  </action>
+  <action name="actionFilter">
+   <property name="text">
+    <string>Filter</string>
+   </property>
+  </action>
+  <action name="actionArithmetic">
+   <property name="text">
+    <string>Arithmetic</string>
+   </property>
+  </action>
+  <action name="actionMask">
+   <property name="text">
+    <string>Mask</string>
+   </property>
+  </action>
+  <action name="actionFilee">
+   <property name="text">
+    <string>Filee</string>
+   </property>
+  </action>
+  <action name="actionFill">
+   <property name="text">
+    <string>Fill</string>
+   </property>
+  </action>
+  <action name="actionRemap_Display">
+   <property name="text">
+    <string>Remap Display</string>
+   </property>
+  </action>
+  <action name="actionVlviewer_Help">
+   <property name="text">
+    <string>VlViewer Help</string>
+   </property>
+  </action>
+  <action name="actionAbout_vlviewer">
+   <property name="text">
+    <string>About VlViewer</string>
+   </property>
+  </action>
+  <action name="actionPixel_Text">
+   <property name="text">
+    <string>Pixel Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Pixel Text</string>
+   </property>
+  </action>
+  <action name="actionBayer">
+   <property name="text">
+    <string>Bayer...</string>
+   </property>
+  </action>
+  <action name="actionSet_ROI">
+   <property name="text">
+    <string>Set ROI...</string>
+   </property>
+  </action>
+  <action name="actionSelect_Line">
+   <property name="text">
+    <string>Select Line</string>
+   </property>
+  </action>
+  <action name="actionZoom_In">
+   <property name="text">
+    <string>Zoom In</string>
+   </property>
+  </action>
+  <action name="actionZoom_Out">
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="actionSelect_Device">
+   <property name="text">
+    <string>Select Device...</string>
+   </property>
+  </action>
+  <action name="actionDevice_info">
+   <property name="text">
+    <string>Device Info...</string>
+   </property>
+  </action>
+  <action name="actionHardware_invert">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hardware Invert</string>
+   </property>
+  </action>
+  <action name="actionFirst_pixel_counter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>First pixel counter</string>
+   </property>
+   <property name="toolTip">
+    <string>First pixel counter</string>
+   </property>
+   <property name="whatsThis">
+    <string>Overwrite the first pixel (two bytes) with incrementing counter.</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>EdtQtImageView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">EdtQtImageView.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../pdv_qtlib/pdv_qtlib.qrc"/>
+ </resources>
+ <connections/>
+</ui>

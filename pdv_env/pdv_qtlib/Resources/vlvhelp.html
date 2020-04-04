@@ -1,0 +1,253 @@
+<html>
+<body>
+
+
+<h1>VlViewer Help</h1>
+
+<h2>Contents</h2>
+
+<a href="#Overview">
+<div style="margin-left: 20px">Overview</div>
+</a>
+
+<a href="#Command_line_arguments">
+<div style="margin-left: 20px">Command line arguments</div>
+</a>
+
+<a href="#Top_Window_Title">
+<div style="margin-left: 20px">Main Window Title</div>
+</a>
+
+<a href="#Menu_and_Tool_Bar">
+<div style="margin-left: 20px">Menu and Tool Bar</div>
+</a>
+
+<a href="#Image_Window">
+<div style="margin-left: 20px">Image Window</div>
+</a>
+
+<a href="#Footer">
+<div style="margin-left: 20px">Footer</div>
+</a>
+
+<a href="#Problems_Questions">
+<div style="margin-left: 20px">Problems, Questions, Feedback</div>
+</a>
+
+
+<a name="Overview">
+<h2 style="margin-left: 20px">Overview</h2>
+<p style="margin-left: 20px">
+<em>VlViewer</em> is a GUI application providing camera image capture, display and save from devices (cameras) connected to EDT Camera Link framegrabbers.</p>
+<p style="margin-left: 20px">
+<em>VlViewer</em> is similar to the original pdvshow (Windows) and pdv_flshow (Linux) applications, and has virtually equivalent functionality, while providing cross-platform operability in a single application.</p>
+<p style="margin-left: 20px">
+Source code for <em>VlViewer</em> and associated libraries is included with EDT PDV software distributions, so users can to modify it to suit custom purposes. The only restriction is that modified versions of <em>VlViewer</em> are only to be used with EDT framegrabbers or other EDT products. See your <a href="https://edt.com/downloads/20141110_VL-FGs_Rev0008.pdf">framegrabber users guide</a> for details on compiling <em>VlViewer</em>. Note that EDT's standard support does not include help with customizing / customized versions of vlviewer or associated libraries.</p>
+
+
+<a name="Command_line_arguments">
+<h2 style="margin-left: 20px">Command line arguments</h2>
+<p style="margin-left: 20px">
+The application can be invoked from the command line (Linux or Windows) or via a desktop icon (Windows). The following options are available, and can be used on the command line when invoking <em>VlViewer</em> or added to a Windows shortcut by adding them to the shortcut's Properties->Target field.
+
+<table style="text-indent: 20px">
+<tr><td><code>-u <em>unit</em></code> </td><td>specify the unit (board) number (default 0)</td></tr>
+<tr><td><code>-c <em>chan</em></code> </td><td>specify the channel number (default 0); for EDT framegrabbers, 0 corresponds to the connector closest to the motherboard, 1 the furthest, and 2 is the "phantom" channel, showing hardware-generated counter data</td></tr>
+<tr><td><code>-pdv<em>U_C</em></code> </td><td>alternate way to specify unit and channel; <em>U</em> = unit, <em>C</em> = channel</td></tr>
+<tr><td><code>-nb<em>X</em></code> </td><td><em>X</em>=number of device driver ring buffers (default will be anywhere between 4 and 64, depending on the image size)</td></tr>
+<tr><td><code>-f, --file <em>filename</em></code> </td><td>show the version message box and exit on OK</td></tr>
+<tr><td><code>-i, --init <em>config_path</em></code> </td><td>initialize with the given config file (relative or absolute path)</td></tr>
+<tr><td><code>-f, --file <em>filename</em></code> </td><td>capture one image on startup and save it; format determined by the extension (.raw, .tif, .jpg, .bmp.); also see the <em>take</em> and <em>simple_take</em> applications which do the same thing without invoking any GUI code</td></tr>
+<tr><td><code>-q, --quit &nbsp;&nbsp;</code></td><td>quit after doing any startup tasks (typically used with -f or -i)</td></tr>
+<tr><td><code>-v, --version &nbsp;&nbsp;</code></td><td>just show the version message box and exit on OK</td></tr>
+<tr><td><code>-h, --help</code></td><td>show the usage message box and exit on OK</td></tr>
+</table>
+
+<a name="Top_Window_Title">
+<h2 style="margin-left: 20px">Main Window Title</h2>
+<p style="margin-left: 20px"><img src="pdv_qtlib/Resources/vlvhelp_top_bar.jpg"> </p>
+<p style="margin-left: 20px">
+The main window title shows the framegrabber type, the device address, and the config file in use, all separated by or ("|") bars.</p>
+
+<a name="Menu_and_Tool_Bar">
+<h2 style="margin-left: 20px">Menu and Tool Bar</h2>
+<p style="margin-left: 20px"><img src="pdv_qtlib/Resources/vlvhelp_menu_toolbar.png"> </p>
+<p style="margin-left: 20px">
+The main menu provides access to the features of the application, and the Tool bar provides buttons to access a subset of the menu functions. The menu / toolbar functions are described below. Within the application, hovering the mouse pointer over a toolbar button will bring up a tooltip showing that button's function.</p>
+
+<a name="File_menu">
+<h3 style="margin-left: 40px">File menu</h3>
+<p style="margin-left: 40px">
+The <b>File</b> menu provides options for saving files. The menu items include <b>Save Image</b>, <b>Save Image As</b>, and <b>Exit</b>, along with a <b>File AutoNumber</b> checkbox which enables auto-numbering of image files as they are saved. File auto-numbering can also be enabled/disabled via a checkbox in the <b>Save Image As</b> dialog.
+If auto-number is enabled, files will be saved with sequential numbering at the end of the given file name.
+For example if you select <code>.tif</code> file format and enter <code>pdvimage</code> or <code>pdvimage.tif</code> as the filename, sequential files will be saved
+as <code>pdvimage0000.tif</code>, <code>pdvimage0001.tif</code>, and so on.</p>
+<p style="margin-left: 40px">
+The <b>Save Image As</b> dialog includes a dropdown for various image file formats:</p>
+
+<ul style="margin-left: 40px">
+<li><b>JPEG (.jpg)</b>: JPEG compressed format (add details re. compression, algorithm, etc.) For 10-16 bit camera data, only the most significant 8 bits of each pixel are saved.
+<li><b>Bitmap (.bmp)</b>: Windows bitmap format. 8 and 24-bit images are saved as-is. For 10-16 bit camera data, only the most significant 8 bits of each pixel are saved.
+<li><b>TIFF (.tif)</b>: Tagged image file format. Files are saved in the appropriate 8, 16 or 24-bit TIFF image format.</li>
+<li><b>RAW (.raw)</b>: Saves the raw bits without any formatting information. 8-bit monochrome camera data is saved as 8 bits per pixel. 10-16 bit monochrome camera data is saved as 16 bits per pixel, LSb justified with the upper bits set to 0. 24-bit RGB camera data (including Bayer) is saved as RGB triplets, 8-bits per R,G and B element. Note that this raw format is not the same as the <em>Camera Raw</em> format used by some commercial digital cameras.</li>
+</ul>
+
+<a name="Device_Menu">
+<h3 style="margin-left: 40px">Device Menu</h3>
+<p style="margin-left: 40px">
+The Device menu provides access to device (framegrabber)-related functions.</p>
+<a name="Hardware_Invert">
+<h4 style="margin-left: 60px">Hardware Invert <img width="16" src="pdv_qtlib/Resources/checkbox.png"></h4>
+<p style="margin-left: 60px">
+When checked, the framegrabber inverts the pixel data end-for-end within each 8-bits, in effect creating a "negative" of the image. This is a hardware operation; data is inverted before being transferred from the framegrabber via DMA into system memory.</p>
+<a name="First_Pixel_Counter">
+<h4 style="margin-left: 60px">First Pixel Counter <img width="16" src="pdv_qtlib/Resources/checkbox.png"></h4>
+<p style="margin-left: 60px">
+Enables a counter in the first word (two bytes) of the pixel data. When enabled, the framegrabber hardware overwrites the first two pixels of an 8-bit image, or the first pixel of a 10-16 bit image, with a counter that increments 1 for every frame captured (useful for diagnostics). Use the <b>View->Pixel Data</b> menu item or toolbar item to view the pixel data: as you move the cursor to the upper left corner of the image you will see this counter incrementing. For 8-bit images, pixel 0,0 will increment to 255 then wrap, and pixel 1, 0 will increment by 1 every time the first pixel wraps. For 10-16 bit images, the first pixel will increment from 0-65535 before starting over at 0.</p>
+
+<a name="Device_Info">
+<h4 style="margin-left: 60px">Device Info <img width="16" src="pdv_qtlib/Resources/board_icon.png"></h4>
+<p style="margin-left: 60px">
+Launches the <b>Device Info</b> message box, which displays information about the framegrabber device, including specifics about the hardware, firmware, library, device driver and current configuration.</p>
+
+<a name="View_menu">
+<h3 style="margin-left: 40px">View menu</h3>
+<p style="margin-left: 40px">
+The <b>View</b> menu and related toolbar buttons provide items for related to the image view.</p>
+
+<a name="Tool_Bar">
+<h4 style="margin-left: 60px">Tool Bar, Status Bar <img width="16" src="pdv_qtlib/Resources/checkbox.png"></h4>
+<p style="margin-left: 60px">
+Check / uncheck these items to display / hide the toolbar or status bar.</p>
+
+<a name="Histogram">
+<h4 style="margin-left: 60px">Histogram <img width="16" src="pdv_qtlib/Resources/histogram.png">, Profile <img width="16" src="pdv_qtlib/Resources/profile.png"></h4>
+<p style="margin-left: 60px">
+Invokes the <b>Histogram</b> and <b>Profile</b> dialogs, respectively. The Histogram dialog shows a histogram and other data for the image, including number of pixels, min and max pixel value, mean, median, mode and mode frequency. The Profile dialog shows a histogram across a selected profile within the image (Region or Line  -- see the next three items.)</p>
+
+<a name="Region">
+<h4 style="margin-left: 60px">Region <img width="16" src="pdv_qtlib/Resources/draw_box.png">, Line <img width="16" src="pdv_qtlib/Resources/draw_line.png">, <b>Reset Selection</b> <img width="16" src="pdv_qtlib/Resources/reset_cursor.png"></h4>
+<p style="margin-left: 60px">
+Lets you select a region or Line, respectively, via rubber-band box or rubber-band line on the image, for the profile dialog (see previous item.) Reset Selection resets the region / line to the full image.</p>
+
+<a name="Zoom">
+<h4 style="margin-left: 60px">Zoom In <img width="16" src="pdv_qtlib/Resources/zoom.png">, Zoom Out <img width="16" src="pdv_qtlib/Resources/zoom_out.png">, Normal Size <img width="16" src="pdv_qtlib/Resources/zoom_normal.png"></h4>
+<p style="margin-left: 60px">
+Zooms the image window. Note that specific zoom presets are also available via the <b>Zoom [%]</b> toolbar item.</p>
+
+<a name="Contrast">
+<h4 style="margin-left: 60px">Contrast <img width="16" src="pdv_qtlib/Resources/contrast.png"></h4>
+<p style="margin-left: 60px">
+Launches the <b>Contrast</b> dialog, which provides image contrast control. Radio buttons allow you to control the contrast via <b>Linear</b>,  <b>Auto-Stretch</b>, or <b>Gamma</b> methods. Contrast control is a post-processing step, and affects only the post-capture image data.
+
+<a name="Bayer">
+<h4 style="margin-left: 60px">Bayer <img width="16" src="pdv_qtlib/Resources/colors.png"></h4>
+<p style="margin-left: 60px">
+The Bayer sub-menu item launches the Bayer control dialog, which allows you to manipulate the Bayer decoding performed on images captured from cameras with Bayer-filter image sensors.  Bayer processing is a post-processing step, and affects only the post-capture image data. The Bayer menu sub-item and dialog are enabled for Bayer camera configurations; specifically configurations (<code>.cfg</code> files) in which the depth is 8 or 10 and the extdepth is 24 -- see the <a href="https://edt.com/downloads/camera-configuration-guide.pdf">Camera Configuration Guide</a> for details. </p>
+
+<a name="Display_Skip">
+<h4 style="margin-left: 60px">Display Skip</h4>
+<p style="margin-left: 60px">
+Launches the <b>Display Skip</b> dialog, which contains a spinbox and slider to set how many images to skip for display. By default, images are displayed as they come in unless the display falls behind the capture, in which case images will be automatically be skipepd as needed for the display to keep up with the camera's image output. If <b>Display Skip</b> is set to some <em>N</em> greater than 1, it forces the application to display only every <em>Nth</em> image. In some situations (e.g. large images, high-speed cameras, or slow displays) it may be necessary to use this control to work around scrambed image problems or to reduce system load.</p>
+
+<a name="Camera_menu">
+<h3 style="margin-left: 40px">Camera menu</h3>
+<p style="margin-left: 40px">
+The Camera menu and related toolbar icons provide camera-specific functions.</p>
+<a name="Select_Camera">
+<h4 style="margin-left: 60px">Select Camera <img width="16" src="pdv_qtlib/Resources/camselect.png"></h4>
+<p style="margin-left: 60px">
+Launches the <b>Camera Configuration</b> dialog, which lets you select from the camera configurations available, based on the <code>.cfg</code> files in the <code>camera_config</code> subdirectory. Note that the <b>Camera Configuration</b> dialog will be launched automatically on application startup if the board has not yet been configured (typically the first time after a reboot).</p>
+<p style="margin-left: 60px">
+When a configuration is selected and OK is pressed, <em>VlViewer</em> creates the file <code>camsetup<em>U_C</em>.bat</code> (Windows), or <code>camsetup<em>U_C</em>.sh</code> (Linux, MacOS) &ndash; where <code><em>U</em></code> is the selected device's unit number and <code><em>C</em></code> is the channel number &ndash; and runs it. <code>camsetup<em>U_C</em>.bat/.sh</code> invokes the initcam application, which does the actual work of configuring the device, and can be run independetly if so desired, for example from a startup script to avoid the need to choose a camera every time <em>VlViewer</em> is run after a reboot. For more details on camera configuration, see the <a href="https://edt.com/downloads/camera-configuration-guide.pdf">Camera Configuration Guide</a>.</p>
+
+<a name="Camera_Settings">
+<h4 style="margin-left: 60px">Camera Settings <img width="16" src="pdv_qtlib/Resources/fstop.png"></h4>
+<p style="margin-left: 60px">
+Launches the <b>Camera Settings</b> dialog, with controls for camera exposure time, gain, and black level.</p>
+
+<p style="margin-left: 60px">
+These controls only apply to cameras for which methods to control the camera functions are present in the camera configuration file. For a given camera, there may be multiple methods to provide control. For example, exposure control can be via camera-specific serial commands, and in order for these to work with these controls, the <code>serial_exposure</code>, <code>serial_gain</code>, <code>serial_offset</code> and associated min/max directives need to be present in the configuration file. For those configurations that set up the camera and framegrabber framegrabber-controlled pulse-width (EXPOSE) timing, the exposure control slider automatically controls that timing since in that mode, the shutter timing is framegrabber-specific.</p>
+<p style="margin-left: 60px">
+Since only a subset of the configurations provided by EDT include directives enabling these controls, most of the time they will do nothing. The <a href="https://edt.com/downloads/camera-configuration-guide.pdf">Camera Configuration Guide</a> has details on setting these controls, so if you have a camera / configuration for which they are not enabled, you can consult the guide for how to enable them. However in the case of serial-controlled cameras/configurations, it is often preferred to use the Camera Manufacturer-provided serial control GUI (Windows) or raw serial commands to control any camera-specific settings.</p>
+
+<a name="Camera_Serial">
+<h4 style="margin-left: 60px">Camera Serial <img width="16" src="pdv_qtlib/Resources/serial1.png"></h4>
+<p style="margin-left: 60px">
+Launches the <b>Camera Serial</b> dialog, which allows you to type in serial commands to send to the camera, and receive the responses. Serial command-sets are camera-specific; consult your camera users' guide for specific serial commands for your camera.</p>
+
+<a name="Capture_One_Image">
+<h4 style="margin-left: 60px">Capture One Image <img width="16" src="pdv_qtlib/Resources/single_shot.png"></h4>
+<p style="margin-left: 60px">
+Causes the framegrabber to capture a single image and display it in the image window, or stop continuous capture if it is active (indicated by the <b>Continous Capture</b> button displaying the stop <img width="16" src="pdv_qtlib/Resources/process-stop.png"> icon.)</p>
+
+<a name="Start_Continuous_Capture_Stop_Continuous_Capture">
+<h4 style="margin-left: 60px">Start Continuous Capture
+/ Stop Continuous Capture <img width="16" src="pdv_qtlib/Resources/start.png"> <img width="16" src="pdv_qtlib/Resources/process-stop.png"></h4>
+
+<p style="margin-left: 40">
+Starts / stops continuous capture. Images captured are displayed in the image window. When continous capture is active, the button / menu item changes to a stop sign, indicating that selecting it will stop continous capture. Clicking on <b>Capture One Image</b> <img width="16" src="pdv_qtlib/Resources/single_shot.png"> will also stop continuous capture.</p>
+
+<a name="Help_menu">
+<h3 style="margin-left: 40px">Help menu</h3>
+<p style="margin-left: 40px">
+The Help menu includes <b>About VlViewer</b> and <b>VlViewer Help</b> (this). </p>
+
+<a name="Image_Window">
+<h2 style="margin-left: 20px">Image Window</h2>
+<p style="margin-left: 20px">
+The main image window displays the frames coming in from the camera, either continuously if continuous capture <img width="16" src="pdv_qtlib/Resources/start.png"> is active, or a static image if image acquisition is stopped or the <b>Capture One Image</b> <img width="16" src="pdv_qtlib/Resources/single_shot.png"> toolbar button is pressed. The image is shown as modified by any hardware functions (e.g. <b>Hardware Invert</b>, <b>First Pixel Counter</b>) or software image processing (e.g.
+<b>Bayer</b>, <b>Display Contrast</b>, <b>Zoom</b>).
+
+<a name="Footer">
+<h2 style="margin-left: 20px">Footer</h2>
+<p style="margin-left: 20px"> <img src="pdv_qtlib/Resources/vlvhelp_footer.png"> </p>
+<p style="margin-left: 20px">
+The footer shows information about the image capture operations.</p>
+
+<a name="Frame_count">
+<h3 style="margin-left: 40px">Frame count:</h3>
+<p style="margin-left: 40px">
+The number of image frames captured since the <b>Continuous Capture</b> was last enabled, or 1 if the last operation was a single capture.</p>
+
+<a name="FPS">
+<h3 style="margin-left: 40px">FPS:</h3>
+<p style="margin-left: 40px">
+The average frames per second captured during the current continuous capture session.</p>
+
+<a name="Timeouts">
+<h3 style="margin-left: 40px">Timeouts:</h3>
+<p style="margin-left: 40px">
+The number of timeouts, if any, during the current continuous capture session, or 1 if the last single capture timed out. Timeouts occur when some or all of the expected image data is missing. Timeouts indicate a problem, and can be the result of many things including misconfiguration, cabling problems, bandwidth saturation, or other factors. If you see timeouts, refer to the Users Guide for troubleshooting options.</p>
+
+<a name="X,Y">
+<h3 style="margin-left: 40px">X,Y:</h3>
+<p style="margin-left: 40px">
+The mouse pointer's X,Y position within the image, when the mouse pointer is located over the image window.</p>
+
+<a name="Pixel">
+<h3 style="margin-left: 40px">Pixel:</h3>
+<p style="margin-left: 40px">
+The value of the pixel data at the mouse pointer's current position, when the mouse pointer is located over the image window.</p>
+
+<a name="Selection">
+<h3 style="margin-left: 40px">Selection:</h3>
+<p style="margin-left: 40px">
+The left or upper-left X, Y coordinates of the selected line or region -- for details see the descroption of the View->Select Line and Select Region menu items.</p>
+
+<a name="Skipped">
+<h3 style="margin-left: 40px">Skipped:</h3>
+<p style="margin-left: 40px">
+When a camera is producing images faster than the computer / display can keep up, <em>VlViewer</em> will skip images to avioid getting behind. This field shows the number of image frames skipped during the current continuous capture session, if any.</p>
+
+<a name="Problems_Questions">
+<h2 style="margin-left: 20px">Problems, Questions, Feedback</h2>
+<p style="margin-left: 20px">
+If you have problems, questions, or feedback about VlViewer, please submit them via the <a href="https://edt.com/technical-support-request/">EDT technical support web form</a>. Include as many details as possible, including the EDT framegrabber being used, the OS, and the VlViewer / EDT package version.</p>
+<p style="margin-left: 20px">
+More information on EDT hardware and software can be found at <a href="https://edt.com">edt.com.</a></p>
+<p>Copyright &copy; 2015-2019, Engineering Design Team, Inc. <a href="https://edt.com/wp-content/uploads/2014/03/EDT_terms_of_use.pdf">Terms</a></p>
+<p>&nbsp;</p>
+</body>
+</html>
+

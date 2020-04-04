@@ -1,0 +1,6 @@
+IDI_ICON1 ICON DISCARDABLE "Resources/vlviewer.ico"
+IDI_ICON2 ICON DISCARDABLE "Resources/pdvutils.ico"
+IDI_ICON3 ICON DISCARDABLE "Resources/pdvutils_black.ico"
+IDI_ICON4 ICON DISCARDABLE "Resources/edtutils.ico"
+IDI_ICON5 ICON DISCARDABLE "Resources/edtutils_black.ico"
+IDI_ICON6 ICON DISCARDABLE "Resources/pdvshow.ico"
