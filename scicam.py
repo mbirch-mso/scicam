@@ -9,6 +9,7 @@ import datetime
 import numpy as np
 import glob
 from astropy.io import fits
+import matplotlib.pyplot as plt
 
 #Convert to little endianness
 def little(s):
@@ -258,28 +259,70 @@ def import_fits(routine='simple_take_fits',date='today',i=False,t=False,\
     return files
 
 
-args = []
-def grab_from_args():
-    if args.p:
-        if args.i:
-            if args.t:
-                files = import_fits(routine = args.p,i=args.i,t=args.t)
+#Function to grab files for any given number of specific args
+def grab_from_args(p='',i='',t=''):
+    if p != '':
+        if i != '':
+            if t != '':
+                files = import_fits(routine = p,i=i.i,t=t)
             else:
-                files = import_fits(routine = args.p,i=args.i)
+                files = import_fits(routine = p,i=i)
         else:
-            if args.t:
-                files = import_fits(routine = args.p,t=args.t)
+            if t != '':
+                files = import_fits(routine = p,t=t)
             else:
-                files = import_fits(routine = args.p,)
+                files = import_fits(routine = p,)
     else:
-        if args.i:
-            if args.t:
-                files = import_fits(i=args.i,t=args.t)
+        if i != '':
+            if t != '':
+                files = import_fits(i=i,t=t)
             else:
-                files = import_fits(i=args.i)
+                files = import_fits(i=i)
         else:
-            if args.t:
-                files = import_fits(t=args.t)
+            if t != '':
+                files = import_fits(t=t)
             else:
                 files = import_fits()
     return files
+
+#Function to display list of fits files as overlayed histograms
+def group_hist(files):
+    for k in range(len(files)):
+        img = fits.open(files[k])[0]
+        img_data = img.data
+        img_int = img.header['INT_T']
+        img_frame = img.header['FRAME_T']
+        plt.hist(img_data.flatten(), bins=400, \
+            label = 'Integration Time (ms):{0} Frame Time (ms):{1}'\
+                .format(img_int,img_frame))
+    plt.legend(loc='best')
+    plt.title('{}'.format(img.header['ROUTINE']))
+    plt.xlabel('Counts (ADUs)')
+    plt.ylabel('# of Pixels')
+    plt.show()
+
+#Function to display list of fits files as grid
+def group_display(files):
+    #Code for the case of a single image
+    #otherwise construct grid geometry
+    Tot = len(files)
+    try:
+        Cols = Tot//2
+        Rows = Tot // Cols 
+        Rows += Tot % Cols
+    except ZeroDivisionError:
+        Cols = 1
+        Rows = 1
+    Position = range(1,Tot + 1)
+    
+    fig = plt.figure(1)
+    for k in range(Tot):
+        img = fits.open(files[k])[0]
+        ax = fig.add_subplot(Rows,Cols,Position[k])
+        ax.imshow(img.data)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_title('{0},{1}'\
+                .format(int(img.header['INT_T']),\
+                int(img.header['FRAME_T'])))
+    plt.show()

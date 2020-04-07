@@ -1,23 +1,19 @@
 from fabric import Connection
-import fits_importing as fits
 import subprocess
 import scicam as cam
 import argparse
 
 
-print('ATLESAT GETTNIG EHRE')
 parser = argparse.ArgumentParser(prog='Remotely Capture Image', description='Captures and View Images remotely on SSH')
 parser.add_argument('-a', type=str, help='Type of Image Analysis')
 parser.add_argument('-p', type=str, help='Routine for image capture',default='')
 parser.add_argument('-i', type=str, help='Integration Time',default='')
 parser.add_argument('-t', type=str, help='Frame Time',default='')
 parser.add_argument('-l', type=str, help='Number of loops',default='')
-args = vars(parser.parse_args())
-
-print(args)
+args = parser.parse_args()
 
 home_loc = '//merger.anu.edu.au/mbirch/scicam/'
-cmd_pre = lambda script: home_loc + "python " + script + ".py " 
+cmd_pre = lambda script: "python " + home_loc + script + ".py " 
 argf = lambda s: " -" + s + " " 
 img_loc = '//merger.anu.edu.au/mbirch/images'
 def args_form(p='simple_take_fits',i='',t='',l=''):
@@ -41,23 +37,19 @@ else:
 
 #Connect to camera server
 print(capture_cmd)
-# connection = Connection(host='150.203.88.24', user='mbirch',\
-#      connect_kwargs={"password": 'BFtrEXZ9'})
-# connection.run(capture_cmd)
+connection = Connection(host='150.203.88.24', user='mbirch',\
+     connect_kwargs={"password": 'BFtrEXZ9'})
+connection.run(capture_cmd)
 
-# print('images successfully captured')
-# #Display and Analyse Image
-# if args.a:
-#     files = cam.grab_from_args()
-#     if args.a == 'view':
-#         print('in view')
-#         fits.group_display(files)
-#     elif args.a == 'hist':
-#         fits.group_hist(files)
-#     else:
-#         pass
-# else:
-#     pass
-
-print(capture_cmd)
-# print(files)
+#Display and Analyse Image
+if args.a:
+    files = cam.grab_from_args(args.p,args.i,args.t)
+    if args.a == 'view':
+        print('in view')
+        cam.group_display(files)
+    elif args.a == 'hist':
+        cam.group_hist(files)
+    else:
+        pass
+else:
+    pass
