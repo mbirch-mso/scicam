@@ -32,9 +32,13 @@ def group_hist(files):
 #Create image gallery of files
 def group_display(files):
     Tot = len(files)
-    Cols = Tot//2
-    Rows = Tot // Cols 
-    Rows += Tot % Cols
+    try:
+        Cols = Tot//2
+        Rows = Tot // Cols 
+        Rows += Tot % Cols
+    except ZeroDivisionError:
+        Cols = 1
+        Rows = 1
     Position = range(1,Tot + 1)
     fig = plt.figure(1)
     for k in range(Tot):

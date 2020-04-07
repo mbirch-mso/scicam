@@ -4,15 +4,18 @@ import subprocess
 import scicam as cam
 import argparse
 
-parser = argparse.ArgumentParser(prog='capture Image', description='Captures and View Images remotely on SSH')
+
+print('ATLESAT GETTNIG EHRE')
+parser = argparse.ArgumentParser(prog='Remotely Capture Image', description='Captures and View Images remotely on SSH')
 parser.add_argument('-a', type=str, help='Type of Image Analysis')
 parser.add_argument('-p', type=str, help='Routine for image capture',default='')
 parser.add_argument('-i', type=str, help='Integration Time',default='')
 parser.add_argument('-t', type=str, help='Frame Time',default='')
 parser.add_argument('-l', type=str, help='Number of loops',default='')
-args = parser.parse_args()
+args = vars(parser.parse_args())
 
 print(args)
+
 home_loc = '//merger.anu.edu.au/mbirch/scicam/'
 cmd_pre = lambda script: home_loc + "python " + script + ".py " 
 argf = lambda s: " -" + s + " " 
@@ -37,23 +40,24 @@ else:
     args_form(i=args.i,t=args.t,l=args.l)
 
 #Connect to camera server
-connection = Connection(host='150.203.88.24', user='mbirch',\
-     connect_kwargs={"password": 'BFtrEXZ9'})
-connection.run(capture_cmd)
+print(capture_cmd)
+# connection = Connection(host='150.203.88.24', user='mbirch',\
+#      connect_kwargs={"password": 'BFtrEXZ9'})
+# connection.run(capture_cmd)
 
-print('images successfully captured')
-#Display and Analyse Image
-if args.a:
-    files = cam.grab_from_args()
-    if args.a == 'view':
-        print('in view')
-        fits.group_display(files)
-    elif args.a == 'hist':
-        fits.group_hist(files)
-    else:
-        pass
-else:
-    pass
+# print('images successfully captured')
+# #Display and Analyse Image
+# if args.a:
+#     files = cam.grab_from_args()
+#     if args.a == 'view':
+#         print('in view')
+#         fits.group_display(files)
+#     elif args.a == 'hist':
+#         fits.group_hist(files)
+#     else:
+#         pass
+# else:
+#     pass
 
 print(capture_cmd)
-print(files)
+# print(files)
