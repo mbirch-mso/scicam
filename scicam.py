@@ -144,7 +144,7 @@ def set_int_time(t,verbose=False):
     #Convert hex response into clocks then milliseconds
     check_clks = hex_to_int(check_clks_hex)
     check_time = check_clks / clk_speed
-    check_time = check_time * 1000
+    check_time = round((check_time * 1000),1)
     print('Integration Time is now: {}ms'.format(check_time))
     return check_time
 
@@ -156,7 +156,7 @@ def read_int_time(verbose=False):
     #Convert hex response into clocks then milliseconds
     check_clks = hex_to_int(check_clks_hex)
     check_time = check_clks / 16E6 
-    check_time = check_time * 1000
+    check_time = round((check_time * 1000),1)
     return check_time
 
 #Similar to set_int_time but calls command for frame time
@@ -182,8 +182,8 @@ def set_frame_time(t,verbose=False,rate=False):
     #Convert hex response into clocks then milliseconds
     check_clks = hex_to_int(check_clks_hex)
     check_time = check_clks / clk_speed
-    check_rate = 1 / check_time
-    check_time = check_time * 1000
+    check_rate = round((1 / check_time),1)
+    check_time = round((check_time * 1000),1)
     print('Frame Rate is now: {0}Hz, Frame Time is now: {1}ms'.format(check_rate,check_time))
     return check_time
 
@@ -195,7 +195,7 @@ def read_frame_time(verbose=False):
     #Convert hex response into clocks then milliseconds
     check_clks = hex_to_int(check_clks_hex)
     check_time = check_clks / 16E6 
-    check_time = check_time * 1000
+    check_time = round((check_time * 1000),1)
     return check_time
 
 #Sorts file into appropriate folder and renames appropriately
@@ -255,4 +255,31 @@ def import_fits(routine='simple_take_fits',date='today',i=False,t=False,\
                     for item in sublist]
         else:
             files = glob.glob(folder_name + "*" + routine + "*")
+    return files
+
+
+args = []
+def grab_from_args():
+    if args.p:
+        if args.i:
+            if args.t:
+                files = import_fits(routine = args.p,i=args.i,t=args.t)
+            else:
+                files = import_fits(routine = args.p,i=args.i)
+        else:
+            if args.t:
+                files = import_fits(routine = args.p,t=args.t)
+            else:
+                files = import_fits(routine = args.p,)
+    else:
+        if args.i:
+            if args.t:
+                files = import_fits(i=args.i,t=args.t)
+            else:
+                files = import_fits(i=args.i)
+        else:
+            if args.t:
+                files = import_fits(t=args.t)
+            else:
+                files = import_fits()
     return files

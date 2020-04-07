@@ -16,7 +16,7 @@ parser.add_argument('-l', type=int, help='Number of loops')
 parser.add_argument('-v', action='store_true', help='Verbose mode')
 args = parser.parse_args()
 
-home_loc = r'\\merger.anu.edu.au\mbirch\images'
+home_loc = '//merger.anu.edu.au/mbirch/images'
 
 
 def capture(routine, loc='no_loc', form = 'f'):
@@ -58,6 +58,7 @@ else:
     else:
         frame_t = cam.read_frame_time()
 
+
 #Capture image w/ or w/out defined location
 if args.l:
     for i in range(args.l):
@@ -86,6 +87,3 @@ else:
     else:
         capture_resp = capture(args.p,home_loc,'f')
         cam.file_sorting(home_loc,int_t,frame_t,routine=args.p)
-
-#test_change
-x = 5
