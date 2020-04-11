@@ -1,10 +1,9 @@
 from fabric import Connection
-import subprocess
 import scicam as cam
 import argparse
 
 
-parser = argparse.ArgumentParser(prog='Remotely Capture Image', description='Captures and View Images remotely on SSH')
+parser = argparse.ArgumentParser(prog='Remotely Capture and View Image/s', description='Captures and View Images remotely on SSH')
 parser.add_argument('-a', type=str, help='Type of Image Analysis')
 parser.add_argument('-p', type=str, help='Routine for image capture',default='')
 parser.add_argument('-i', type=str, help='Integration Time',default='')
@@ -45,7 +44,6 @@ connection.run(capture_cmd)
 if args.a:
     files = cam.grab_from_args(args.p,args.i,args.t)
     if args.a == 'view':
-        print('in view')
         cam.group_display(files)
     elif args.a == 'hist':
         cam.group_hist(files)

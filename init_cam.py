@@ -4,6 +4,7 @@ import os
 import subprocess
 from scicam import command
 
+
 #Run initcam batch file here
 init = subprocess.Popen(os.path.dirname(os.path.realpath(__file__)) + '\pirt_init_cam.bat')
 _, _ = init.communicate()

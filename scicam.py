@@ -264,7 +264,7 @@ def grab_from_args(p='',i='',t=''):
     if p != '':
         if i != '':
             if t != '':
-                files = import_fits(routine = p,i=i.i,t=t)
+                files = import_fits(routine = p,i=i,t=t)
             else:
                 files = import_fits(routine = p,i=i)
         else:
@@ -290,12 +290,7 @@ def group_hist(files):
     for k in range(len(files)):
         img = fits.open(files[k])[0]
         img_data = img.data
-        img_int = img.header['INT_T']
-        img_frame = img.header['FRAME_T']
-        plt.hist(img_data.flatten(), bins=400, \
-            label = 'Integration Time (ms):{0} Frame Time (ms):{1}'\
-                .format(img_int,img_frame))
-    plt.legend(loc='best')
+        plt.hist(img_data.flatten(), bins=400)
     plt.title('{}'.format(img.header['ROUTINE']))
     plt.xlabel('Counts (ADUs)')
     plt.ylabel('# of Pixels')
@@ -305,6 +300,7 @@ def group_hist(files):
 def group_display(files):
     #Code for the case of a single image
     #otherwise construct grid geometry
+    #Display header in format (int_time,frame_time,Reg_status 0x01)
     Tot = len(files)
     try:
         Cols = Tot//2
@@ -322,7 +318,7 @@ def group_display(files):
         ax.imshow(img.data)
         ax.set_xticks([])
         ax.set_yticks([])
-        ax.set_title('{0},{1}'\
+        ax.set_title('{0},{1},{2}'\
                 .format(int(img.header['INT_T']),\
-                int(img.header['FRAME_T'])))
+                int(img.header['FRAME_T']),img.header['STATUS']))
     plt.show()
