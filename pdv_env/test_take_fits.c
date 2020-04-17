@@ -36,8 +36,7 @@
 static void usage(char *progname, char *errmsg);
 static void 
 save_image(u_char *image_p, int width, int height, int depth,
-        char *basename, uint regstatus);
-
+        char *basename, uint regstatus, int fv_counts, double buf_time);
 
 #ifdef NO_MAIN
 #include "opt_util.h"
@@ -158,27 +157,32 @@ main(argc, argv)
         pdv_perror(errstr);
         return (1);
     }
-    
-    double start_time = edt_dtime();
+
+
     pdv_flush_fifo(pdv_p);
     pdv_cl_reset_fv_counter(pdv_p);
-    uint status1 = edt_reg_read(pdv_p, PDV_STAT);
     
     width = pdv_get_width(pdv_p);
     height = pdv_get_height(pdv_p);
     depth = pdv_get_depth(pdv_p);
     cameratype = pdv_get_cameratype(pdv_p);
-    
+
+    /* Initalise Buffer */
     pdv_multibuf(pdv_p, 1);
-    uint status2 = edt_reg_read(pdv_p, PDV_STAT);
     
-    pdv_start_image(pdv_p);
+    /* Image Capture Section */
+    double start_time = edt_dtime();
+    edt_start_buffers(pdv_p, 1);
+
     fflush(stdout);
     uint mid_status = edt_reg_read(pdv_p, PDV_STAT);
-    
-    image_p = pdv_wait_image(pdv_p);
-    uint status4 = edt_reg_read(pdv_p, PDV_STAT);
-    
+
+    image_p = pdv_wait_image(pdv_p); /* Bypass processing and collect from DMA */
+    double end_time = edt_dtime();
+    double slop_time = 0.000014; /* Time taken to do fflush and reg_read commands */
+    /* Image Capture Section */
+    double buf_time = end_time - slop_time;
+
     if ((overrun = (edt_reg_read(pdv_p, PDV_STAT) & PDV_OVERRUN)))
         ++overruns;
     timeouts = pdv_timeouts(pdv_p);
@@ -193,19 +197,15 @@ main(argc, argv)
         recovering_timeout = FALSE;
         printf("\nrestarted....\n");
     }
+    int fv_counts = pdv_cl_get_fv_counter(pdv_p);
 
     printf("%d Timeouts %d Overruns\n", last_timeouts, overruns);
-    int fv_counts = pdv_cl_get_fv_counter(pdv_p);
     printf("Number of Frame Valids Seen:%d\n",fv_counts);
-    double end_time = edt_dtime();
-    printf("Start time: %f\nEnd time: %f\n",start_time,end_time);
-    uint status5 = edt_reg_read(pdv_p, PDV_STAT);
-    printf("Status before bufs:%x,before start:%x,after start:%x,after wait:%x,end:%x\n"
-            ,status1,status2,mid_status,status4,status5);
-    /*Section to read frame valid interrupt style */
+    printf("Time to fill buffs: %f seconds\n",buf_time);
+    printf("STATUS after buffer opened:%x\n",mid_status);
 
     if (*fitsfname){
-        save_image(image_p, width, height, depth, fitsfname,mid_status);
+        save_image(image_p, width, height, depth, fitsfname,mid_status, fv_counts, buf_time);
     }
     
     if (last_timeouts)
@@ -218,7 +218,8 @@ main(argc, argv)
     exit(0);
 }
 
-int savefitsfile_double(u_char *datatosave, int numberofdimensions, long *dimensionvalues, char *fitsfilename,uint regstatus) 
+int savefitsfile_double(u_char *datatosave, int numberofdimensions, 
+long *dimensionvalues, char *fitsfilename,uint regstatus, int fv_counts, double buf_time) 
 {
     fitsfile *fitsfilepointer = NULL;
     int status = 0, nkeys, IS_SUCCESS;
@@ -256,17 +257,32 @@ int savefitsfile_double(u_char *datatosave, int numberofdimensions, long *dimens
         return status;
     }
 
-    
-    fits_get_hdrspace(fitsfilepointer, &nkeys, NULL, &status);
-    const char *new_key = "STATUS";
-    const char *comms = "Reg read of 0x01 Status";
-    fits_write_key(fitsfilepointer,TUINT,new_key,&regstatus,comms,&status);
+    /* Write registry read of 8bit 0x01 STATUS Reg ot FITS */
+    const char *stat_ptr = "STATUS";
+    const char *stat_com = "Reg read of 0x01 Status";
+    fits_write_key(fitsfilepointer,TUINT,stat_ptr,&regstatus,stat_com,&status);
     if (status != 0) {
         fits_report_error(stderr, status);
         return status;
     }
-    fits_read_record(fitsfilepointer, 11, card, &status); /* read keyword */
-    printf("%s\n", card);
+    
+    /* Write number of frame valid signals counted */
+    const char *fvsc_ptr = "FVSNUM";
+    const char *fvsc_com = "Number of frame valid signals counted";
+    fits_write_key(fitsfilepointer,TUINT,fvsc_ptr,&fv_counts,fvsc_com,&status);
+    if (status != 0) {
+        fits_report_error(stderr, status);
+        return status;
+    }
+
+    /* Write time to fill data buffer in seconds */
+    const char *buf_time_ptr = "BUFTIM";
+    const char *buf_time_com = "Seconds for buffer to fill";
+    fits_write_key(fitsfilepointer,TDOUBLE,buf_time_ptr,&buf_time,buf_time_com,&status);
+    if (status != 0) {
+        fits_report_error(stderr, status);
+        return status;
+    }
 
     fits_close_file(fitsfilepointer, &status);
     if (status != 0) {
@@ -278,7 +294,7 @@ int savefitsfile_double(u_char *datatosave, int numberofdimensions, long *dimens
     return IS_SUCCESS;
 }
     static void
-save_image(u_char *image_p, int s_width, int s_height, int s_depth, char *tmpname,uint regstatus)
+save_image(u_char *image_p, int s_width, int s_height, int s_depth, char *tmpname,uint regstatus, int fv_counts, double buf_time)
 {
     int     s_db = bits2bytes(s_depth);
     int     success;
@@ -286,7 +302,7 @@ save_image(u_char *image_p, int s_width, int s_height, int s_depth, char *tmpnam
     long    dimensions = 2;
     naxes[0] = s_width;
     naxes[1] = s_height;
-    success = savefitsfile_double(image_p,2,naxes,tmpname,regstatus);
+    success = savefitsfile_double(image_p,2,naxes,tmpname,regstatus,fv_counts,buf_time);
     printf("Writing %dx%dx%d FITS file to %s\n",
                     s_width, s_height, s_depth, tmpname);
 }

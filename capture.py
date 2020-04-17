@@ -13,6 +13,7 @@ parser.add_argument('-f', type=str, help='Location to store image as FITS')
 parser.add_argument('-i', type=float, help='Integration Time')
 parser.add_argument('-t', type=float, help='Frame Time')
 parser.add_argument('-l', type=int, help='Number of loops')
+parser.add_argument('-g', type=str, help='Naming Tag',default = '')
 parser.add_argument('-v', action='store_true', help='Verbose mode')
 args = parser.parse_args()
 
@@ -64,26 +65,26 @@ if args.l:
     for i in range(args.l):
         if args.r:
             capture_resp, _ = capture(args.p,args.r,'f')
-            cam.file_sorting(args.r,int_t,frame_t,'.raw',args.p)
+            cam.file_sorting(args.r,int_t,frame_t,'.raw',args.p,tag=args.g)
         elif args.b:
             capture_resp, _ = capture(args.p,args.b,'b')
-            cam.file_sorting(args.b,int_t,frame_t,routine=args.p)
+            cam.file_sorting(args.b,int_t,frame_t,routine=args.p,tag=args.g)
         elif args.f:
             capture_resp, _ = capture(args.p,args.f,'f')
-            cam.file_sorting(args.f,int_t,frame_t,'.fits',routine=args.p)
+            cam.file_sorting(args.f,int_t,frame_t,'.fits',routine=args.p,tag=args.g)
         else:
             capture_resp = capture(args.p,home_loc,'f')
-            cam.file_sorting(home_loc,int_t,frame_t,routine=args.p)
+            cam.file_sorting(home_loc,int_t,frame_t,routine=args.p,tag=args.g)
 else:
     if args.r:
         capture_resp, _ = capture(args.p,args.r,'f')
-        cam.file_sorting(args.r,int_t,frame_t,'.raw',args.p)
+        cam.file_sorting(args.r,int_t,frame_t,'.raw',args.p,tag=args.g)
     elif args.b:
         capture_resp, _ = capture(args.p,args.b,'b')
-        cam.file_sorting(args.b,int_t,frame_t,routine=args.p)
+        cam.file_sorting(args.b,int_t,frame_t,routine=args.p,tag=args.g)
     elif args.f:
         capture_resp, _ = capture(args.p,args.f,'f')
-        cam.file_sorting(args.f,int_t,frame_t,'.fits',routine=args.p)
+        cam.file_sorting(args.f,int_t,frame_t,'.fits',routine=args.p,tag=args.g)
     else:
         capture_resp = capture(args.p,home_loc,'f')
-        cam.file_sorting(home_loc,int_t,frame_t,routine=args.p)
+        cam.file_sorting(home_loc,int_t,frame_t,routine=args.p,tag=args.g)

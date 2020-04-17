@@ -12,7 +12,7 @@ if args.v:
     if args.r:
         cam.set_frame_time(args.f,verbose=True,rate=True)
     else:
-        cam.set_frame_time(args.f,verbose=False)
+        cam.set_frame_time(args.f,verbose=True)
 else:
     if args.r:
         cam.set_frame_time(args.f,rate=True)
