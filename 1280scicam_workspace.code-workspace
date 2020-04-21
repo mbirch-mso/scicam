@@ -7,5 +7,8 @@
 			"name": "scicam-1",
 			"path": "scicam-1"
 		}
-	]
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
 }

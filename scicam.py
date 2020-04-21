@@ -60,7 +60,6 @@ def crc16(cmd):
     else:
         return crc[2:6]
 
-
 #Format hex string into octets
 def byte_format(s):
     result = [s[i:i+2] for i in range(0, len(s), 2)]
@@ -84,7 +83,7 @@ def send_to_cam(cmd,data="no_data"):
         print('Invalid data (cannot compute CRC)...trying again')
         return 'crc_err'
     else:
-        packet = "3e00ff" + packet + crc +"3e" #Construct packet
+        packet = "3e00ff" + packet + crc + "3e" #Construct packet
         packet = byte_format(packet) #Format into spaced bytes
         #Run batch file and collect output through python
         p = subprocess.Popen([file_path, packet], stdout=subprocess.PIPE, shell=True)
@@ -169,22 +168,30 @@ def set_int_time(t,verbose=False):
     if verbose == True:
         check_clks_hex = command('106c',clks_hex,verbose=True)
         while ((check_clks_hex == 'crc_err') or (check_clks_hex == 'serial_err')):
-            t = t + 0.001 #Create new time
+            t = t + 0.001 #Create new time by adding 0.1ms
             print("Calculating for new time: {}ms".format(t*1000))
             clks_hex = secs_to_refclks(t) #Add ms if CRC not working
             check_clks_hex = command('106c',clks_hex,verbose=True)
     else: 
         check_clks_hex = command('106c',clks_hex)
         while ((check_clks_hex == 'crc_err') or (check_clks_hex == 'serial_err')):
-            t = t + 0.001 #Create new time
+            t = t + 0.001 #Create new time by adding 0.1ms
             print("Calculating for new time: {}ms".format(t*1000))
             clks_hex = secs_to_refclks(t) #Add ms if CRC not working
             check_clks_hex = command('106c',clks_hex)
 
     #Convert hex response into clocks then milliseconds
-    check_clks = hex_to_int(check_clks_hex)
+    try:
+        check_clks = hex_to_int(check_clks_hex)
+    except ValueError:
+        t = t + 0.001 #Create new time by adding 1ms
+        print("Unknown Error\nCalculating for new time: {}ms".format(t*1000))
+        clks_hex = secs_to_refclks(t) #Add ms if CRC not working
+        check_clks_hex = command('106e',clks_hex)
+        check_clks = hex_to_int(check_clks_hex)
+    
     check_time = check_clks / 16E6
-    check_time = round((check_time * 1000),1)
+    check_time = round((check_time * 1000),0)
     print('Integration Time is now: {}ms'.format(check_time))
     return check_time
 
@@ -196,7 +203,7 @@ def read_int_time(verbose=False):
     #Convert hex response into clocks then milliseconds
     check_clks = hex_to_int(check_clks_hex)
     check_time = check_clks / 16E6 
-    check_time = round((check_time * 1000),1)
+    check_time = round((check_time * 1000),0)
     return check_time
 
 #Similar to set_int_time but calls command for frame time
@@ -211,22 +218,30 @@ def set_frame_time(t,verbose=False,rate=False):
     if verbose == True:
         check_clks_hex = command('106e',clks_hex,verbose=True)
         while ((check_clks_hex == 'crc_err') or (check_clks_hex == 'serial_err')):
-            t = t + 0.001 #Create new time
+            t = t + 0.001 #Create new time by adding 0.1ms
             print("Calculating for new time: {}ms".format(t*1000))
             clks_hex = secs_to_refclks(t) #Add ms if CRC not working
             check_clks_hex = command('106e',clks_hex,verbose=True)
     else: 
         check_clks_hex = command('106e',clks_hex)
         while ((check_clks_hex == 'crc_err') or (check_clks_hex == 'serial_err')):
-            t = t + 0.001 #Create new time
+            t = t + 0.001 #Create new time by adding 0.1ms
             print("Calculating for new time: {}ms".format(t*1000))
             clks_hex = secs_to_refclks(t) #Add ms if CRC not working
             check_clks_hex = command('106e',clks_hex)
 
     #Convert hex response into clocks then milliseconds
-    check_clks = hex_to_int(check_clks_hex)
+    try:
+        check_clks = hex_to_int(check_clks_hex)
+    except ValueError:
+        t = t + 0.001 #Create new time by adding 1ms
+        print("Unknown Error\nCalculating for new time: {}ms".format(t*1000))
+        clks_hex = secs_to_refclks(t) #Add ms if CRC not working
+        check_clks_hex = command('106e',clks_hex,verbose=True)
+        check_clks = hex_to_int(check_clks_hex)
+    
     check_time = check_clks / 16E6
-    check_time = round((check_time * 1000),1)
+    check_time = round((check_time * 1000),0)
     print('Frame Time is now: {}ms'.format(check_time))
     return check_time
 
@@ -238,7 +253,7 @@ def read_frame_time(verbose=False):
     #Convert hex response into clocks then milliseconds
     check_clks = hex_to_int(check_clks_hex)
     check_time = check_clks / 16E6 
-    check_time = round((check_time * 1000),1)
+    check_time = round((check_time * 1000),0)
     return check_time
 
 #Sorts file into appropriate folder and renames appropriately
