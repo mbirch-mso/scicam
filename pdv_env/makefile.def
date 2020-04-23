@@ -28,6 +28,7 @@ HEADER_DIR =$(PDVHOME)
 INCLUDEFLAGS=-I$(HEADER_DIR) -I$(JPEGDIR)
 INCLUDES = $(HEADER_DIR)/edtinc.h \
         $(HEADER_DIR)/libedt.h \
+        $(HEADER_DIR)/libedt_timing.h \
         $(HEADER_DIR)/libpdv.h \
         $(HEADER_DIR)/libdvu.h \
         $(HEADER_DIR)/edtreg.h \

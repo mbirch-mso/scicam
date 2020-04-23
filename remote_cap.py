@@ -16,7 +16,7 @@ home_loc = '//merger.anu.edu.au/mbirch/scicam/'
 cmd_pre = lambda script: "python " + home_loc + script + ".py " 
 argf = lambda s: " -" + s + " " 
 img_loc = '//merger.anu.edu.au/mbirch/images'
-def args_form(p='simple_take_fits',i='',t='',l='',g=''):
+def args_form(p='capture',i='',t='',l='',g=''):
     args = p
     if i != '':
         args = args + argf('i') + i

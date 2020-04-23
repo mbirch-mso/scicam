@@ -18,7 +18,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
 testing_dir = '//merger.anu.edu.au/mbirch/data/'
 img_dir = '//merger.anu.edu.au/mbirch/images'
 unsorted_img = img_dir +'/image_unsorted.fits'
-routine = 'test_take_fits'
+routine = 'capture'
 
 def frame_times(i,loops,points,min_t,max_t,tag):
     cam.set_int_time(i)

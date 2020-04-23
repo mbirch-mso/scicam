@@ -203,7 +203,7 @@ main(argc, argv)
     printf("Number of Frame Valids Seen:%d\n",fv_counts);
     printf("Time to fill buffs: %f seconds\n",buf_time);
     printf("STATUS after buffer opened:%x\n",mid_status);
-
+    
     if (*fitsfname){
         save_image(image_p, width, height, depth, fitsfname,mid_status, fv_counts, buf_time);
     }

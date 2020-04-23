@@ -1,3 +1,4 @@
+
 import crcmod
 import ctypes
 import binascii
@@ -257,7 +258,7 @@ def read_frame_time(verbose=False):
     return check_time
 
 #Sorts file into appropriate folder and renames appropriately
-def file_sorting(loc,i,t,ext='.fits',routine='simple_take_fits',tag=False):
+def file_sorting(loc,i,t,ext='.fits',routine='capture',tag=False):
     #Define name of folder(s) file is to be sorted into
     now = datetime.datetime.now()
     today = now.strftime("%d-%m-%Y")
@@ -296,27 +297,20 @@ def file_sorting(loc,i,t,ext='.fits',routine='simple_take_fits',tag=False):
             hdu_header = hdu[0].header
             hdu_header.set('INT_T',i,'Integration time in ms')
             hdu_header.set('FRAME_T',t,'Frame time in ms')
-            hdu_header.set('ROUTINE',routine,'EDT Routine used for capture')
             hdu.flush()
-    else:
-        pass
 
     print('Successfully saved image to {}'.format(folder_name + image_name))
     return folder_name+image_name
 
-def import_fits(routine='simple_take_fits',date='today',i=False,t=False,\
+def import_fits(routine='capture',date='today',i=False,t=False,\
     loc='//merger.anu.edu.au/mbirch/images/images',tag=False):
     if date == 'today':
         now = datetime.datetime.now()
         date = now.strftime("%d-%m-%Y")
-    else:
-        pass
     folder_name = loc + date + '/'
     
     if tag != False:
         folder_name = folder_name + tag + '/'
-    else:
-        pass
 
     if i != False:
         if t != False:
@@ -417,31 +411,14 @@ def group_display(files):
     fig = plt.figure(1)
     for k in range(Tot):
         img = fits.open(files[k])[0]
+        print(img.header)
+        print(np.max(img.data))
+        print(np.min(img.data))
         ax = fig.add_subplot(Rows,Cols,Position[k])
         ax.imshow(img.data)
         ax.set_xticks([])
         ax.set_yticks([])
-        print('0x01 Reg STATUS: {0}, FVSC: {1}, BUF_TIME: {2}'.format(img.header['STATUS'],img.header['FVSNUM'],img.header['BUFTIM']))
-        #ax.set_title('{0},{1},{2},{3}'\
-               # .format(int(img.header['INT_T']),\
-              #  int(img.header['FRAME_T']),\
-             #       img.header['STATUS'],img.header['FVSNUM']))
-        ax.set_title('{0},{1}'.format(img.header['STATUS'],img.header['FVSNUM']))
-    
-    plt.show()
-
-def group_analysis(files):
-    fvscs = np.zeros(len(files))
-    stat_codes = np.zeros(len(files))
-    for k in range(len(files)):
-        img = fits.open(files[k])[0]
-        fvscs[k] = int(img.header['FVSNUM'])
-        print("STAT:{0},FVSC:{1}".format(img.header['STATUS'],img.header['FVSNUM']))
-        stat_codes[k] = int(img.header['STATUS'])
-    print("Average FVSC: {}".format(np.mean(fvscs)))
-    print("Average STATUS: {}".format(np.mean(stat_codes)))
-    x = np.arange(65,86)
-    plt.bar(x,)    
+    plt.show()   
 
 #Generic capture command that runs capture.bat 
 #with given routine and leaves unsorted
@@ -459,3 +436,12 @@ def img_cap(routine, loc = False, form = 'f'):
     p = subprocess.Popen([file_path, routine, loc, form], stdout=subprocess.PIPE, shell=True)
     (output, err) = p.communicate()
     return output, err
+
+
+def check_temp(verbose=False):
+    #Requires registry read of 476-479 and 480-483 and 484-487
+    if verbose == True:
+        cam_temp = command('1061',476,verbose=True)
+    else: 
+        cam_temp = command('1061',476)
+    return cam_temp

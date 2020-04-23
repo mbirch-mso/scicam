@@ -196,7 +196,8 @@ main(argc, argv)
         pdv_perror(errstr);
         return (1);
     }
-
+    printf("%s\n",fitsfname);
+    printf("%s\n",progname);
     pdv_flush_fifo(pdv_p);
 
     /*

@@ -85,4 +85,5 @@ TARGETS= \
     test_take.exe\
     simple_take_fits.exe\
     basic_fits.exe\
-    test_take_fits.exe
+    test_take_fits.exe\
+    capture.exe
