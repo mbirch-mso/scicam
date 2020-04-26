@@ -165,7 +165,7 @@ def saturation_testing(loops,points,tag):
         modes[j] = mode_entry[0]
         maxs[j] = np.max(empty_array)
     #Code to save all data to numpy array in txt
-    results_path = testing_dir +'camera_control/saturation_testing/' + \
+    results_path = testing_dir +'saturation_testing/' + \
                     tag + '_results.txt'
     np.savetxt(results_path,(means,medians,buf_times,variances,modes,maxs,int_times))
     print('PROGRAM HAS COMPLETED')
@@ -176,3 +176,5 @@ saturation_testing(1,100,'saturation_test_source_2')
 #frame_times(1002,3,3,20,2000,'wide_100point_study_8')
 #int_times(1000,3,10,20,2000,'wide__int_100point_study_4')
 #frame_int_space(1,50,21,10000,'param_space_study_1')
+
+def read_testing

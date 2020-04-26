@@ -13,3 +13,5 @@ command('1026', data = '02')
 #Set total number of OUTPUT mode channels to 4
 command('10ca', data = '03')
 print('PIRT 1280SCICAM initialised to full 4 channel operation')
+command('2006',data = '01')
+print('Metadata Enabled')

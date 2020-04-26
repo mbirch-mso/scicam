@@ -412,6 +412,7 @@ def group_display(files):
     for k in range(Tot):
         img = fits.open(files[k])[0]
         print(img.header)
+        print(img.data[0,:])
         print(np.max(img.data))
         print(np.min(img.data))
         ax = fig.add_subplot(Rows,Cols,Position[k])
