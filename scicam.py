@@ -290,14 +290,6 @@ def file_sorting(loc,i,t,ext='.fits',routine='capture',tag=False):
             k = k + 1
             image_name = '/' + routine + '_' + str(i) + '_' + str(t) + '_' + str(k) + ext
     os.rename(loc + '/image_unsorted' + ext, folder_name + image_name)
-    
-    #Write int and frame time into header
-    if ext == '.fits':
-        with fits.open(folder_name+image_name, mode = 'update') as hdu:
-            hdu_header = hdu[0].header
-            hdu_header.set('INT_T',i,'Integration time in ms')
-            hdu_header.set('FRAME_T',t,'Frame time in ms')
-            hdu.flush()
 
     print('Successfully saved image to {}'.format(folder_name + image_name))
     return folder_name+image_name

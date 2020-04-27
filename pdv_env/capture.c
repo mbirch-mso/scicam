@@ -26,11 +26,14 @@ TIME / AEST date and time of capture
 
     int
 savefitsfile(u_char *datatosave, int numberofdimensions, 
-        long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int depth, char *time_str);
+        long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int depth, char *time_str,
+        float int_time, float frame_time);
 
-    int
-check_frame_s(u_char *metdata);
+    float
+read_int_time(u_char *metadata);
 
+    float
+read_frame_time(u_char *metadata);
 
     
     int
@@ -41,7 +44,7 @@ main( int argc, char *argv[] )
     char    time_str[64];
     char    fitsfname[128];
     u_char *image_p; /*Image data pointer*/
-    u_char metadata[2560]; 
+
     PdvDev *pdv_p;  /*Device pointer */
 
     /* Retrieve local date/time for FITS header*/
@@ -77,71 +80,19 @@ main( int argc, char *argv[] )
     }
     
     int row_size = width * sizeof(short);
+    u_char metadata[2560]; 
     memcpy(metadata, image_p, (row_size - 1)); /* Move image pointer to second row*/
     image_p = &image_p[row_size]; /* Move image pointer to second row*/
 
-    /*Frame time ticks */
-    u_char FT0 = metadata[146];
-    u_char FT1 = metadata[147];
-    u_char FT2 = metadata[148];
-    u_char FT3 = metadata[149];
-
-    /*Int time ticks */
-    u_char IT0 = metadata[142];
-    u_char IT1 = metadata[143];
-    u_char IT2 = metadata[144];
-    u_char IT3 = metadata[145];
-    char frame_clks[] = { FT3, FT2, FT1, FT0};
-    char int_clks[] = { IT3, IT2, IT1, IT0};
-    uint32_t frame_clks_int = *(uint32_t *)frame_clks;
-    uint32_t myInt1 = (frame_clks[0] << 24) + (frame_clks[1] << 16) 
-                        + (frame_clks[2] << 8) + frame_clks[3];
-
-    /*Offset pixels*/
-    u_char COFF0 = metadata[130];
-    u_char COFF1 = metadata[131];
-    u_char CWS0 = metadata[132];
-    u_char CWS1 = metadata[133];
-    u_char HB0 = metadata[134];
-    u_char HB1 = metadata[134];
-    u_char ROFF0 = metadata[135];
-    u_char ROFF1 = metadata[136];
-    u_char RWS0 = metadata[137];
-    u_char RWS1 = metadata[138];
-
-    /* FPA TEMP */
-    u_char temp1 = metadata[476];
-    u_char temp2 = metadata[477];
-    u_char temp3 = metadata[478];
-    u_char temp4 = metadata[479];
-    u_char temp5 = metadata[480];
-    u_char temp6 = metadata[481];
-    u_char temp7 = metadata[482];
-    u_char temp8 = metadata[483];
-    u_char temp9 = metadata[484];
-    u_char temp10 = metadata[485];
-    u_char temp11 = metadata[486];
-    u_char temp12 = metadata[487];
-
-    /*Cooler runtime in minutes */
-    u_char cooler1 = metadata[488];
-    u_char cooler2 = metadata[489];
-    u_char cooler3 = metadata[490];
-    u_char cooler4 = metadata[491];
-
-    printf("TEMP--byte1: %x,byte2: %x,byte3: %x,byte4: %x\n",temp1,temp2,temp3,temp4);
-    printf("TEMP2--byte1: %x,byte2: %x,byte3: %x,byte4: %x\n",temp5,temp6,temp7,temp8);
-    printf("TEMP3--byte1: %x,byte2: %x,byte3: %x,byte4: %x\n",temp9,temp10,temp11,temp12);
-    printf("COOLER--byte1: %x,byte2: %x,byte3: %x,byte4: %x\n",cooler1,cooler2,cooler3,cooler4);
-    printf("FT--byte1: %x,byte2: %x,byte3: %x,byte4: %x\n",FT0,FT1,FT2,FT3);
-    printf("IT--byte1: %x,byte2: %x,byte3: %x,byte4: %x\n",IT0,IT1,IT2,IT3);
-    printf("checking reg130: COFF0: %x",COFF0);
     progname = argv[0];
     char ctype[10] = { ".c"};
     strcat(progname, ctype);
     strcpy(fitsfname, argv[2]);
 
-    savefitsfile(image_p, 2, naxes, fitsfname, end_time, progname, depth, time_str); /*Output to FITS file*/
+    float int_time = read_int_time(metadata);
+    float frame_time = read_frame_time(metadata);
+
+    savefitsfile(image_p, 2, naxes, fitsfname, end_time, progname, depth, time_str,int_time, frame_time); /*Output to FITS file*/
     printf("Image written to %s\n",fitsfname);
     
     pdv_close(pdv_p);
@@ -151,7 +102,7 @@ main( int argc, char *argv[] )
 
     int
 savefitsfile(u_char *datatosave, int numberofdimensions, 
-long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int depth, char *time_str) 
+long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int depth, char *time_str,float int_time, float frame_time) 
 {
     fitsfile *fitsfilepointer = NULL;
     int status = 0;
@@ -185,10 +136,28 @@ long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int 
         return status;
     }
 
-    /* Write time to fill data buffer in seconds */
+    /* Write number of bits per pixel*/
     const char *depth_ptr = "DEPTH";
     const char *depth_com = "bits per pixel";
     fits_write_key(fitsfilepointer,TINT,depth_ptr,&depth,depth_com,&status);
+    if (status != 0) {
+        fits_report_error(stderr, status);
+        return status;
+    }
+
+    /* Write number of bits per pixel*/
+    const char *int_ptr = "INTT";
+    const char *int_com = "Integration time in ms";
+    fits_write_key(fitsfilepointer,TFLOAT,int_ptr,&int_time,int_com,&status);
+    if (status != 0) {
+        fits_report_error(stderr, status);
+        return status;
+    }
+
+    /* Write frame time in milliseconds*/
+    const char *frame_ptr = "FRAMET";
+    const char *frame_com = "Frame time in ms";
+    fits_write_key(fitsfilepointer,TFLOAT,frame_ptr,&frame_time,frame_com,&status);
     if (status != 0) {
         fits_report_error(stderr, status);
         return status;
@@ -212,7 +181,7 @@ long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int 
         return status;
     }
 
-        /* Write time to fill data buffer in seconds */
+        /* Write AEST date and time */
     const char *time_ptr = "TIME";
     const char *time_com = "AEST date and time of image";
     fits_write_key(fitsfilepointer,TSTRING,time_ptr,time_str,time_com,&status);
@@ -230,6 +199,22 @@ long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int 
     return (0);
 }
 
-  /*  int
-check_frame_s(u_char *metadata);
-*/
+  float
+read_int_time(u_char *metadata)
+{
+    u_char IT0=metadata[142], IT1=metadata[143], IT2=metadata[144], IT3=metadata[145];
+    uint32_t int_refclks = (IT3 << 24) + (IT2 << 16) 
+                        + (IT1 << 8) + IT0; 
+    float int_time = (int_refclks/16E6)*1000;
+    return int_time;
+}
+
+    float
+read_frame_time(u_char *metadata)
+{
+    u_char FT0=metadata[146], FT1=metadata[147], FT2=metadata[148], FT3=metadata[149];
+    uint32_t frame_refclks = (FT3 << 24) + (FT2 << 16) 
+                        + (FT1 << 8) + FT0; 
+    float frame_time = (frame_refclks/16E6)*1000;
+    return frame_time;
+}
