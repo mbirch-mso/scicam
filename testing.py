@@ -272,7 +272,7 @@ def expose(i,n,tag=''):
 
 #create_master_read(1000,'test1_1000')
 #read_ramp_testing(200,200,'200on200_test1_transition')
-#saturation_testing(20,50,'satuation_20loops_50pnts_1')
+saturation_testing(20,50,'satuation_20loops_50pnts_1')
 #frame_times(1002,3,3,20,2000,'wide_100point_study_8')
 #int_times(1000,3,10,20,2000,'wide__int_100point_study_4')
 #frame_int_space(1,50,21,10000,'param_space_study_1')
