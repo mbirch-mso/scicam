@@ -10,6 +10,8 @@ BITPIX / 16 / number of bits per data pixel (2-bit padding)
 NAXIS1 / 1280 / width of detector
 NAXIS2 / 1024 / height of detector
 DEPTH / 14 / bits per pixel (FPA)
+INTT / Integration time in ms
+FRAMET /  Frame time in ms
 BUFTIM / seconds for buffer to fill
 PROGNM / "capture.c" / EDT framegrabber routine used for image capture
 TIME / AEST date and time of capture
@@ -35,13 +37,13 @@ read_int_time(u_char *metadata);
     float
 read_frame_time(u_char *metadata);
 
-    
     int
 main( int argc, char *argv[] )
 {
     int     width, height, depth;
     char   *cameratype, *progname;
     char    time_str[64];
+    char    active_coords[64];
     char    fitsfname[128];
     u_char *image_p; /*Image data pointer*/
 
@@ -51,7 +53,7 @@ main( int argc, char *argv[] )
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
     sprintf(time_str, "%d-%02d-%02d %02d:%02d:%02d", tm.tm_year + 1900, 
-            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+         tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 
     /*Open camera and flush FIFO memory */
@@ -106,15 +108,12 @@ long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int 
 {
     fitsfile *fitsfilepointer = NULL;
     int status = 0;
-    LONGLONG nelements;
+
     long fpixel[2];
-    char exclamantionpoint[2] = "!";
-    char filename[200] = { NULL }; /*ERROR IS FLAGGED HERE DUE TO POINTER TYPE CONVERSION */
+    char filename[200] = "!";
     char extension[10] = { ".fits" };
     fpixel[0] = fpixel[1] = 1;
-    nelements = dimensionvalues[0] * dimensionvalues[1];
-
-    strcat(filename, exclamantionpoint);
+    LONGLONG nelements = dimensionvalues[0] * dimensionvalues[1];
     strcat(filename, fitsfilename);
     strcat(filename, extension);
 
@@ -124,7 +123,7 @@ long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int 
         return status;
     }
 
-    fits_create_img(fitsfilepointer, USHORT_IMG, numberofdimensions, dimensionvalues, &status);
+    fits_create_img(fitsfilepointer, SHORT_IMG, numberofdimensions, dimensionvalues, &status);
     if (status != 0) {
         fits_report_error(stderr, status);
         return status;
@@ -145,9 +144,9 @@ long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int 
         return status;
     }
 
-    /* Write number of bits per pixel*/
-    const char *int_ptr = "INTT";
-    const char *int_com = "Integration time in ms";
+    /* Write integration time retrieved from metadata*/
+    const char *int_ptr = "DITMET";
+    const char *int_com = "Integration time in ms (metadata)";
     fits_write_key(fitsfilepointer,TFLOAT,int_ptr,&int_time,int_com,&status);
     if (status != 0) {
         fits_report_error(stderr, status);
@@ -155,8 +154,8 @@ long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int 
     }
 
     /* Write frame time in milliseconds*/
-    const char *frame_ptr = "FRAMET";
-    const char *frame_com = "Frame time in ms";
+    const char *frame_ptr = "FRAMTM";
+    const char *frame_com = "Frame time in ms (metadata)";
     fits_write_key(fitsfilepointer,TFLOAT,frame_ptr,&frame_time,frame_com,&status);
     if (status != 0) {
         fits_report_error(stderr, status);
@@ -181,10 +180,20 @@ long *dimensionvalues, char *fitsfilename, double buf_time, char *progname, int 
         return status;
     }
 
-        /* Write AEST date and time */
+    /* Write AEST date and time */
     const char *time_ptr = "TIME";
     const char *time_com = "AEST date and time of image";
     fits_write_key(fitsfilepointer,TSTRING,time_ptr,time_str,time_com,&status);
+    if (status != 0) {
+        fits_report_error(stderr, status);
+        return status;
+    }
+
+    /*Coordiantes for standard 1280x1024 pixel array*/
+    char active_coords[64] = "(8,8)-(1288,8)-(8,1032)-(1288,1032)";
+    const char *active_ptr = "ACTIVE";
+    const char *active_com = "Coordinates of standard pixel array";
+    fits_write_key(fitsfilepointer,TSTRING,active_ptr,active_coords,active_com,&status);
     if (status != 0) {
         fits_report_error(stderr, status);
         return status;

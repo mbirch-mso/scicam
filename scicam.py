@@ -10,6 +10,9 @@ import datetime
 import numpy as np
 import glob
 from astropy.io import fits
+from ftplib import FTP
+import xml.etree.ElementTree as ET
+from astral import moon
 import matplotlib.pyplot as plt
 
 #Convert to little endianness
@@ -90,6 +93,7 @@ def send_to_cam(cmd,data="no_data"):
         p = subprocess.Popen([file_path, packet], stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
         return output, err, packet
+
 
 #Calls send_to_cam with hex input of command and data
 #Retrieves response from raw string and decodes it
@@ -188,11 +192,16 @@ def set_int_time(t,verbose=False):
         t = t + 0.001 #Create new time by adding 1ms
         print("Unknown Error\nCalculating for new time: {}ms".format(t*1000))
         clks_hex = secs_to_refclks(t) #Add ms if CRC not working
-        check_clks_hex = command('106e',clks_hex)
+        check_clks_hex = command('106c',clks_hex)
+        while ((check_clks_hex == 'crc_err') or (check_clks_hex == 'serial_err')):
+            t = t + 0.001 #Create new time by adding 0.1ms
+            print("Calculating for new time: {}ms".format(t*1000))
+            clks_hex = secs_to_refclks(t) #Add ms if CRC not working
+            check_clks_hex = command('106c',clks_hex)
         check_clks = hex_to_int(check_clks_hex)
     
     check_time = check_clks / 16E6
-    check_time = round((check_time * 1000),0)
+    check_time = round((check_time * 1000),4)
     print('Integration Time is now: {}ms'.format(check_time))
     return check_time
 
@@ -239,10 +248,15 @@ def set_frame_time(t,verbose=False,rate=False):
         print("Unknown Error\nCalculating for new time: {}ms".format(t*1000))
         clks_hex = secs_to_refclks(t) #Add ms if CRC not working
         check_clks_hex = command('106e',clks_hex,verbose=True)
+        while ((check_clks_hex == 'crc_err') or (check_clks_hex == 'serial_err')):
+            t = t + 0.001 #Create new time by adding 0.1ms
+            print("Calculating for new time: {}ms".format(t*1000))
+            clks_hex = secs_to_refclks(t) #Add ms if CRC not working
+            check_clks_hex = command('106e',clks_hex)
         check_clks = hex_to_int(check_clks_hex)
     
     check_time = check_clks / 16E6
-    check_time = round((check_time * 1000),0)
+    check_time = round((check_time * 1000),4)
     print('Frame Time is now: {}ms'.format(check_time))
     return check_time
 
@@ -258,15 +272,14 @@ def read_frame_time(verbose=False):
     return check_time
 
 #Sorts file into appropriate folder and renames appropriately
-def file_sorting(loc,i,t,ext='.fits',routine='capture',tag=False):
+def file_sorting(loc,i,t,ext='.fits',routine='capture',tag=''):
     #Define name of folder(s) file is to be sorted into
     now = datetime.datetime.now()
     today = now.strftime("%d-%m-%Y")
     new_fold = 'images' + today
-    if tag != False:
+    if tag != '':
         new_fold = new_fold + '/' + tag
-    else:
-        pass
+
     folder_name = loc + '/' + new_fold
     k = 0
     image_name = '/' + routine + '_' + str(i) + '_' + str(t) + '_' + str(k) + ext
@@ -278,7 +291,7 @@ def file_sorting(loc,i,t,ext='.fits',routine='capture',tag=False):
         os.chdir(loc)
         try:
             os.mkdir('images' + today)
-            if tag != False:
+            if tag != '':
                 os.chdir('images' + today)
                 os.mkdir(tag)
         except FileExistsError:
@@ -289,9 +302,16 @@ def file_sorting(loc,i,t,ext='.fits',routine='capture',tag=False):
         while os.path.exists(folder_name + image_name) == True:
             k = k + 1
             image_name = '/' + routine + '_' + str(i) + '_' + str(t) + '_' + str(k) + ext
+ 
+    
     os.rename(loc + '/image_unsorted' + ext, folder_name + image_name)
-
+    
+    with fits.open((folder_name+image_name),mode='update') as hdu:
+        head = hdu[0].header
+        head.append(('DITSER',i,'Integration time in ms (serial)')) 
+    
     print('Successfully saved image to {}'.format(folder_name + image_name))
+    
     return folder_name+image_name
 
 def import_fits(routine='capture',date='today',i=False,t=False,\
@@ -404,9 +424,6 @@ def group_display(files):
     for k in range(Tot):
         img = fits.open(files[k])[0]
         print(img.header)
-        print(img.data[0,:])
-        print(np.max(img.data))
-        print(np.min(img.data))
         ax = fig.add_subplot(Rows,Cols,Position[k])
         ax.imshow(img.data)
         ax.set_xticks([])
@@ -430,11 +447,42 @@ def img_cap(routine, loc = False, form = 'f'):
     (output, err) = p.communicate()
     return output, err
 
+#Function adds BOM Canberr Airport weather statistics
+#and moon phase to FITS header
+def weather_to_fits(target):
+    stat_id = 'IDN60920.xml' #CANBERRA AIRPORT SUMMARY
+    ftp = FTP('ftp2.bom.gov.au')
+    ftp.login()
+    ftp.cwd('anon/gen/fwo')
+    with open(stat_id, 'wb') as fp:
+        ftp.retrbinary('RETR '+ stat_id, fp.write)
+    ftp.quit()
+    tree = ET.parse(stat_id)
+    root = tree.getroot()
+    stat_weather = root.findall(".//observations/station/[@stn-name='CANBERRA AIRPORT']/period/level/")
+    keys = ['CLOUD','CLOUDOKT','DELTA_T','GUST','AIR_TEMP',\
+            'PRESSURE','HUMID','WIND_DIR','WIND_SPD','PRECIP']
+    choice = ['cloud','cloud_oktas',\
+        'delta_t','gust_kmh','air_temperature','pres','rel-humidity',\
+            'wind_dir_deg','wind_spd_kmh','rainfall']
+    with fits.open(target,mode='update') as hdu:
+        target_head = hdu[0].header
+        k = 0
+        for i in range(len(stat_weather)):
+            if stat_weather[i].attrib['type'] in choice:
+                try:
+                    comment = stat_weather[i].attrib['type']\
+                        + '  ' + stat_weather[i].attrib['units']
+                except KeyError:
+                    comment = stat_weather[i].attrib['type']
+                try: 
+                    entry = round(float(stat_weather[i].text),2)
+                except ValueError:
+                    entry = stat_weather[i].text
+                target_head.append((keys[k],entry,comment))
+                k += 1
+        phase = round(moon.phase(datetime.date.today()),2)
+        target_head.append(('MOON',phase,'phase of moon (0-28)'))
+        print(target_head)
 
-def check_temp(verbose=False):
-    #Requires registry read of 476-479 and 480-483 and 484-487
-    if verbose == True:
-        cam_temp = command('1061',476,verbose=True)
-    else: 
-        cam_temp = command('1061',476)
-    return cam_temp
+

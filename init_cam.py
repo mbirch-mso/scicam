@@ -30,6 +30,13 @@ elif args.f:
 else:
     init = subprocess.Popen([script,'base'])
     _, _ = init.communicate()
-    print('PIRT 1280SCICAM initialised to base 1 tap operation')
+    print('Initialised to base 1 tap operation')
+
 command('2006',data = '01')
 print('Metadata enabled')
+
+command('1064',data = '10050000') #Set CWS to 1296
+command('1066',data = '00000000') #Set COFF to 0
+command('1068',data = '10040000') #Set RWS to 1040
+command('106A',data = '00000000') #Set ROFF to 0
+print('Offset pixels enabled (image dim now 1296x1040)')
