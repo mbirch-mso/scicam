@@ -450,6 +450,7 @@ def img_cap(routine, loc = False, form = 'f'):
 #Function adds BOM Canberr Airport weather statistics
 #and moon phase to FITS header
 def weather_to_fits(target):
+    #Access BOM FTP service for NSW/ACT Forecast
     stat_id = 'IDN60920.xml' #CANBERRA AIRPORT SUMMARY
     ftp = FTP('ftp2.bom.gov.au')
     ftp.login()
@@ -457,6 +458,8 @@ def weather_to_fits(target):
     with open(stat_id, 'wb') as fp:
         ftp.retrbinary('RETR '+ stat_id, fp.write)
     ftp.quit()
+    
+    #Retrieve forecast for Canberra
     tree = ET.parse(stat_id)
     root = tree.getroot()
     stat_weather = root.findall(".//observations/station/[@stn-name='CANBERRA AIRPORT']/period/level/")
@@ -465,6 +468,7 @@ def weather_to_fits(target):
     choice = ['cloud','cloud_oktas',\
         'delta_t','gust_kmh','air_temperature','pres','rel-humidity',\
             'wind_dir_deg','wind_spd_kmh','rainfall']
+    
     with fits.open(target,mode='update') as hdu:
         target_head = hdu[0].header
         k = 0
@@ -481,8 +485,42 @@ def weather_to_fits(target):
                     entry = stat_weather[i].text
                 target_head.append((keys[k],entry,comment))
                 k += 1
+        
         phase = round(moon.phase(datetime.date.today()),2)
+        
         target_head.append(('MOON',phase,'phase of moon (0-28)'))
         print(target_head)
 
+
+# Print progress
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
+    if iteration == total: 
+        print()
+
+
+#Stack frames and perform z-wise median collapse
+def median_stack(i,folder):
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    img_list_split = [i.split('_') for i in img_list]
+    stack = np.zeros((1040,1296))
+    for k in range(len(img_list)):
+        if img_list_split[k][1] == str(float(i)):
+            hdu = fits.open(img_list[k])
+            data = hdu[0].data
+            stack = np.dstack((stack,data))
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    #Collapse multi-dimensional array along depth axis by median
+    return np.median(stack, axis=2)
+
+
+def get_master_read(temp):
+    read_dir = '//merger.anu.edu.au/mbirch/data/master_read/'
+    read_file = read_dir + str(temp) + 'C.fits'
+    master_read = fits.open(read_file)[0]
+    return master_read.data
 

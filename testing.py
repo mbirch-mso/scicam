@@ -230,6 +230,7 @@ def create_master_read(frames,tag):
         if j == frames-1: #On final frame grab header
             frame_header = fits.getheader(unsorted_img)
             frame_header.append(('NDIT',frames,'Number of integrations'))
+            sky_header.append(('TYPE','MASTER_READ','Read noise esteimate from min exposure'))
         os.remove(unsorted_img) #Delete image after data retrieval 
     
     master_read = master_read / frames #Divide by NDIT
