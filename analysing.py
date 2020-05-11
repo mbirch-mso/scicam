@@ -3,15 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scicam as cam
 import scipy.ndimage
-from scipy.stats import sigmaclip
+from scipy.stats import sigmaclip,norm
+from scipy import signal
+from skimage import exposure
+import seaborn as sns
+import matplotlib.mlab as mlab
 import glob
 import os
 import astropy.io as fits
 from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 from astropy.io import fits
-
 
 #Folder variables
 testing_dir = '//merger.anu.edu.au/mbirch/data/'
@@ -21,7 +23,6 @@ int_path = folder_path('camera_control/int_time_studies')
 frame_int_space_path = folder_path('camera_control/frame_int_space_testing')
 saturation_path = folder_path('saturation_testing')
 read_path = folder_path('read_testing')
-
 
 def plot2d(param,x,y):
     plt.plot(x,y,label='Data')
@@ -207,6 +208,7 @@ def create_master_sky(i,folder,am,temp):
     
     #Collapse multi-dimensional array along depth axis by median
     sky_collapsed = np.median(stack, axis=2)
+    fits.writeto('for_pic.fits',sky_collapsed)
     #Subtract read frame
     master_read = cam.get_master_read(temp)
     sky_reduced = sky_collapsed - master_read
@@ -229,9 +231,7 @@ def create_master_sky(i,folder,am,temp):
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
     return background_est
 
-
-
-def master_sky():
+def master_sky_plot():
     bias_data = cam.get_master_read(-40)
     squished = cam.median_stack(i,folder)
     reduced = squished - bias_data #Subtract master bias
@@ -256,7 +256,94 @@ def master_sky():
     plt.suptitle('Sky background (no filter) at airmass 2: {}ADUs/pixel/s'.format(round(np.mean(reduce_clipped_s),2)))
     plt.show()
 
-#folder = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/4-5-2020/focused_45degs'
+def hist_analysis_sky():
+    m = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/4-5-2020/focused_45degs/mastersky_2.0s_9stack_am2.fits'
+    hdu = fits.open(m)
+    data = (hdu[0].data)/2
+    clipped, _ , _ = sigmaclip(data,4,4) #4 sigma clip of outliers
+    clippy, low , up = sigmaclip(data,2.8,2.8) #2.8 sigma clip of outliers
+    # best fit of data
+    (mu, sigma) = norm.fit(clipped)
+    (mu1, sigma1) = norm.fit(clippy)
+    n, bins, patches = plt.hist(clipped, 200, normed=1, facecolor='green', alpha=0.75)
+    # add a 'best fit' line
+    y = mlab.normpdf( bins, mu, sigma)
+    y2 = mlab.normpdf( bins, mu1, sigma1)
+    l = plt.plot(bins, y, 'r--', linewidth=2,label='$\sigma={}$'.format(int(sigma)))
+    l2 = plt.plot(bins, y2, 'b--', linewidth=2,label='$\sigma={}$'.format(int(sigma1)))
+    #plot
+    plt.xlabel('ADUs')
+    plt.ylabel('$\%$')
+    plt.title(r'$\mathrm{Normalised\ pixel\ distribution\ of\ sky/s:}\ \mu=%.0f$' %(mu1))
+    plt.grid(True)
+    plt.legend(loc='best')
+    plt.show()
+
+def read_temp_analysis():
+    neg_forty = cam.get_master_read(-40)
+    neg_twenty = cam.get_master_read(-20)
+    zero = cam.get_master_read(0)
+    twenty = cam.get_master_read(20)
+    temps = [-40,-20,0,20]
+    means = [np.mean(neg_forty),np.mean(neg_twenty),np.mean(zero),np.mean(twenty)]
+    devs = [np.std(neg_forty),np.std(neg_twenty),np.std(zero),np.std(twenty)]
+    
+    max_resid = neg_forty - twenty
+    img_eq = exposure.equalize_hist(max_resid)
+    raveled = max_resid.flatten()
+    raveled = raveled[(raveled>500) & (raveled<650)]
+    fig, axs = plt.subplots(1, 2)
+    axs[0].imshow(img_eq)
+    axs[0].set_xticks([])
+    axs[0].set_yticks([])
+    axs[1].hist(raveled,bins=200,label = '$\mu={0}\ \sigma={1}$'\
+                .format(int(np.mean(raveled)),int(np.std(raveled))))
+    axs[1].set_xlim(550,608)
+    axs[1].set_xlabel('ADUs')
+    axs[0].set_title('Hist-equalised image')
+    axs[1].set_title('Pixel distribution')
+    plt.suptitle('-40C to 20C Bias Residual')
+    plt.legend(loc='best')
+    plt.show()
+    # fig, ax1 = plt.subplots()
+    # colour = 'tab:blue'
+    # ax1 = sns.pointplot(x=temps,y=means,color=colour)
+    # ax1.set_ylabel('Mean (ADUs)', color=colour)
+    # ax1.tick_params(axis='y', labelcolor=colour)
+    # ax1.set_xlabel('Temperature ($^{\circ}$C)')
+    
+    # colour = 'tab:red'
+    # ax2 = ax1.twinx()
+    # ax2 = sns.pointplot(x=temps,y=devs,color=colour)
+    # ax2.set_ylabel('$\sigma$ (ADUs)', color=colour)
+    # ax2.tick_params(axis='y', labelcolor=colour)
+    # plt.title(r'$\mathrm{Master\ Bias\ results\ against\ Temperature}$')
+    # plt.show()
+
+
+    # residuals = np.array([[neg_forty-neg_forty,neg_forty-neg_twenty,neg_forty-zero,neg_forty-twenty],\
+    #     [neg_twenty-neg_forty,neg_twenty-neg_twenty,neg_twenty-zero,neg_twenty-twenty],\
+    #         [zero-neg_forty,zero-neg_twenty,zero-zero,zero-twenty],\
+    #             [twenty-neg_forty,twenty-neg_twenty,twenty-zero,twenty-twenty]])
+    # residual_matrix = np.zeros(shape=(4,4))
+    # for i in range(residuals.shape[0]):
+    #     for j in range(residuals.shape[1]):
+    #         residual_matrix[i,j] = np.mean(residuals[i,j])
+    # residual_matrix.astype(int)
+    # sns.set(style="white")
+    # fig, axs = plt.subplots(1, 2)#, tight_layout=True)    
+    # pos = axs[0].matshow(residual_matrix)#ax1.set_yticklabels(temps)
+    # axs[0].set_xticklabels(['']+temps)
+    # axs[0].set_yticklabels(['']+temps)
+    # axs[0].set_title('Mean Residual Matrix ($^{\circ}$C)')
+    # fig.colorbar(pos, ax=axs[0])
+    #plt.title(r'$\mathrm{Mean\ of\ Residual\ Matrix}$')
+
+
+read_temp_analysis()
+
+
+#hist_analysis()
 #reduced = median_stacking(2000,folder)
 
 

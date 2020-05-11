@@ -5,9 +5,10 @@ from astropy.io import fits
 import argparse
 
 parser = argparse.ArgumentParser(prog='Expose and save to FITS', description='Expose for a given integration time and number of integrations')
-parser.add_argument('i', type=float, help='Integration time in milliseconds')
-parser.add_argument('-n', type=int, help='Integration time in milliseconds')
-parser.add_argument('-g', type=str, help='Integration time in milliseconds',default = '')
+parser.add_argument('i', type=float, help='Integration time in milliseconds (DIT)')
+parser.add_argument('-n', type=int, help='Number of integrations to co-add (NDIT)')
+parser.add_argument('-g', type=str, help='Tag for placing in folder',default = '')
+parser.add_argument('-c', type=str, help='Commment for FITS Header',default = '')
 args = parser.parse_args()
 
 #Input Parameters
@@ -37,6 +38,9 @@ def expose(i,n,tag=''):
             int_header = fits.getheader(unsorted_img)
             int_header.append(('NDIT',n,'Number of integrations'))
         os.remove(unsorted_img) #Delete image after data retrieval 
+    if args.c != '':
+        int_header.append(('COMMENT',args.c,'User-defined comment'))
+    
     fits.writeto(unsorted_img,array,int_header)
     cam.weather_to_fits(unsorted_img)
     cam.file_sorting(img_dir,int_t,frame_t,tag=tag)
