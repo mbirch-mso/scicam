@@ -237,12 +237,9 @@ def create_master_read(frames,tag):
     master_path = testing_dir + 'read_testing/' + 'master_read_' \
                   + tag + '.fits'
     fits.writeto(master_path,master_read,frame_header)
-    
-    
     results_path = testing_dir +'read_testing/' + \
                     tag + '_masterdata.txt'
     np.savetxt(results_path,master_read)
-    
     print('PROGRAM HAS COMPLETED')
 
 

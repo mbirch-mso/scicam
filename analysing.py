@@ -205,10 +205,9 @@ def create_master_sky(i,folder,am,temp):
             hdu = fits.open(img_list[k])
             data = hdu[0].data
             stack = np.dstack((stack,data))
-    
+    stack = stack[:,:,1:] #Remove 0 array it is stacked on
     #Collapse multi-dimensional array along depth axis by median
     sky_collapsed = np.median(stack, axis=2)
-    fits.writeto('for_pic.fits',sky_collapsed)
     #Subtract read frame
     master_read = cam.get_master_read(temp)
     sky_reduced = sky_collapsed - master_read
@@ -257,68 +256,87 @@ def master_sky_plot():
     plt.show()
 
 def hist_analysis_sky():
-    m = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/4-5-2020/focused_45degs/mastersky_2.0s_9stack_am2.fits'
-    hdu = fits.open(m)
-    data = (hdu[0].data)/2
-    clipped, _ , _ = sigmaclip(data,4,4) #4 sigma clip of outliers
-    clippy, low , up = sigmaclip(data,2.8,2.8) #2.8 sigma clip of outliers
-    # best fit of data
-    (mu, sigma) = norm.fit(clipped)
-    (mu1, sigma1) = norm.fit(clippy)
-    n, bins, patches = plt.hist(clipped, 200, normed=1, facecolor='green', alpha=0.75)
-    # add a 'best fit' line
-    y = mlab.normpdf( bins, mu, sigma)
-    y2 = mlab.normpdf( bins, mu1, sigma1)
-    l = plt.plot(bins, y, 'r--', linewidth=2,label='$\sigma={}$'.format(int(sigma)))
-    l2 = plt.plot(bins, y2, 'b--', linewidth=2,label='$\sigma={}$'.format(int(sigma1)))
-    #plot
-    plt.xlabel('ADUs')
-    plt.ylabel('$\%$')
-    plt.title(r'$\mathrm{Normalised\ pixel\ distribution\ of\ sky/s:}\ \mu=%.0f$' %(mu1))
-    plt.grid(True)
+    m2 = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/11-5-2020/zenith_first_test_h/mastersky_2.0s_10stack_am1.fits'
+    m5 = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/11-5-2020/zenith_first_test_h/mastersky_5.0s_10stack_am1.fits'
+    m10 = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/11-5-2020/zenith_first_test_h/mastersky_10.001s_10stack_am1.fits'
+    m20 = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/11-5-2020/zenith_first_test_h/mastersky_20.0s_10stack_am1.fits'
+    hdu2 = fits.open(m2)
+    hdu5 = fits.open(m5)
+    hdu10 = fits.open(m10)
+    hdu20 = fits.open(m20)
+    
+    #Create simple mask
+    nrows, ncols = (1040,1296)
+    row, col = np.ogrid[:nrows, :ncols]
+    cnt_row, cnt_col = nrows / 2, ncols / 2
+    outer_disk_mask = ((row - cnt_row)**2 + (col - cnt_col)**2 >(nrows / 2.5)**2)
+
+    def format_sky(hdu,i):
+        data = (hdu[0].data)/i
+        data[outer_disk_mask] = 0
+        data_masked = data.flatten()
+        data_masked = data_masked[data_masked != 0]
+        clipped, _ , _ = sigmaclip(data_masked,4,4) #4 sigma clip of outliers
+        return clipped
+
+    clipped2 = format_sky(hdu2,2)
+    clipped5 = format_sky(hdu5,5)
+    clipped10 = format_sky(hdu10,10)
+    clipped20 = format_sky(hdu20,20)
+    sns.set(color_codes=True)
+    sns.distplot(clipped2,label='DIT=2s,$\mu={}$'.format(int(np.mean(clipped2))))
+    sns.distplot(clipped5,label='DIT=5s,$\mu={}$'.format(int(np.mean(clipped5))))
+    sns.distplot(clipped10,label='DIT=10s,$\mu={}$'.format(int(np.mean(clipped10))))
+    sns.distplot(clipped20,label='DIT=20s,$\mu={}$'.format(int(np.mean(clipped20))))
+    #sns.distplot(clip_avg,label='Average,$\mu={}$'.format(int(np.mean(clip_avg))))
+    plt.xlabel('ADUs/s')
+    plt.ylabel('Density $\%$')
+    plt.title('H-band sky background distribution (NDIT=10, Airmass=1)')
     plt.legend(loc='best')
     plt.show()
 
 def read_temp_analysis():
+    neg_sixty = cam.get_master_read(-60)
     neg_forty = cam.get_master_read(-40)
     neg_twenty = cam.get_master_read(-20)
     zero = cam.get_master_read(0)
-    twenty = cam.get_master_read(20)
-    temps = [-40,-20,0,20]
-    means = [np.mean(neg_forty),np.mean(neg_twenty),np.mean(zero),np.mean(twenty)]
-    devs = [np.std(neg_forty),np.std(neg_twenty),np.std(zero),np.std(twenty)]
+    #twenty = cam.get_master_read(20)
+    temps = [-60,-40,-20,0]
+    means = [np.mean(neg_sixty),np.mean(neg_forty),np.mean(neg_twenty),np.mean(zero)]
+    devs = [np.std(neg_sixty),np.std(neg_forty),np.std(neg_twenty),np.std(zero)]
     
-    max_resid = neg_forty - twenty
+    max_resid = neg_sixty - zero
     img_eq = exposure.equalize_hist(max_resid)
     raveled = max_resid.flatten()
-    raveled = raveled[(raveled>500) & (raveled<650)]
-    fig, axs = plt.subplots(1, 2)
-    axs[0].imshow(img_eq)
-    axs[0].set_xticks([])
-    axs[0].set_yticks([])
-    axs[1].hist(raveled,bins=200,label = '$\mu={0}\ \sigma={1}$'\
-                .format(int(np.mean(raveled)),int(np.std(raveled))))
-    axs[1].set_xlim(550,608)
-    axs[1].set_xlabel('ADUs')
-    axs[0].set_title('Hist-equalised image')
-    axs[1].set_title('Pixel distribution')
-    plt.suptitle('-40C to 20C Bias Residual')
-    plt.legend(loc='best')
-    plt.show()
-    # fig, ax1 = plt.subplots()
-    # colour = 'tab:blue'
-    # ax1 = sns.pointplot(x=temps,y=means,color=colour)
-    # ax1.set_ylabel('Mean (ADUs)', color=colour)
-    # ax1.tick_params(axis='y', labelcolor=colour)
-    # ax1.set_xlabel('Temperature ($^{\circ}$C)')
-    
-    # colour = 'tab:red'
-    # ax2 = ax1.twinx()
-    # ax2 = sns.pointplot(x=temps,y=devs,color=colour)
-    # ax2.set_ylabel('$\sigma$ (ADUs)', color=colour)
-    # ax2.tick_params(axis='y', labelcolor=colour)
-    # plt.title(r'$\mathrm{Master\ Bias\ results\ against\ Temperature}$')
+    raveled = raveled[(raveled>650) & (raveled<850)]
+    # fig, axs = plt.subplots(1, 2)
+    # axs[0].imshow(img_eq)
+    # axs[0].set_xticks([])
+    # axs[0].set_yticks([])
+    # axs[1].hist(raveled,bins=200,label = '$\mu={0}\ \sigma={1}$'\
+    #             .format(int(np.mean(raveled)),int(np.std(raveled))))
+    # #axs[1].set_xlim(550,608)
+    # axs[1].set_xlabel('ADUs')
+    # axs[0].set_title('Hist-equalised image')
+    # axs[1].set_title('Pixel distribution')
+    # plt.suptitle('-60C to 0C Bias Residual')
+    # plt.legend(loc='best')
     # plt.show()
+    
+    fig, ax1 = plt.subplots()
+    colour = 'tab:blue'
+    ax1 = sns.pointplot(x=temps,y=means,color=colour)
+    ax1.set_ylabel('Mean (ADUs)', color=colour)
+    ax1.tick_params(axis='y', labelcolor=colour)
+    ax1.set_xlabel('Temperature ($^{\circ}$C)')
+    
+    colour = 'tab:red'
+    ax2 = ax1.twinx()
+    ax2 = sns.pointplot(x=temps,y=devs,color=colour)
+    ax2.set_ylabel('$\sigma$ (ADUs)', color=colour)
+    ax2.tick_params(axis='y', labelcolor=colour)
+    plt.title(r'$\mathrm{Master\ Bias\ results\ against\ Temperature (33\mu s, 520REFCLKS)}$')
+    plt.show()
 
 
     # residuals = np.array([[neg_forty-neg_forty,neg_forty-neg_twenty,neg_forty-zero,neg_forty-twenty],\
@@ -343,10 +361,30 @@ def read_temp_analysis():
 read_temp_analysis()
 
 
-#hist_analysis()
-#reduced = median_stacking(2000,folder)
+#hist_analysis_sky()
 
 
+#zenith_all = 'Y:/data/sky_background_offsite/11-5-2020/images11-05-2020/zenith_first_test'
+# create_master_sky(2000,zenith_all,1,-60)
+# create_master_sky(5000,zenith_all,1,-60)
+# create_master_sky(10001,zenith_all,1,-60)
+# create_master_sky(20000,zenith_all,1,-60)
+# zenith_h = 'Y:/data/sky_background_offsite/11-5-2020/images11-05-2020/zenith_first_test_h'
+# create_master_sky(2000,zenith_h,1,-60)
+# create_master_sky(5000,zenith_h,1,-60)
+# create_master_sky(10001,zenith_h,1,-60)
+# create_master_sky(20000,zenith_h,1,-60)
 
 
+# os.chdir(zenith_all)
+# img_list = glob.glob('*.fits*')
+# img_list_split = [i.split('_') for i in img_list]
+# stack = np.zeros((1040,1296))
+# for k in range(len(img_list)):
+#     if img_list_split[k][1] == str(float(2000)):
+#         print(img_list[k])
+#         hdu = fits.open(img_list[k])
+#         data = hdu[0].data
+#         stack = np.dstack((stack,data))
+# print(stack.shape)
 

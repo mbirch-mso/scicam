@@ -517,7 +517,6 @@ def median_stack(i,folder):
     #Collapse multi-dimensional array along depth axis by median
     return np.median(stack, axis=2)
 
-
 def get_master_read(temp):
     read_dir = '//merger.anu.edu.au/mbirch/data/master_read/'
     read_file = read_dir + str(temp) + 'C.fits'

@@ -7,6 +7,7 @@ import argparse
 parser = argparse.ArgumentParser(prog='Expose and save to FITS', description='Expose for a given integration time and number of integrations')
 parser.add_argument('i', type=float, help='Integration time in milliseconds (DIT)')
 parser.add_argument('-n', type=int, help='Number of integrations to co-add (NDIT)')
+parser.add_argument('-l', type=int, help='Number of loops/images to save',default=1)
 parser.add_argument('-g', type=str, help='Tag for placing in folder',default = '')
 parser.add_argument('-c', type=str, help='Commment for FITS Header',default = '')
 args = parser.parse_args()
@@ -38,6 +39,7 @@ def expose(i,n,tag=''):
             int_header = fits.getheader(unsorted_img)
             int_header.append(('NDIT',n,'Number of integrations'))
         os.remove(unsorted_img) #Delete image after data retrieval 
+    
     if args.c != '':
         int_header.append(('COMMENT',args.c,'User-defined comment'))
     
@@ -46,7 +48,8 @@ def expose(i,n,tag=''):
     cam.file_sorting(img_dir,int_t,frame_t,tag=tag)
     print('EXPOSE COMPLETE')
 
-if args.n:
-    expose(args.i,args.n,args.g)
-else:
-    expose(args.i,1,args.g)
+for i in range(args.l-1):
+    if args.n:
+        expose(args.i,args.n,args.g)
+    else:
+        expose(args.i,1,args.g)
