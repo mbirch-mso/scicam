@@ -10,3 +10,9 @@ Primary python module for functions is scicam.py.
 serial_command.py for sending and receiving serial communication found in PIRT-ICD. 
 remote_cap.py can be used to automatically capture FITS images remotely and view or analyse locally.
 
+analysing.py contains plotting and master_frame construction routines.
+
+testing.py contains complex routines for taking images for a variety of parameter spaces
+
+expose.py is most generic python command with command-line interface for local image capture and fits output/file sorting (runs capture.c)
+
