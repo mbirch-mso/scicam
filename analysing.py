@@ -226,24 +226,10 @@ def hist_analysis_sky():
     hdu10 = fits.open(m10)
     hdu20 = fits.open(m20)
     
-    #Create simple mask
-    nrows, ncols = (1040,1296)
-    row, col = np.ogrid[:nrows, :ncols]
-    cnt_row, cnt_col = nrows / 2, ncols / 2
-    outer_disk_mask = ((row - cnt_row)**2 + (col - cnt_col)**2 >(nrows / 2.5)**2)
-
-    def format_sky(hdu,i):
-        data = (hdu[0].data)/i
-        data[outer_disk_mask] = 0
-        data_masked = data.flatten()
-        data_masked = data_masked[data_masked != 0]
-        clipped, _ , _ = sigmaclip(data_masked,4,4) #4 sigma clip of outliers
-        return clipped
-
-    clipped2 = format_sky(hdu2,2)
-    clipped5 = format_sky(hdu5,5)
-    clipped10 = format_sky(hdu10,10)
-    clipped20 = format_sky(hdu20,20)
+    clipped2 = cam.roi_clip(hdu2[0].data])/2 
+    clipped5 = cam.roi_clip(hdu5[0].data)/5
+    clipped10 = cam.roi_clip(hdu10[0].data)/10
+    clipped20 = cam.roi_clip(hdu20[0].data)/20
     sns.set(color_codes=True)
     sns.distplot(clipped2,label='DIT=2s,$\mu={}$'.format(int(np.mean(clipped2))))
     sns.distplot(clipped5,label='DIT=5s,$\mu={}$'.format(int(np.mean(clipped5))))
@@ -335,44 +321,3 @@ def read_diff(files):
     axs[1].set_title('Difference of Master Bias Frames, DIT=$33\mu s$ (520REFCLKS), NDIT=1000, RN={}'.format(RN))
     plt.show()
     plt.legend(loc='best')
-
-
-
-def gain_fitting(files):
-
-    pass
-
-    # diff_imgs = []
-    # means, variances = [],[]
-    # for i in sets:
-    #     diff = i[1] - i[0]
-    #     intensity, _ , _ = sigmaclip(intensity,5,5)
-    #     means.append(np.mean(intensity))
-    #     clipped, _ , _ = sigmaclip(diff,5,5)
-    #     #means.append(np.mean(clipped))
-    #     variances.append(np.var(clipped))
-    #     diff_imgs.append(clipped)
-
-    # variances = np.array(variances)/2 #Adjustment for variance of the difference
-    
-    # slope, intercept, r_value, _ ,_ = stats.linregress(means,variances)
-
-    # #Figure out parameters
-    # gain = round((1 / slope),2)
-    # read_noise = int(np.sqrt((gain**2)-intercept))
-
-    # print(slope,intercept,r_value)
-    # fit = slope * np.array(means) + intercept
-    # slope = round(slope,2)  
-    # intercept = int(intercept)
-    # rsqr = round((r_value**2),4)
-    # plt.scatter(means,variances,c='red',label = 'Data')
-    # plt.plot(means,fit,'g--',label = 'Linear Fit: (m = {0}, b = {1}, $r^2$ = {2})'\
-    #     .format(slope,intercept,rsqr))
-    # plt.ylabel('$\sigma^2$ (ADUs)')
-    # plt.xlabel('Intensity (ADUs)')
-    # plt.grid(True)
-    # plt.legend(loc='best')
-    # plt.title('Pairwise Variance vs Intensity for Blue Flats (g = {0}, RN = {1}$e^-$)'\
-    #     .format(gain,read_noise))
-    # plt.show()

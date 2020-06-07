@@ -223,7 +223,7 @@ def read_noise_estimate(frames,n,tag):
             suffix = 'Complete', length = 50)
 
         bias_dif = bias_2 - bias_1
-        dif_clipped,_,_ = sigmaclip(bias_dif,5,5)
+        dif_clipped,_,_ = sigmaclip(bias_dif,3,3)
         RN += np.std(dif_clipped)/np.sqrt(2)
 
 
@@ -261,9 +261,12 @@ def gain_estimate():
         first,_ = cam.simple_capture()
         second,_ = cam.simple_capture()
         
-        diff_img = (first-bias) - (second-bias)
-        variances.append(np.var(diff_img))
-        intensities.append(np.mean(first_bias))
+        diff_img = (first-bias) - (second-bias) #Difference of bias-subtracted frames
+        clipped_diff_img = cam.roi_clip(diff_image)
+        clipped_img = cam.roi_clip(first-bias)
+        
+        variances.append(np.var(clipped_img))
+        intensities.append(np.mean(clipped_image))
     
     variances = np.array(variances)/2 #Adjust for difference theorem
     intensities = np.array(intensities)

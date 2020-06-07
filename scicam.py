@@ -515,6 +515,26 @@ def median_stack(i,folder):
     #Collapse multi-dimensional array along depth axis by median
     return np.median(stack, axis=2)
 
+def roi_clip(data):
+    '''
+    Apply circular ROI mask
+    and clip to 5-sigma
+    Returns flattened array
+    '''
+    #Define circular ROI
+    nrows, ncols = (1040,1296)
+    row, col = np.ogrid[:nrows, :ncols]
+    cnt_row, cnt_col = nrows / 2, ncols / 2
+    outer_disk_mask = ((row - cnt_row)**2 + (col - cnt_col)**2 >(nrows / 2.5)**2)
+    
+    #Apply mask and sigmaclip
+    data[outer_disk_mask] = 0
+    data_masked = data.flatten()
+    data_masked = data_masked[data_masked != 0]
+    clipped, _ , _ = sigmaclip(data_masked,5,5)
+    return clipped
+
+
 def get_master_bias(temp):
     bias_dir = '//merger.anu.edu.au/mbirch/data/master_bias/'
     bias_file = bias_dir + str(temp) + 'C.fits'
