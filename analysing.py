@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scicam as cam
 import scipy.ndimage
-from scipy.stats import sigmaclip,norm
+from scipy.stats import sigmaclip,norm,linregress
 from scipy import signal
 from skimage import exposure
 import seaborn as sns
@@ -188,50 +188,11 @@ def analyse_read():
     axs[2].set_xlim(-900,900)
     axs[2].set_title('Mean-subtracted/Gain Adjusted  $\sigma={}$ electrons'.format(int(np.std(noise_img))))
     axs[2].set_xlabel('$e^{-}$')
-    axs[1].set_title('Master Read Frame, DIT=$33\mu s$ (520REFCLKS), NDIT=1000')
+    axs[1].set_title('Master Bias Frame, DIT=$33\mu s$ (520REFCLKS), NDIT=1000')
     plt.show()
 
-def create_master_sky(i,folder,am,temp):
-    '''
-    Takes integration time in ms, folder containing sky backgrounds
-    an airmass and camera temperature
-    '''
-    os.chdir(folder)
-    img_list = glob.glob('*.fits*')
-    img_list_split = [i.split('_') for i in img_list]
-    stack = np.zeros((1040,1296))
-    for k in range(len(img_list)):
-        if img_list_split[k][1] == str(float(i)):
-            hdu = fits.open(img_list[k])
-            data = hdu[0].data
-            stack = np.dstack((stack,data))
-    stack = stack[:,:,1:] #Remove 0 array it is stacked on
-    #Collapse multi-dimensional array along depth axis by median
-    sky_collapsed = np.median(stack, axis=2)
-    #Subtract read frame
-    master_read = cam.get_master_read(temp)
-    sky_reduced = sky_collapsed - master_read
-    #Create single estimate in adus/pixel/s
-    sky_reduced_clipped, _ , _ = sigmaclip(sky_reduced,3,3) #3 sigma clip of outliers
-    sky_reduced_clipped = sky_reduced_clipped/(i/1000) #Divide by seconds
-    background_est = round(np.mean(sky_reduced_clipped),2)
-
-    #Append neccesary info to header
-    sky_header = hdu[0].header
-    sky_header.append(('NSTACK',stack.shape[2],'Number of exposures stacked'))
-    sky_header.append(('TYPE','MASTER_SKY','Median stack of sky backgrounds'))
-    sky_header.append(('AIRMASS',am,'Airmass of exposures'))
-    sky_header.append(('COUNTEST',background_est,'Estimate of background in ADUs/pixel/s'))
-    master_name = 'mastersky_'+str(i/1000)+"s_" + str(stack.shape[2]) \
-                    + 'stack_am' + str(am) + '.fits'
-    
-    #Write to FITS file
-    fits.writeto(master_name,sky_reduced,sky_header)
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    return background_est
-
 def master_sky_plot():
-    bias_data = cam.get_master_read(-40)
+    bias_data = cam.get_master_bias(-40)
     squished = cam.median_stack(i,folder)
     reduced = squished - bias_data #Subtract master bias
     #Clip to 3 sigmas the squished image to remove recurring
@@ -295,12 +256,11 @@ def hist_analysis_sky():
     plt.legend(loc='best')
     plt.show()
 
-def read_temp_analysis():
-    neg_sixty = cam.get_master_read(-60)
-    neg_forty = cam.get_master_read(-40)
-    neg_twenty = cam.get_master_read(-20)
-    zero = cam.get_master_read(0)
-    #twenty = cam.get_master_read(20)
+def bias_temp_analysis():
+    neg_sixty = cam.get_master_bias(-60)
+    neg_forty = cam.get_master_bias(-40)
+    neg_twenty = cam.get_master_bias(-20)
+    zero = cam.get_master_bias(0)
     temps = [-60,-40,-20,0]
     means = [np.mean(neg_sixty),np.mean(neg_forty),np.mean(neg_twenty),np.mean(zero)]
     devs = [np.std(neg_sixty),np.std(neg_forty),np.std(neg_twenty),np.std(zero)]
@@ -357,34 +317,62 @@ def read_temp_analysis():
     # fig.colorbar(pos, ax=axs[0])
     #plt.title(r'$\mathrm{Mean\ of\ Residual\ Matrix}$')
 
+def read_diff(files):
+    hdu1 = fits.open(imgs[0])
+    hdu2 = fits.open(imgs[1])
+    img1 = hdu1[0].data
+    img2 = hdu2[0].data
+    diff = img1 - img2 #Create difference image
+    header = hdu1[0].header
+    img, _, _ = sigmaclip(diff,5,5)
+    sig = np.std(img)
+    RN = int(sig/np.sqrt(2))
+    fig, axs = plt.subplots(1, 2, tight_layout=True)
+    axs[0].imshow(diff,vmax=25)
+    axs[1].hist(img, bins=1000,label='$\sigma={}$ electrons'.format(int(sig)))
+    axs[1].set_title('Mean-subtracted/Gain Adjusted'.format(int(np.std(img))))
+    axs[1].set_xlabel('$e^{-}$')
+    axs[1].set_title('Difference of Master Bias Frames, DIT=$33\mu s$ (520REFCLKS), NDIT=1000, RN={}'.format(RN))
+    plt.show()
+    plt.legend(loc='best')
 
-read_temp_analysis()
 
 
-#hist_analysis_sky()
+def gain_fitting(files):
 
+    pass
 
-#zenith_all = 'Y:/data/sky_background_offsite/11-5-2020/images11-05-2020/zenith_first_test'
-# create_master_sky(2000,zenith_all,1,-60)
-# create_master_sky(5000,zenith_all,1,-60)
-# create_master_sky(10001,zenith_all,1,-60)
-# create_master_sky(20000,zenith_all,1,-60)
-# zenith_h = 'Y:/data/sky_background_offsite/11-5-2020/images11-05-2020/zenith_first_test_h'
-# create_master_sky(2000,zenith_h,1,-60)
-# create_master_sky(5000,zenith_h,1,-60)
-# create_master_sky(10001,zenith_h,1,-60)
-# create_master_sky(20000,zenith_h,1,-60)
+    # diff_imgs = []
+    # means, variances = [],[]
+    # for i in sets:
+    #     diff = i[1] - i[0]
+    #     intensity, _ , _ = sigmaclip(intensity,5,5)
+    #     means.append(np.mean(intensity))
+    #     clipped, _ , _ = sigmaclip(diff,5,5)
+    #     #means.append(np.mean(clipped))
+    #     variances.append(np.var(clipped))
+    #     diff_imgs.append(clipped)
 
+    # variances = np.array(variances)/2 #Adjustment for variance of the difference
+    
+    # slope, intercept, r_value, _ ,_ = stats.linregress(means,variances)
 
-# os.chdir(zenith_all)
-# img_list = glob.glob('*.fits*')
-# img_list_split = [i.split('_') for i in img_list]
-# stack = np.zeros((1040,1296))
-# for k in range(len(img_list)):
-#     if img_list_split[k][1] == str(float(2000)):
-#         print(img_list[k])
-#         hdu = fits.open(img_list[k])
-#         data = hdu[0].data
-#         stack = np.dstack((stack,data))
-# print(stack.shape)
+    # #Figure out parameters
+    # gain = round((1 / slope),2)
+    # read_noise = int(np.sqrt((gain**2)-intercept))
 
+    # print(slope,intercept,r_value)
+    # fit = slope * np.array(means) + intercept
+    # slope = round(slope,2)  
+    # intercept = int(intercept)
+    # rsqr = round((r_value**2),4)
+    # plt.scatter(means,variances,c='red',label = 'Data')
+    # plt.plot(means,fit,'g--',label = 'Linear Fit: (m = {0}, b = {1}, $r^2$ = {2})'\
+    #     .format(slope,intercept,rsqr))
+    # plt.ylabel('$\sigma^2$ (ADUs)')
+    # plt.xlabel('Intensity (ADUs)')
+    # plt.grid(True)
+    # plt.legend(loc='best')
+    # plt.title('Pairwise Variance vs Intensity for Blue Flats (g = {0}, RN = {1}$e^-$)'\
+    #     .format(gain,read_noise))
+    # plt.show()

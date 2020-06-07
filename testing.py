@@ -13,22 +13,12 @@ routine = 'capture'
 naxis1 = 1040
 naxis2 = 1296
 
-# Print progress
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
-    if iteration == total: 
-        print()
-
-
 def frame_times(i,loops,points,min_t,max_t,tag):
     cam.set_int_time(i)
     frame_times = np.linspace(min_t,max_t,points)
     frame_times = np.round(frame_times,2) #Round so no errors
     means, medians, buf_times, variances = map(np.zeros,[points]*4)
-    printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    cam.printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
     y=0
     for k in range(len(frame_times)):
         cam.set_frame_time(frame_times[k])
@@ -43,7 +33,7 @@ def frame_times(i,loops,points,min_t,max_t,tag):
             hdu_img.close() #Close image so it can be sorted
             os.remove(unsorted_img) #Delete image after data retrieval
             y = y + 1
-            printProgressBar(y, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
+            cam.printProgressBar(y, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
         #Write to arrays
         buf_times[k] = np.mean(buf_time_per)
         means[k] = np.mean(empty_array)
@@ -56,13 +46,12 @@ def frame_times(i,loops,points,min_t,max_t,tag):
     np.savetxt(results_path,(means,medians,buf_times,variances,frame_times),header=str(i))
     print('PROGRAM HAS COMPLETED')
 
-
 def int_times(t,loops,points,min_i,max_i,tag):
     cam.set_frame_time(t)
     int_times = np.linspace(min_i,max_i,points)
     int_times = np.round(int_times,2) #Round so no errors
     means, medians, buf_times, variances = map(np.zeros,[points]*4)
-    printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    cam.printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
     y=0
     #Iterate over frame time
     for k in range(len(int_times)):
@@ -78,7 +67,7 @@ def int_times(t,loops,points,min_i,max_i,tag):
             hdu_img.close() #Close image so it can be sorted
             os.remove(unsorted_img) #Delete image after data retrieval
             y = y + 1
-            printProgressBar(y, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
+            cam.printProgressBar(y, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
         #Write to arrays
         buf_times[k] = np.mean(buf_time_per)
         means[k] = np.mean(empty_array)
@@ -91,8 +80,7 @@ def int_times(t,loops,points,min_i,max_i,tag):
     np.savetxt(results_path,(means,medians,buf_times,variances,int_times),header=str(t))
     print('PROGRAM HAS COMPLETED')
 
-
-def frame_int_space(loops,points,min_val,max_val,tag):
+def frame_int_times(loops,points,min_val,max_val,tag):
     int_times = np.round(np.linspace(min_val,max_val,points),2)
     int_times[31] = 6327.62
     frame_times = np.round(np.linspace(min_val,max_val,points),2)
@@ -101,7 +89,7 @@ def frame_int_space(loops,points,min_val,max_val,tag):
     buf_times = np.zeros(shape = (points,points))
     variances = np.zeros(shape = (points,points))
     medians = np.zeros(shape = (points,points))
-    printProgressBar(0,(loops*(points**2)), prefix = 'Progress:', suffix = 'Complete', length = 50)
+    cam.printProgressBar(0,(loops*(points**2)), prefix = 'Progress:', suffix = 'Complete', length = 50)
     y=0
     for j in range(points):
         cam.set_int_time(int_times[j])
@@ -118,7 +106,7 @@ def frame_int_space(loops,points,min_val,max_val,tag):
                 hdu_img.close() #Close image so it can be sorted
                 os.remove(unsorted_img) #Delete image after data retrieval 
                 y = y + 1
-                printProgressBar(y,(loops*(points**2)), prefix = 'Progress:', \
+                cam.printProgressBar(y,(loops*(points**2)), prefix = 'Progress:', \
                     suffix = 'Complete', length = 50)
             #Write to arrays
             buf_times[j,k] = np.mean(buf_time_per)
@@ -137,11 +125,10 @@ def frame_int_space(loops,points,min_val,max_val,tag):
     np.savetxt(results_path + '_frames.txt',frame_times)
     print('PROGRAM HAS COMPLETED')
     
-
-def saturation_testing(loops,points,tag):
+def saturation_ramp(loops,points,tag):
     int_times = np.round(np.linspace(1001,25000,points),0)
     means, medians, buf_times, variances, modes, maxs = map(np.zeros,[points]*6)
-    printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    cam.printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
     y=0
     for j in range(points):
         cam.set_int_time(int_times[j])
@@ -157,7 +144,7 @@ def saturation_testing(loops,points,tag):
             hdu_img.close() #Close image so it can be sorted
             os.remove(unsorted_img) #Delete image after data retrieval 
             y = y + 1
-            printProgressBar(y,loops*points, prefix = 'Progress:', \
+            cam.printProgressBar(y,loops*points, prefix = 'Progress:', \
                 suffix = 'Complete', length = 50)
         empty_array = empty_array / loops
         buf_times[j] = np.mean(buf_time_per)
@@ -173,12 +160,11 @@ def saturation_testing(loops,points,tag):
     np.savetxt(results_path,(means,medians,buf_times,variances,modes,maxs,int_times))
     print('PROGRAM HAS COMPLETED')
 
-
-def read_ramp_testing(points,loops,tag):
+def read_ramp(points,loops,tag):
     int_times = np.round(np.linspace(0.033,25,points),4)
     #int_times[169] = 0.846
     means, medians, variances, stddevs = map(np.zeros,[points]*4)
-    printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    cam.printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
     y=0
     for j in range(points):
         int_t = cam.set_int_time(int_times[j])
@@ -198,7 +184,7 @@ def read_ramp_testing(points,loops,tag):
                 hdu_img.close() #Close image so it can be sorted
                 os.remove(unsorted_img) #Delete image after data retrieval 
                 y = y + 1
-                printProgressBar(y,loops*points, prefix = 'Progress:', \
+                cam.printProgressBar(y,loops*points, prefix = 'Progress:', \
                     suffix = 'Complete', length = 50)
             means[j] = np.mean(empty_array)
             medians[j] = np.median(empty_array)
@@ -210,67 +196,98 @@ def read_ramp_testing(points,loops,tag):
     np.savetxt(results_path,(means,medians,variances,stddevs,int_times))
     print('PROGRAM HAS COMPLETED')
 
+def read_noise_estimate(frames,n,tag):
 
-def create_master_read(frames,tag):
+    '''
+    Capture n pairs of bias frames (520REFCLKS)
+    Produce difference image from each pair and store
+    read noise estimate from sigma/sqrt(2) of difference
+    Output histogram of final pair with RN estimate as average
+    of all pairs
+    '''
     int_t = cam.set_int_time(0.033)
     frame_t = cam.set_frame_time(20.033)
-    printProgressBar(0, frames, prefix = 'Progress:', suffix = 'Complete', length = 50)
-    y=0
-    master_read = np.zeros(shape = (naxis1,naxis2)) #Initiate array for coadding
-    for j in range(frames):
-        cap, _ = cam.img_cap(routine,img_dir,'f')
-        hdu_img = fits.open(unsorted_img)
-        fits_img = hdu_img[0]
-        master_read += fits_img.data
-        hdu_img.close() #Close image so it can be sorted
+    cam.printProgressBar(0, 2*n, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    y = 0
+    RN = 0
 
-        y = y + 1
-        printProgressBar(y,frames, prefix = 'Progress:', \
+    for j in range(n):
+        bias_1,_ = cam.simple_cap()
+        y += 1
+        cam.printProgressBar(y,frames, prefix = 'Progress:', \
             suffix = 'Complete', length = 50)
-        if j == frames-1: #On final frame grab header
-            frame_header = fits.getheader(unsorted_img)
-            frame_header.append(('NDIT',frames,'Number of integrations'))
-            sky_header.append(('TYPE','MASTER_READ','Read noise esteimate from min exposure'))
-        os.remove(unsorted_img) #Delete image after data retrieval 
+        
+        bias_2,_ = cam.simple_cap()
+        y += 1
+        cam.printProgressBar(y,frames, prefix = 'Progress:', \
+            suffix = 'Complete', length = 50)
+
+        bias_dif = bias_2 - bias_1
+        dif_clipped,_,_ = sigmaclip(bias_dif,5,5)
+        RN += np.std(dif_clipped)/np.sqrt(2)
+
+
+    RN = RN / 500
+
+    n, bins, _ = plt.hist(dif_clipped,bins = 200,density = 1,facecolor='blue', alpha=0.75,\
+                label = 'Bias Difference Frame, $\sigma$:{}'.format(round(np.std(dif_clipped))))
     
-    master_read = master_read / frames #Divide by NDIT
-    master_path = testing_dir + 'read_testing/' + 'master_read_' \
-                  + tag + '.fits'
-    fits.writeto(master_path,master_read,frame_header)
-    results_path = testing_dir +'read_testing/' + \
-                    tag + '_masterdata.txt'
-    np.savetxt(results_path,master_read)
+    def fit_function(x, B, sigma):
+        return (B * np.exp(-1.0 * (x**2) / (2 * sigma**2)))
+    popt, _ = curve_fit(fit_function, xdata=bins[0:-1], \
+                ydata=n, p0=[0.1, dev])
+    xspace = np.linspace(bins[0], bins[-1], 100000)
+    fit_dev = round(popt[1],3)
+    plt.plot(xspace+0.5, fit_function(xspace, *popt), color='darkorange', \
+        linewidth=2.5, label='Gaussian fit, $\sigma$:{}'.format(fit_dev))
+    
+    plt.ylabel('Density ($\%$)')
+    plt.xlabel('ADUs')
+    plt.title('Read Noise Estimate:{}'.format(RN))
+    plt.legend(loc='best')
+    plt.show()
     print('PROGRAM HAS COMPLETED')
 
+def gain_estimate():
+    bias = cam.get_master_bias(-60)
+    int_times = np.round(np.linspace(1001,25000,points),0)
+    intensities,  variances = [],[]
 
-def expose(i,n,tag=''):
-    int_t = cam.set_int_time(i)
-    frame_t = cam.set_frame_time(i+25)
-    printProgressBar(0, n, prefix = 'Progress:', suffix = 'Complete', length = 50)
-    y=0
-    array = np.zeros(shape = (naxis1,naxis2)) #Initiate array for coadding
-    for j in range(n):
-        cap, _ = cam.img_cap(routine,img_dir,'f')
-        hdu_img = fits.open(unsorted_img)
-        fits_img = hdu_img[0]
-        array += fits_img.data
-        hdu_img.close() #Close image so it can be sorted
-        y = y + 1
-        printProgressBar(y,n, prefix = 'Progress:', \
-            suffix = 'Complete', length = 50)
-        if j == n-1: #On final frame grab header
-            int_header = fits.getheader(unsorted_img)
-            int_header.append(('NDIT',n,'Number of integrations'))
-        os.remove(unsorted_img) #Delete image after data retrieval 
-    fits.writeto(unsorted_img,array,int_header)
-    cam.weather_to_fits(unsorted_img)
-    cam.file_sorting(img_dir,int_t,frame_t,tag=tag)
-    print('EXPOSE COMPLETE')
+    for j in int_times:
+        cam.set_int_time(j)
+        cam.set_frame_time(j+20)
 
+        #Take pair of images
+        first,_ = cam.simple_capture()
+        second,_ = cam.simple_capture()
+        
+        diff_img = (first-bias) - (second-bias)
+        variances.append(np.var(diff_img))
+        intensities.append(np.mean(first_bias))
+    
+    variances = np.array(variances)/2 #Adjust for difference theorem
+    intensities = np.array(intensities)
 
-#create_master_read(1000,'test1_1000')
-#read_ramp_testing(200,200,'200on200_test1_transition')
-saturation_testing(20,50,'satuation_20loops_50pnts_1')
-#frame_times(1002,3,3,20,2000,'wide_100point_study_8')
-#int_times(1000,3,10,20,2000,'wide__int_100point_study_4')
-#frame_int_space(1,50,21,10000,'param_space_study_1')
+    #Linear fit
+    slope, intercept, r_value, _ ,_ = stats.linregress(intensities,variances)
+
+    #Figure out parameters
+    gain = round((1 / slope),2)
+    read_noise = int(np.sqrt((gain**2)-intercept))
+
+    print(slope,intercept,r_value)
+    fit = slope*intensities + intercept
+    slope = round(slope,2)  
+    intercept = int(intercept)
+    rsqr = round((r_value**2),4)
+    plt.scatter(intensities,variances,c='red',label = 'Data')
+    plt.plot(intensities,fit,'g--',label = 'Linear Fit: (m = {0}, b = {1}, $r^2$ = {2})'\
+        .format(slope,intercept,rsqr))
+    plt.ylabel('$\sigma^2$ (ADUs)')
+    plt.xlabel('Intensity (ADUs)')
+    plt.grid(True)
+    plt.legend(loc='best')
+    plt.title('Pairwise Variance vs Intensity (g = {0}, RN = {1}$e^-$)'\
+        .format(gain,read_noise))
+    plt.show()
+    print('PROGRAM HAS COMPLETED')

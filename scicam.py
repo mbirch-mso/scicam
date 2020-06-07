@@ -491,7 +491,6 @@ def weather_to_fits(target):
         target_head.append(('MOON',phase,'phase of moon (0-28)'))
         print(target_head)
 
-
 # Print progress
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
@@ -500,7 +499,6 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
     if iteration == total: 
         print()
-
 
 #Stack frames and perform z-wise median collapse
 def median_stack(i,folder):
@@ -517,9 +515,55 @@ def median_stack(i,folder):
     #Collapse multi-dimensional array along depth axis by median
     return np.median(stack, axis=2)
 
-def get_master_read(temp):
-    read_dir = '//merger.anu.edu.au/mbirch/data/master_read/'
-    read_file = read_dir + str(temp) + 'C.fits'
-    master_read = fits.open(read_file)[0]
-    return master_read.data
+def get_master_bias(temp):
+    bias_dir = '//merger.anu.edu.au/mbirch/data/master_bias/'
+    bias_file = bias_dir + str(temp) + 'C.fits'
+    master_bias = fits.open(bias_file)[0]
+    return master_bias.data
 
+def simple_capture():
+    '''
+    Take single image and return numpy array and header
+    '''
+    img_dir = '//merger.anu.edu.au/mbirch/images'
+    cap, _ = cam.img_cap('capture',img_dir,'f')
+    hdu_img = fits.open(unsorted_img)
+    data = hdu_img[0].data
+    header = hdu_img[0].header
+    hdu_img.close() #Close image so it can be sorted
+    os.remove(unsorted_img) #Delete image after data retrieval 
+    return data, header
+
+def expose(i,n,path=False,tag=''):
+    '''
+    Capture image for given NDIT/DIT
+    Can write user-defined comment to header
+    Adds recent Canberra BOM weather to header
+    Can save to custom file path or auto-sort
+    '''
+    int_t = set_int_time(i)
+    frame_t = set_frame_time(i+25)
+    array = np.zeros(shape = (naxis1,naxis2)) #Initiate array for coadding
+    for j in range(n):
+        cap, _ = cam.img_cap(routine,img_dir,'f')
+        hdu_img = fits.open(unsorted_img)
+        fits_img = hdu_img[0]
+        array += fits_img.data
+        hdu_img.close() #Close image so it can be sorted
+
+        if j == n-1: #On final frame grab header
+            img_header = fits.getheader(unsorted_img)
+            img_header.append(('NDIT',n,'Number of integrations'))
+            if tag != '':
+                img_header.append(('COMMENT',tag,'User-defined comment'))
+        
+        os.remove(unsorted_img) #Delete image after data retrieval 
+    
+    if path:
+        fits.writeto(path,array,img_header)
+        weather_to_fits(path)
+    else:
+        fits.writeto(unsorted_img,array,img_header)
+        weather_to_fits(unsorted_img)
+        file_sorting(img_dir,int_t,frame_t,tag=tag)
+    print('EXPOSE COMPLETE')

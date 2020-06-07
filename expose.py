@@ -2,7 +2,7 @@ import scicam as cam
 import os
 import numpy as np
 from astropy.io import fits
-import argparse
+import argparseccc
 
 parser = argparse.ArgumentParser(prog='Expose and save to FITS', description='Expose for a given integration time and number of integrations')
 parser.add_argument('i', type=float, help='Integration time in milliseconds (DIT)')
