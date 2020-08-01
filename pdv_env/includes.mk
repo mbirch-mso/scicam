@@ -10,25 +10,26 @@ LIBOBJS= \
      $(CFGNAME)/libedt.obj \
      $(CFGNAME)/libpdv.obj \
      $(CFGNAME)/pciload_fn.obj \
-     $(CFGNAME)/pdv_bayer_filter.obj \
      $(CFGNAME)/pdv_dmy_image.obj \
      $(CFGNAME)/pdv_initcam.obj \
-     $(CFGNAME)/pdv_interlace.obj \
      $(CFGNAME)/pdv_recplay.obj \
      $(CFGNAME)/readcfg.obj \
      $(CFGNAME)/libedt_timing.obj \
+     $(CFGNAME)/chkbuf.obj \
+     $(CFGNAME)/edt_os_nt.obj \
      $(CFGNAME)/pdv_irig.obj \
      $(CFGNAME)/edt_si570.obj \
      $(CFGNAME)/lib_two_wire.obj \
      $(CFGNAME)/edt_optstring.obj \
-     $(CFGNAME)/chkbuf.obj \
      $(CFGNAME)/edt_si5338.obj \
-     $(CFGNAME)/edt_os_nt.obj
+     $(CFGNAME)/pdv_interlace.obj \
+     $(CFGNAME)/pdv_bayer_filter.obj
 
 CPP_LIBOBJS=
 
 CPP_TARGETS= \
     pdvcom.exe
+
 
 TARGETS= \
     bitload.exe \
@@ -86,4 +87,11 @@ TARGETS= \
     simple_take_fits.exe\
     basic_fits.exe\
     test_take_fits.exe\
-    capture.exe
+    capture.exe\
+    cpp_test.exe\
+    serial_func.exe \
+    persist.exe \
+    persistence.exe\
+    persist_2.exe\
+    soak.exe\
+    sld_on.exe

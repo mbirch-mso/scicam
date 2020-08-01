@@ -5,6 +5,7 @@ import binascii
 import struct
 import pandas as pd
 import subprocess
+import pathlib
 import sys
 import os
 import datetime
@@ -204,6 +205,21 @@ def set_int_time(t,verbose=False):
     
     check_time = check_clks / 16E6
     check_time = round((check_time * 1000),4)
+
+    if check_time > 2.5E17:
+        t = t + 0.001 #Create new time by adding 1ms
+        print("Unbound response time\nCalculating for new time: {}ms".format(t*1000))
+        clks_hex = secs_to_refclks(t) #Add ms if CRC not working
+        check_clks_hex = command('106c',clks_hex)
+        while ((check_clks_hex == 'crc_err') or (check_clks_hex == 'serial_err')):
+            t = t + 0.001 #Create new time by adding 0.1ms
+            print("Calculating for new time: {}ms".format(t*1000))
+            clks_hex = secs_to_refclks(t) #Add ms if CRC not working
+            check_clks_hex = command('106c',clks_hex)
+        check_clks = hex_to_int(check_clks_hex)
+        check_time = check_clks / 16E6
+        check_time = round((check_time * 1000),4)
+
     print('Integration Time is now: {}ms'.format(check_time))
     return check_time
 
@@ -259,6 +275,20 @@ def set_frame_time(t,verbose=False,rate=False):
     
     check_time = check_clks / 16E6
     check_time = round((check_time * 1000),4)
+    if check_time > 2.5E17:
+        t = t + 0.001 #Create new time by adding 1ms
+        print("Unbound response time\nCalculating for new time: {}ms".format(t*1000))
+        clks_hex = secs_to_refclks(t) #Add ms if CRC not working
+        check_clks_hex = command('106e',clks_hex)
+        while ((check_clks_hex == 'crc_err') or (check_clks_hex == 'serial_err')):
+            t = t + 0.001 #Create new time by adding 0.1ms
+            print("Calculating for new time: {}ms".format(t*1000))
+            clks_hex = secs_to_refclks(t) #Add ms if CRC not working
+            check_clks_hex = command('106e',clks_hex)
+        check_clks = hex_to_int(check_clks_hex)
+        check_time = check_clks / 16E6
+        check_time = round((check_time * 1000),4)
+
     print('Frame Time is now: {}ms'.format(check_time))
     return check_time
 
@@ -299,7 +329,7 @@ def file_sorting(loc,i,t,ext='.fits',routine='capture',tag=''):
         except FileExistsError:
             os.chdir('images' + today)
             os.mkdir(tag)
-        os.chdir(os.path.dirname(os.path.realpath(__file__))) #Reset to script path
+        os.chdir('Z:/scicam') #Reset to script path (force windows drive letter to avoid UNC error msg)
         while os.path.exists(folder_name + image_name) == True:
             k = k + 1
             image_name = '/' + routine + '_' + str(i) + '_' + str(t) + '_' + str(k) + ext
@@ -450,7 +480,7 @@ def img_cap(routine, loc = False, form = 'f'):
 
 #Function adds BOM Canberr Airport weather statistics
 #and moon phase to FITS header
-def weather_to_fits(target):
+def weather_to_fits(target,verbose=False):
     #Access BOM FTP service for NSW/ACT Forecast
     stat_id = 'IDN60920.xml' #CANBERRA AIRPORT SUMMARY
     ftp = FTP('ftp2.bom.gov.au')
@@ -463,16 +493,14 @@ def weather_to_fits(target):
     #Retrieve forecast for Canberra
     tree = ET.parse(stat_id)
     root = tree.getroot()
-    stat_weather = root.findall(".//observations/station/[@stn-name='CANBERRA AIRPORT']/period/level/")
-    keys = ['CLOUD','CLOUDOKT','DELTA_T','GUST','AIR_TEMP',\
-            'PRESSURE','HUMID','WIND_DIR','WIND_SPD','PRECIP']
-    choice = ['cloud','cloud_oktas',\
-        'delta_t','gust_kmh','air_temperature','pres','rel-humidity',\
-            'wind_dir_deg','wind_spd_kmh','rainfall']
-    
+    stat_weather = root.findall(".//observations/station/[@stn-name='TIDBINBILLA (PCS)']/period/level/")
+    keys = ['DELTA_T','GUST','AIR_TEMP','PRESSURE','HUMID','WIND_DIR','WIND_SPD']
+    choice = ['delta_t','gust_kmh','air_temperature','pres','rel-humidity','wind_dir_deg','wind_spd_kmh']
+
     with fits.open(target,mode='update') as hdu:
         target_head = hdu[0].header
         k = 0
+        target_head.append(('STATNAME','Tidbinbilla (PCS)'))
         for i in range(len(stat_weather)):
             if stat_weather[i].attrib['type'] in choice:
                 try:
@@ -490,7 +518,9 @@ def weather_to_fits(target):
         phase = round(moon.phase(datetime.date.today()),2)
         
         target_head.append(('MOON',phase,'phase of moon (0-28)'))
-        print(target_head)
+        
+        if verbose:
+            print(target_head)
 
 # Print progress
 def printProgressBar (iteration, total, prefix = 'Progress', suffix = 'Complete', decimals = 1, length = 50, fill = '█', printEnd = "\r"):
@@ -516,7 +546,8 @@ def median_stack(i,folder):
     #Collapse multi-dimensional array along depth axis by median
     return np.median(stack, axis=2)
 
-def roi_clip(data):
+
+def roi_circle(data):
     '''
     Apply circular ROI mask
     and clip to 5-sigma
@@ -532,21 +563,26 @@ def roi_clip(data):
     data[outer_disk_mask] = 0
     data_masked = data.flatten()
     data_masked = data_masked[data_masked != 0]
-    clipped, _ , _ = sigmaclip(data_masked,5,5)
-    return clipped
+    return data_masked
 
 
-def get_master_bias(temp):
+def get_master_bias(temp,promote=True):
     bias_dir = '//merger.anu.edu.au/mbirch/data/master_bias/'
     bias_file = bias_dir + str(temp) + 'C.fits'
     master_bias = fits.open(bias_file)[0]
-    return master_bias.data
+    master_bias = master_bias.data
+    if promote:
+        master_bias = master_bias.astype(np.int32)
+    return master_bias
 
-def get_master_dark(int_time):
-    bias_dir = '//merger.anu.edu.au/mbirch/data/master_dark/dark_'
-    bias_file = bias_dir + str(int_time) + '.fits'
-    master_bias = fits.open(bias_file)[0]
-    return master_bias.data
+def get_master_dark(int_time,temp,promote=True):
+    dark_dir = '//merger.anu.edu.au/mbirch/data/master_dark/dark_'
+    dark_file = dark_dir + str(int_time) + '_' + str(temp) + 'C.fits'
+    master_dark = fits.open(dark_file)[0]
+    master_dark = master_dark.data
+    if promote:
+        master_dark = master_dark.astype(np.int32)
+    return master_dark
 
 
 def simple_cap():
@@ -555,11 +591,11 @@ def simple_cap():
     '''
     img_dir = '//merger.anu.edu.au/mbirch/images'
     unsorted_img = img_dir +'/image_unsorted.fits'
-    cap, _ = img_cap('capture',img_dir,'f')
-    hdu_img = fits.open(unsorted_img)
-    data = hdu_img[0].data
-    header = hdu_img[0].header
-    hdu_img.close() #Close image so it can be sorted
+    img_cap('capture',img_dir,'f')
+    hdul = fits.open(unsorted_img,memmap=False)
+    data = hdul[0].data
+    header = hdul[0].header
+    hdul.close()
     os.remove(unsorted_img) #Delete image after data retrieval 
     return data, header
 
@@ -570,8 +606,10 @@ def expose(i,n,path=False,tag=''):
     Adds recent Canberra BOM weather to header
     Can save to custom file path or auto-sort
     '''
-    unsorted_img = img_dir +'/image_unsorted.fits'
     img_dir = '//merger.anu.edu.au/mbirch/images'
+    unsorted_img = img_dir +'/image_unsorted.fits'
+    naxis1 = 1040
+    naxis2 = 1296
 
     int_t = set_int_time(i)
     frame_t = set_frame_time(i+25)
@@ -645,3 +683,11 @@ def assign_temp(img_file):
             rel_temp = round(float(temps[s]),3)
             hdu[0].header['AMBTEMP'] = rel_temp
             print('ambient temp adjusted:{}'.format(rel_temp))
+
+
+def fits_extract(file_name,promote=True):
+    hdu = fits.open(file_name)
+    frame = hdu[0].data
+    if promote:
+        frame = frame.astype(np.int32)
+    return frame

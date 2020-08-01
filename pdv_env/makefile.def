@@ -29,6 +29,7 @@ INCLUDEFLAGS=-I$(HEADER_DIR) -I$(JPEGDIR)
 INCLUDES = $(HEADER_DIR)/edtinc.h \
         $(HEADER_DIR)/libedt.h \
         $(HEADER_DIR)/libpdv.h \
+        $(HEADER_DIR)/persist.h\
         $(HEADER_DIR)/libdvu.h \
         $(HEADER_DIR)/edtreg.h \
         $(HEADER_DIR)/edt_bitload.h \
@@ -39,7 +40,9 @@ INCLUDES = $(HEADER_DIR)/edtinc.h \
         $(HEADER_DIR)/pdv_dependent.h \
         $(HEADER_DIR)/edt_os_nt.h \
         $(HEADER_DIR)/fitsio.h \
-        $(HEADER_DIR)/longnam.h
+        $(HEADER_DIR)/longnam.h\
+        $(HEADER_DIR)/cmd_library.h\
+
 
 CFG=Release
 

@@ -20,13 +20,11 @@ local_img_dir = 'C:/images'
 
 #Data paths
 folder_path = lambda test: testing_dir + test + "/" 
-frame_path = folder_path('camera_control/frame_time_studies')
-int_path = folder_path('camera_control/int_time_studies')
-frame_int_space_path = folder_path('camera_control/frame_int_space_testing')
 saturation_path = folder_path('saturation_testing')
 read_path = folder_path('read_testing')
 master_biases = folder_path('master_bias')
 master_darks = folder_path('master_dark')
+master_skys = folder_path('master_sky')
 unsorted_img = img_dir + '/image_unsorted.fits'
 local_unsorted = local_img_dir + '/image_unsorted.fits'
 
@@ -41,11 +39,10 @@ def master_bias(n,tag,T):
     Enter docstring here
     '''
     cam.set_int_time(0.033)
-    cam.set_frame_time(20.033)
+    cam.set_frame_time(100.033)
     cam.printProgressBar(0, n, prefix = 'Progress:', suffix = 'Complete', length = 50)
     
-    window = np.zeros((100,100))
-    stack = np.zeros((naxis1,naxis2),dtype=uint16)
+    stack = np.zeros((naxis1,naxis2),dtype=np.uint16)
     for j in range(n):
         cap, _ = cam.img_cap(routine,img_dir,'f')
         hdu_img = fits.open(unsorted_img)
@@ -55,9 +52,6 @@ def master_bias(n,tag,T):
 
         stack = np.dstack((stack,data))
 
-        data_window = cam.window(data,100)
-        window = np.dstack((window,data_window))
-
         cam.printProgressBar(j,n, prefix = 'Progress:', \
             suffix = 'Complete', length = 50)
 
@@ -66,21 +60,14 @@ def master_bias(n,tag,T):
 
         os.remove(unsorted_img) #Delete image after data retrieval 
 
-    #Prepare and save window for temporal analysis
-    window = window[:,:,1:] #Slice off base layer
-    temp_var = np.median(np.var(stack, axis=2))
-    temp_path = read_path + 'bias_cube_' + str(T) +'C.npy'
-    np.save(temp_path,window)
-
     bias_header.append(('NDIT',n,'Number of integrations'))
     bias_header.append(('TYPE','MASTER_BIAS','0s exposure frame'))
     bias_header.append(('FPATEMP',T,'Temperature of detector'))
-    bias_header.append(('TEMPVAR',temp_var,'Median temporal variance of central (100,100) window'))
 
     #Median Stack
     stack = stack[:,:,1:] #Slice off base layer
     master_bias = np.median(stack, axis=2)
-
+    master_bias = master_bias.astype(np.uint16)
     #Write master frame to fits
     master_path = read_path + 'master_bias_' \
                 + tag + '.fits'
@@ -102,8 +89,8 @@ def master_dark(i,n,T,tag=''):
 
     cam.printProgressBar(0, n , prefix = 'Progress:', suffix = 'Complete', length = 50)
 
-    stack = np.zeros((naxis1,naxis2),dtype=uint16)
-    window = np.zeros((100,100),dtype=uint16)
+    stack = np.zeros((naxis1,naxis2),dtype=np.uint16)
+    window = np.zeros((100,100),dtype=np.uint16)
     for j in range(n):
         _ , _ = cam.img_cap(routine,img_dir,'f')
         hdu_img = fits.open(unsorted_img)
@@ -176,46 +163,46 @@ def master_flat(i,folder):
     #Write to FITS file
     fits.writeto(master_name,sky_reduced,sky_header)
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    return background_est
 
-def master_sky(i,folder,am):
+def master_sky(i,folder,am,filter):
     '''
     Takes integration time in ms, folder containing sky backgrounds
     an airmass and camera temperature
     '''
     os.chdir(folder)
     bias = cam.get_master_bias(-60) #Retrieve bias
+    bias = bias.astype(np.int32)
+    dark = cam.get_master_dark(int(i/2000)) #Retrieve dark
+    dark = dark.astype(np.int32)
     img_list = glob.glob('*.fits*')
     img_list_split = [i.split('_') for i in img_list]
-    stack = np.zeros((1040,1296))
+    stack = np.zeros((1040,1296),dtype=np.int32)
     for k in range(len(img_list)):
         if img_list_split[k][1] == str(float(i)):
             hdu = fits.open(img_list[k])
             data = hdu[0].data
-            data = data - bias #Bias subtract
+            data = data.astype(np.int32)
+            data -= bias #Bias subtract
+            data -= dark #Dark subtract
             stack = np.dstack((stack,data))
+    
     stack = stack[:,:,1:] #Remove 0 array it is stacked on
     #Collapse multi-dimensional array along depth axis by median
     sky_collapsed = np.median(stack, axis=2)
-    
-    #Create single estimate in adus/pixel/s
-    sky_reduced_clipped, _ , _ = sigmaclip(sky_reduced,3,3) #3 sigma clip of outliers
-    sky_reduced_clipped = sky_reduced_clipped/(i/1000) #Divide by seconds
-    background_est = round(np.mean(sky_reduced_clipped),2)
 
     #Append neccesary info to header
     sky_header = hdu[0].header
-    sky_header.append(('NSTACK',stack.shape[2],'Number of exposures stacked'))
+    sky_header.append(('NDIT',stack.shape[2],'Number of integrations'))
     sky_header.append(('TYPE','MASTER_SKY','Median stack of sky backgrounds'))
     sky_header.append(('AIRMASS',am,'Airmass of exposures'))
-    sky_header.append(('COUNTEST',background_est,'Estimate of background in ADUs/pixel/s'))
-    master_name = 'mastersky_'+str(i/1000)+"s_" + str(stack.shape[2]) \
+    sky_header.append(('BAND',filter,'Bandpass filter'))
+    master_name = master_skys + 'mastersky_'+str(i/1000)+"s_" + str(stack.shape[2]) \
                     + 'stack_am' + str(am) + '.fits'
     
     #Write to FITS file
     fits.writeto(master_name,sky_collapsed,sky_header)
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    return background_est
+    print('PROGRAM COMPLETE')
 
 def master_dark_local(folder,i):
     '''
@@ -300,7 +287,3 @@ def bad_pix_map():
     hot_mask = (dark>hot_dark)*1 #*1 converts to integer bool
     bad_mask = dead_mask+hot_mask+flag_mask+low_mask
     return bad_mask
-
-
-master_dark_local('//merger.anu.edu.au/mbirch/images/nstf_images/master_dark_frames_-60_1',40000)
-

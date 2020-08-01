@@ -1,5 +1,6 @@
 
 import numpy as np
+import math as m
 import matplotlib.pyplot as plt
 import scicam as cam
 import scipy.ndimage
@@ -28,50 +29,6 @@ frame_int_space_path = folder_path('camera_control/frame_int_space_testing')
 saturation_path = folder_path('saturation_testing')
 read_path = folder_path('read_testing')
 
-
-def read_ramp():
-    struct = np.loadtxt(read_path + '200on200_test1_transition' + '_results.txt')
-    sigma = [0.8, 0.8]
-    means = struct[0,:]
-    means = means/200
-    stddevs = struct[3,:]
-    stddevs = stddevs/200
-    x = struct[4,:]
-    x = x
-    cubic_coefs = np.polyfit(x, means, 3)
-    cubic = np.poly1d(cubic_coefs)
-    
-    fig, ax1 = plt.subplots()
-    
-    color = 'tab:red'
-    ax1.set_xlabel('Frame Time ($ms$)')
-    ax1.set_ylabel('Mean (ADUs)', color=color)
-    ax1.plot(x,means, color=color)
-    ax1.plot(x,cubic(x),label = 'Cubic Fit',color='green')
-    ax1.legend(loc='best')
-    ax1.tick_params(axis='y', labelcolor=color)
-
-    ax2 = ax1.twinx()
-    color = 'tab:blue'
-    ax2.set_ylabel('$\sigma$ (ADUs)', color=color)  # we already handled the x-label with ax1
-    ax2.plot(x, stddevs, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
-    plt.suptitle("Read to dark noise regime transition ({} frames per data point)".format(len(x)))
-    plt.show()
-
-def saturation_plot():
-    struct = np.loadtxt(saturation_path + 'saturation_20loops_50pnts_1' + '_results.txt')
-    means = struct[0,:]
-    maxs = struct[5,:]
-    x = struct[6,:]
-    plt.plot(x,means,label = 'Mean')
-    plt.axhline(means[-1],c='r',ls = '--',label ='Effective Saturation Value: {}'.format(15635))
-    plt.axhline(16385,c='b',ls = '--',label ='Bad pixel value: {}'.format(16385))
-    plt.xlabel('Integration time (ms)')
-    plt.ylabel('ADUs')
-    plt.legend(loc = 'best')
-    plt.title("Detector Saturation")
-    plt.show()
 
 def analyse_read():
     img_path = read_path + 'master_read_' \
@@ -118,60 +75,29 @@ def master_sky_plot():
     plt.suptitle('Sky background (no filter) at airmass 2: {}ADUs/pixel/s'.format(round(np.mean(reduce_clipped_s),2)))
     plt.show()
 
-def hist_analysis_sky():
-    m2 = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/11-5-2020/zenith_first_test_h/mastersky_2.0s_10stack_am1.fits'
-    m5 = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/11-5-2020/zenith_first_test_h/mastersky_5.0s_10stack_am1.fits'
-    m10 = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/11-5-2020/zenith_first_test_h/mastersky_10.001s_10stack_am1.fits'
-    m20 = '//merger.anu.edu.au/mbirch/data/sky_background_offsite/11-5-2020/zenith_first_test_h/mastersky_20.0s_10stack_am1.fits'
-    hdu2 = fits.open(m2)
-    hdu5 = fits.open(m5)
-    hdu10 = fits.open(m10)
-    hdu20 = fits.open(m20)
-    
-    clipped2 = cam.roi_clip(hdu2[0].data)/2 
-    clipped5 = cam.roi_clip(hdu5[0].data)/5
-    clipped10 = cam.roi_clip(hdu10[0].data)/10
-    clipped20 = cam.roi_clip(hdu20[0].data)/20
-    sns.set(color_codes=True)
-    sns.distplot(clipped2,label='DIT=2s,$\mu={}$'.format(int(np.mean(clipped2))))
-    sns.distplot(clipped5,label='DIT=5s,$\mu={}$'.format(int(np.mean(clipped5))))
-    sns.distplot(clipped10,label='DIT=10s,$\mu={}$'.format(int(np.mean(clipped10))))
-    sns.distplot(clipped20,label='DIT=20s,$\mu={}$'.format(int(np.mean(clipped20))))
-    #sns.distplot(clip_avg,label='Average,$\mu={}$'.format(int(np.mean(clip_avg))))
-    plt.xlabel('ADUs/s')
-    plt.ylabel('Density $\%$')
-    plt.title('H-band sky background distribution (NDIT=10, Airmass=1)')
-    plt.legend(loc='best')
-    plt.show()
-
 def bias_temp_analysis():
-    b_1_1 = cam.get_master_bias(-60)
-    b_1_2 = cam.get_master_bias(-40)
-    b_1_3 = cam.get_master_bias(-20)
-    b_2_1 = cam.get_master_bias(-62)
-    b_2_2 = cam.get_master_bias(-42)
-    b_2_3 = cam.get_master_bias(-22)
 
-    temps = [-60,-40,-20]
-    medians_1 = [np.median(b_1_1),np.median(b_1_2),np.median(b_1_3)]
-    medians_2 = [np.median(b_2_1),np.median(b_2_2),np.median(b_2_3)]
-    medians_1 = 3.22*np.array(medians_1)
-    medians_2 = 3.22*np.array(medians_2)
-    shutter_temps = [-10,25,-10,25,-10,25]
-    temps = [-60,-40,-20]
-    # vals = [np.median(b_1_1),np.median(b_2_1),np.median(b_1_2),np.median(b_2_2),np.median(b_1_3),np.median(b_2_3)]
-    # dat = list(zip(vals,temps,shutter_temps))
-    # biases = pd.DataFrame(dat, columns = ['Median Pixel Value' , 'FPA Temperature', 'Shutter Temperature'])
+    #Base Mode
+    b_1 = cam.get_master_bias(-40)
+    b_2 = cam.get_master_bias(-20)
+    b_3 = cam.get_master_bias(0)
+    b_4 = cam.get_master_bias(20)
 
-    #sns.set()
-    # sns.set(style="darkgrid")
-    # ax = sns.pointplot(x="FPA Temperature", y="Median Pixel Value", hue="Shutter Temperature",
-    #                data=biases,
-    #                markers=["o", "x"],
-    #                linestyles=["-", "--"])
-    plt.plot(temps,medians_1,marker='o',linestyle='--',c='g',label='Shutter: -10.6$^\circ$C')
-    plt.plot(temps,medians_2,marker='x',c='r',label='Shutter: 25$^\circ$C')
-    plt.ylabel('Median ($e^-$)')
+    #Full Mode
+    f_1 = cam.get_master_bias(-42)
+    f_2 = cam.get_master_bias(-22)
+    f_3 = cam.get_master_bias(2)
+    f_4 = cam.get_master_bias(22)
+
+    temps = [-40,-20,0,20]
+    medians_b = [np.median(b_1),np.median(b_2),np.median(b_3),np.median(b_4)]
+    medians_f = [np.median(f_1),np.median(f_2),np.median(f_3),np.median(f_4)]
+
+
+
+    plt.plot(temps,medians_b,marker='o',linestyle='--',c='g',label='Base Mode (1-tap)')
+    plt.plot(temps,medians_f,marker='x',c='r',label='Full Mode (4-taps)')
+    plt.ylabel('Median (ADUs)')
     plt.xlabel('Temperature ($^{\circ}$C)')
     
     plt.legend(loc='best')
@@ -213,16 +139,10 @@ def gain_calc():
     x = x[x<3000]
 
 
-    print(y[0])
-    print(len(y),len(x))
-    print(x.shape,y.shape)
-
     slope, intercept, r_value, _ ,_ = linregress(x,y)
-    print(slope,intercept,r_value)
     gain = round(slope,3)
     fit = slope*x + intercept
     slope = round(slope,2)  
-    intercept = int(intercept)
     rsqr = round((r_value**2),4)
     plt.scatter(x,y,c='red',label = 'Data')
     plt.plot(x,fit,'g--',label = 'Linear Fit, $r^2$ = {}'.format(rsqr))
@@ -281,22 +201,22 @@ def cooling_test():
     plt.title('Detector Cooling Test (FPA:-60$^\circ$C, DIT=2s)')
     plt.show()
 
-def dark_current():
-    os.chdir('//merger.anu.edu.au/mbirch/images/images24-06-2020/dark_current_-40_20')
+def dark_current(folder):
+    os.chdir(folder)
     files = glob.glob('*.fits*')
-    bias = cam.get_master_bias(-40)
+   # bias = cam.get_master_bias(-60)
     vals,temps,times = [] , [], []
     for i in files:
         hdu = fits.open(i)
         temps.append(hdu[0].header['TEMPAMB'])
         times.append(hdu[0].header['DITSER'])
         data = hdu[0].data
-        data = data - bias
-        data[data > 60000] = 0 #Avoid unsigned integer overflow
+       # data = data - bias
+       # data[data > 60000] = 0 #Avoid unsigned integer overflow
         clipped,_,_ = sigmaclip(data,3,3)
         vals.append(np.median(clipped))
     
-    test_temp = round(np.mean(temps),1)
+    #test_temp = round(np.mean(temps),1)
     times = np.array(times)/1000
     vals = 3.22*np.array(vals)
 
@@ -311,16 +231,19 @@ def dark_current():
     plt.xlabel('Integration Time (s)')
     plt.ylabel('Median Pixel Value ($ke^-$)')
     plt.legend(loc='best')
-    plt.title('Dark Current, {0}$e^-$/s (FPA: $-40^\circ$, Shutter: {1}$^\circ$C)'\
-        .format(i_dark,test_temp))
+    plt.title('Dark Current, {0}$e^-$/s (FPA: $0^\circ$, Shutter: 20$^\circ$C)'\
+        .format(i_dark))
     plt.show()
 
 def dark_temp_analysis():
-    temp_aitc = [-60,-40,-20]
-    dark_aitc = [51,419,2199]
+    temp_aitc = [-60,-40,-20,0]
+    dark_aitc = [51,419,2199,7100,]
     temp_sull = [-50,-40,-30,-20,-10,0]
     dark_sull = [163,500,1000,3000,10000,30000]
-
+    dark_pirt = [300,28000]
+    temp_pirt = [-60,20]
+    dark_fpa = [160]
+    temp_fpa = [-50]
     def exp(x,a,b):
         return a*np.exp(b*(x))
     temps = np.linspace(-60,20,5000)
@@ -338,13 +261,23 @@ def dark_temp_analysis():
 
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
-    plt.plot(temps, (exp(temps, *popt_1)),'r--',label="$A: {0}\pm{1},\:k: {2}\pm0.03$"\
+    def targ_temp(I,A,k):
+        return (m.log(I/A))/k
+    return_temp = targ_temp(100,popt_1[0],popt_1[1])
+    print('Temp is {}'.format(return_temp))
+
+    temps_fine = np.linspace(-80,20,5000)
+
+    plt.plot(temps_fine, (exp(temps_fine, *popt_1)),'r--',label="$A: {0}\pm{1},\:k: {2}\pm0.03$"\
         .format(a_aitc,a_aitc_err,k_aitc))
-    plt.plot(temps, (exp(temps, *popt_2)),'g--',label="$A: {0}\pm{1},\:k: {2}\pm0.01$"\
+    plt.plot(temps_fine, (exp(temps_fine, *popt_2)),'g--',label="$A: {0}\pm{1},\:k: {2}\pm0.01$"\
         .format(a_sull,a_sull_err,k_sull))
     
+
+    plt.scatter(temp_pirt,dark_pirt,c= 'k',marker='*',label = 'PIRT 1280SCICAM (Vendor Sheet)')
     plt.scatter(temp_aitc,dark_aitc,c= 'red',marker='s',label = 'PIRT 1280SCICAM')
     plt.scatter(temp_sull,dark_sull,c = 'green',marker = "D",label='FLIR AP1121 (Sullivan et. al. 2014)')
+    plt.scatter(temp_fpa,dark_fpa,c= 'm',marker='o',label = 'PIRT 1280A1-12 (FPA)')
     plt.text(-10,100,r'$I_{dark}\approx Ae^{kT}$',size=20,bbox=props)
     plt.grid(True)
     plt.xlabel('FPA Temperature [$^\circ$C]')
@@ -510,8 +443,718 @@ def bias_temp_var(folder):
     plt.imshow(temp_stack)
     plt.show()
 
+def full_well_hist(folder):
+    
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40)
+    
+    stack = np.zeros((naxis1,naxis2),dtype=np.uint16)
+    
+    for i in img_list:   
+        hdu_img = fits.open(i)
+        data = hdu_img[0].data
+        data = data - bias
+        data[data > 60000] = 0 #Avoid unsigned integer overflow
+        stack = np.dstack((stack,data))
+    
+    stack = stack[:,:,1:] #Remove 0 array it is stacked on
+    collapsed = np.median(stack, axis=2)
+    clipped,_,_ = sigmaclip(collapsed,8,8)
+    #clipped *= 3.22 #gain-adjust
+    median = np.median(clipped)
+    sigma = np.std(clipped)
+    early_line = median-3*sigma #3sigma away from distribution full-well begins
+    
+    fig,axs = plt.subplots(nrows=1,ncols=2)
+    
+    axs[0].axvline(early_line,linestyle='--',c='r',label='$3\sigma$ Full Well: {}ADUs'.format(int(early_line)))
+    axs[0].axvline(median,linestyle='--',c='blue',label='Median: {}ADUs'.format(int(median)))
+    
+    axs[0].hist(clipped,bins=110,facecolor='g',edgecolor='k',fill=True)
+    axs[0].set_yscale('log')
+    axs[0].set_ylabel('No. of Pixels')
+    axs[0].set_xlabel('ADUs')
+    axs[0].grid(True)
+    axs[0].legend(loc='best')
+    
+    img_eq = exposure.equalize_hist(data)
+    axs[1].imshow(img_eq)
+    plt.suptitle('Full-well Study of Oversaturated Frames (DIT={}s,NDIT={})'.format(20,70))
+    plt.show()
+
+def var_time(folder):
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40)
+    bias = np.asarray(bias, dtype=np.int32)
+    times = []
+    for k in img_list:
+        hdu = fits.open(k)
+        times.append(hdu[0].header['DITSER'])
+    times = np.unique(times)
+    #sort times if order is needed
+    sets = [[] for _ in times]
+    for j in img_list:
+        hdu = fits.open(j)
+        dit = hdu[0].header['DITSER']
+        ind = np.argwhere(times==dit)
+        sets[ind[0,0]].append(hdu[0].data)
+    
+    var = []
+    for i in sets:
+        first = i[1].astype(np.int32)
+        second = i[0].astype(np.int32)
+
+        diff_img = first - second
+        roi_diff = diff_img[400:800,400:800]
+
+        var.append(np.var(roi_diff))
+
+    var = np.array(var)/2
+
+    plt.scatter(times,var,c='blue',label = 'Data')
+
+    plt.ylabel('$\sigma^2$ (ADUs)')
+    plt.xlabel('Integration Time (ms)')
+    plt.grid(True)
+    plt.title('Variance vs Integration Time')
+    plt.legend(loc='best')
+    plt.show()
+    print('PROGRAM HAS COMPLETED')
+
+def ramp_plot(folder):
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40)
+    bias = np.asarray(bias, dtype=np.int32)
+    times,amp = [],[]
+
+    for i in img_list:
+        hdu = fits.open(i)
+        data = hdu[0].data
+        data = np.asarray(data, dtype=np.int32)
+       # data = data - bias
+
+        times.append(hdu[0].header['DITSER'])
+
+        #Dark Region
+        roi_single_d = data[400:800,400:800]
+        amp.append(np.median(roi_single_d))
+
+    amp = np.array(amp)
+
+    plt.scatter(times,amp,c='blue',label = 'Data')
+    plt.xlabel('Integration Time (ms)')
+    plt.ylabel('Intensity (ADUs)')
+  #  plt.xscale('log')
+  #  plt.yscale('log')
+    plt.grid(True)
+    plt.title('Integration Ramp')
+    plt.legend(loc='best')
+    plt.show()
+    print('PROGRAM HAS COMPLETED')
+
+def pixel_population_ramp(folder):
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40)
+    bias = np.asarray(bias, dtype=np.int32)
+    times,pixels = [],[]
+    stack = np.zeros((10,10),dtype=np.int32)
+    for i in img_list:
+        hdu = fits.open(i)
+        data = hdu[0].data
+        data = np.asarray(data, dtype=np.int32)
+        data = data - bias
+
+        times.append(hdu[0].header['DITSER'])
+        #Bright Region
+        roi = data[790:800,790:800]
+        stack = np.dstack((stack,roi))
+    
+    stack = stack[:,:,1:] #Slice off base layer
+    
+    for i in range(stack.shape[0]):
+        for j in range(stack.shape[1]):
+            pix_array = stack[i,j,:]
+            plt.scatter(times,pix_array)
+
+    plt.xlabel('Integration Time (ms)')
+    plt.ylabel('Intensity (ADUs)')
+    plt.grid(True)
+    plt.title('Integration Ramp for 100 pixel population')
+    plt.show()
+    print('PROGRAM HAS COMPLETED')
+
+def ptc_gain(folder):
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40)
+    bias = np.asarray(bias, dtype=np.int32)
+    times = []
+    for k in img_list:
+        hdu = fits.open(k)
+        times.append(hdu[0].header['DITSER'])
+    times = np.unique(times)
+    print('times retrieved')
+    #sort times if order is needed
+    sets = [[] for _ in times]
+    for j in img_list:
+        hdu = fits.open(j)
+        dit = hdu[0].header['DITSER']
+        ind = np.argwhere(times==dit)
+        sets[ind[0,0]].append(hdu[0].data)
+    print('sets constructed')
+    amp,var = [],[]
+    
+    for i in sets:
+        first = i[1].astype(np.int32)
+        second = i[0].astype(np.int32)
+        diff_img = first - second
+        first = first - bias
+        roi_diff = diff_img[400:800,400:800]
+        roi_single = first[400:800,400:800]
+        var.append(np.var(roi_diff))
+        amp.append(np.median(roi_single))
+    print('arrays finished')
+    var = np.array(var)/2
+    amp = np.array(amp)
+
+    plt.scatter(amp,var)#,label = 'Data')
+    
+    # slope, intercept, r_value, _ ,_ = linregress(x,y)
+    # fit = slope*x + intercept
+    # plt.plot(x,fit)
+    
+   # rsqr = round((r_value**2),4)
+
+ #   plt.plot(amp,fit,'g',label = 'Linear Fit, $r^2$ = {}'.format(rsqr))
+
+    # def fixed(x,b):
+    #     return 0.31*x+b
+    # popt1, _ = optimize.curve_fit(fixed,x,y)
+    # plt.plot(amp, fixed(amp, *popt1), 'r-',label='Pre-determined gain slope fit (m=0.31)')
+
+    plt.ylabel('$\sigma^2$ (ADUs)')
+    plt.xlabel('Median Pixel Value (ADUs)')
+    plt.grid(True)
+    plt.title('Variance vs Intensity')# Gain Study 2 (SLD), g = {}ADUs/$e^-$ (n = {})'.format(round(slope,2),len(x)))
+   # plt.legend(loc='best')
+
+def median_ptc(folder): 
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40)
+    bias = np.asarray(bias, dtype=np.int32)
+    times = []
+    for k in img_list:
+        hdu = fits.open(k)
+        times.append(hdu[0].header['DITSER'])
+    times = np.unique(times)
+    sets = [[] for _ in times]
+    for j in img_list:
+        hdu = fits.open(j)
+        dit = hdu[0].header['DITSER']
+        ind = np.argwhere(times==dit)
+        sets[ind[0,0]].append(hdu[0].data)
+    amp,var = [],[]
+    
+    for i in sets:
+        print(len(i))
+        med,var_ele = [],[]
+        for j in range(0,len(i),2): #select every second array
+            first = i[j].astype(np.int32)
+            second = i[j+1].astype(np.int32)
+            diff_img = first - second
+            roi_diff = diff_img[400:800,400:800]
+            roi_single = first[400:800,400:800]
+            med.append(np.median(roi_single))
+            var_ele.append(np.var(roi_diff))
+
+        var.append(np.mean(var_ele))
+        amp.append(np.mean(med))
+    
+    var = np.array(var)/2
+    amp = np.array(amp)
+
+    plt.scatter(amp,var,marker='d',label='Median Results (n=20)')
+    plt.ylabel('$\sigma^2$ (ADUs)')
+    plt.xlabel('Median Pixel Value (ADUs)')
+    plt.grid(True)
+    plt.legend(loc='best')
+    plt.title('Variance vs Intensity')
+    plt.show()
+
+def ptc(folder):
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40)
+    bias = np.asarray(bias, dtype=np.int32)
+    times = []
+    for k in img_list:
+        hdu = fits.open(k)
+        times.append(hdu[0].header['DITSER'])
+    times = np.unique(times)
+    #sort times if order is needed
+    sets = [[] for _ in times]
+    for j in img_list:
+        hdu = fits.open(j)
+        dit = hdu[0].header['DITSER']
+        ind = np.argwhere(times==dit)
+        sets[ind[0,0]].append(hdu[0].data)
+    amp,  noise= [],[]
+    for i in sets:
+        first = i[1].astype(np.int32)
+        second = i[0].astype(np.int32)
+
+        diff_img = first - second
+        single = first - bias
+
+        roi_diff = diff_img[200:900,300:1000]
+        roi_single = single[200:900,300:1000]
+
+        noise.append(np.std(roi_diff))
+        amp.append(np.median(roi_single))
+
+    noise = np.array(noise)/m.sqrt(2)
+    amp = np.array(amp)
+    amp = np.log10(amp)
+    noise = np.log10(noise)
+
+    plt.scatter(amp,noise,c='b',label = 'Data')
+    x1 = amp[(amp<4) & (amp>3.4)] 
+    y1 = noise[(amp<4) & (amp>3.4)] 
+    x = np.linspace(-1,5,500)
+
+    x2 = amp[(amp<4) & (amp>3.8)] 
+    y2 = noise[(amp<4) & (amp>3.8)]
+
+    def fixed(x,b):
+        return 0.5*x+b
+    popt1, _ = optimize.curve_fit(fixed,x1,y1)
+    plt.plot(x, fixed(x, *popt1), 'r-',label='1/2 Slope Fit 1')
+    
+ 
+    popt2, _ = optimize.curve_fit(fixed,x2,y2)
+   # plt.plot(x, fixed(x, *popt2), 'g-',label='1/2 Slope Fit 2')
+    
+
+    plt.axhline(1.255,c='m',linestyle='--',label='19ADU Read-noise floor')
+    plt.ylabel('Noise (log(ADUs))')
+    plt.xlabel('Intensity (log(ADUs))')
+    plt.grid(True)
+    plt.title('Photon Transfer Curve (g=3.34$e^-$/ADU)')
+    plt.legend(loc='best')
+    plt.show()
+
+def temp_var(folder):
+
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40) #Retrieve bias
+    bias = bias.astype(np.int32)
+    stack = np.zeros((naxis1,naxis2),dtype=np.int32)
+    for i in img_list:
+            hdu = fits.open(i)
+            data = hdu[0].data
+            data = data.astype(np.int32)
+            data -= bias
+            stack = np.dstack((stack,data))
+
+    
+    stack = stack[:,:,1:] #Slice off base layer
+    var_map = np.var(stack, axis=2)
+
+    dark = cam.get_master_dark(40)
+    bias = cam.get_master_bias(-60)
+    
+    nonlinear_mask = (var_map>50000)*1
+
+   # var_map = var_map[var_map<0.6E6]
+    plt.hist(var_map.flatten(),bins=200)
+    plt.yscale('log')
+    plt.grid(True)
+    plt.xlabel('$\sigma^2$ (ADUs)')
+    plt.ylabel('No. of pixels')
+    plt.title('Distribution of temporal variability (DIT=450ms,NDIT=30)')
+    plt.show()
+    print('PROGRAM HAS COMPLETED')
+    return nonlinear_mask
+
+def stack_hists(folder):
+    
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40) #Retrieve bias
+    bias = bias.astype(np.int32)
+    for i in img_list:
+            hdu = fits.open(i)
+            data = hdu[0].data
+            data = data.astype(np.int32)
+            data -= bias
+            data = data[400:800,400:800]
+            plt.hist(data.flatten(),bins=100)
+
+    plt.yscale('log')
+    plt.grid(True)
+    plt.xlabel('ADUs')
+    plt.ylabel('No. of pixels')
+    plt.title('Pixel Distribution Histograms (NDIT=30)')
+    plt.show()
+
+def nonlinearity(folder):
+    os.chdir(folder)
+    img_list = glob.glob('*.fits*')
+    bias = cam.get_master_bias(-40)
+    bias = np.asarray(bias, dtype=np.int32)
+    times = []
+    for k in img_list:
+        hdu = fits.open(k)
+        times.append(hdu[0].header['DITSER'])
+    times = np.unique(times)
+    sets = [[] for _ in times]
+    for j in img_list:
+        hdu = fits.open(j)
+        dit = hdu[0].header['DITSER']
+        ind = np.argwhere(times==dit)
+        sets[ind[0,0]].append(hdu[0].data)
+    amp,var = [],[]
+    
+    for i in sets:
+        first = i[1].astype(np.int32)
+        second = i[0].astype(np.int32)
+        diff_img = first - second
+        first = first - bias
+        roi_diff = diff_img[400:800,400:800]
+        roi_single = first[400:800,400:800]
+        var.append(np.var(roi_diff))
+        amp.append(np.median(roi_single))
+    var = np.array(var)/2 #Adjust var
+    amp = np.array(amp)
+
+    #Linear Region
+    lin_y = var[(amp>2000) & (amp<8000)]
+    lin_x = amp[(amp>2000) & (amp<8000)]
 
 
-#bias_temp_var('//merger.anu.edu.au/mbirch/images/nstf_images/bias_-60_-10.6_1')
-#bias_bad_pix_var('//merger.anu.edu.au/mbirch/images/nstf_images/bias_-60_-10.6_1')
-#dark_bad_pix_var('//merger.anu.edu.au/mbirch/images/nstf_images/master_dark_frames_-60_1',40)
+
+    slope, intercept, r_value, _ ,_ = linregress(lin_x,lin_y)
+    fit = slope*amp + intercept
+    rsqr = round(r_value**2,3)
+    m = round(slope,2)
+    b = int(intercept)
+
+    x = np.linspace(amp[0],amp[-1],5000)
+    noise = (20**2) + np.sqrt(x)
+    nonlin = 11600
+    fwell = 13480
+    fig1 = plt.figure(1)
+    frame1=fig1.add_axes((.1,.3,.8,.6))
+    plt.plot(amp,fit,linestyle='--',c='g',label='Linear fit: $r^2$ = {}, m = {}, b = {}'.format(rsqr,m,b))
+    plt.scatter(amp,var,label = 'Data (n={})'.format(len(times)))
+    plt.axvline(nonlin,c='m',label = '$4\%$ Non-linearity Point: {}ADUs'.format(nonlin))
+    plt.axvline(fwell,c='y',label = 'Full-well: {}ADUs'.format(fwell))
+    plt.xlim(11000,13600)
+    plt.ylim(0,4000)
+    plt.ylabel('$\sigma^2$ (ADUs)')
+    plt.title('Linear photon transfer curve with fit residuals')
+    plt.legend(loc='best')
+    frame1.set_xticklabels([])
+    plt.grid()
+
+    #Residual plot
+    resids = fit - var
+    frame2 = fig1.add_axes((.1,.1,.8,.2))        
+    plt.plot(amp,resids,'or')
+    plt.fill_between(x, -noise, noise, alpha=0.2,label = 'Shot/Read Noise')
+    plt.ylabel('$\sigma^2$ Residuals (ADUs)')
+    plt.xlabel('Median Pixel Value (ADUs)')
+    plt.axvline(nonlin,c='m',label = '$4\%$ Non-linearity Point: {}ADUs'.format(nonlin))
+    plt.axvline(fwell,c='y',label = 'Full-well: {}ADUs'.format(fwell))
+    plt.grid()
+    plt.ylim(-1000,4000)
+    plt.xlim(11000,13600)
+    plt.legend(loc='best')
+    plt.show()
+
+def bias_config_diff():
+    #Base Mode
+    b_1 = cam.get_master_bias(-40)
+    b_2 = cam.get_master_bias(-20)
+    b_3 = cam.get_master_bias(0)
+    b_4 = cam.get_master_bias(20)
+
+    #Full Mode
+    f_1 = cam.get_master_bias(-42)
+    f_2 = cam.get_master_bias(-22)
+    f_3 = cam.get_master_bias(2)
+    f_4 = cam.get_master_bias(22)
+
+
+    b_1 = b_1.astype(np.int32)
+    b_2 = b_2.astype(np.int32)
+    b_3 = b_3.astype(np.int32)
+    b_4 = b_4.astype(np.int32)
+
+    f_1 = f_1.astype(np.int32)
+    f_2 = f_2.astype(np.int32)
+    f_3 = f_3.astype(np.int32)
+    f_4 = f_4.astype(np.int32)
+
+    img1 = b_1 - f_1
+    img2 = b_2 - f_2
+    img3 = b_3 - f_3
+    img4 = b_4 - f_4
+
+    img_eq1 = exposure.equalize_hist(img1)
+    img_eq2 = exposure.equalize_hist(img2)
+    img_eq3 = exposure.equalize_hist(img3)
+    img_eq4 = exposure.equalize_hist(img4)
+
+    fig, axs = plt.subplots(nrows = 1, ncols= 4)
+
+    axs[0].imshow(img1)
+    axs[0].set_title('Temp: {}$^\circ$C, Median Difference: {}'.format(-40,int(np.median(img1))))
+    
+    axs[1].imshow(img2)
+    axs[1].set_title('Temp: {}$^\circ$C, Median Difference: {}'.format(-20,int(np.median(img2))))
+
+    
+    axs[2].imshow(img3)
+    axs[2].set_title('Temp: {}$^\circ$C, Median Difference: {}'.format(0,int(np.median(img3))))
+
+    
+    axs[3].imshow(img4)
+    axs[3].set_title('Temp: {}$^\circ$C, Median Difference: {}'.format(20,int(np.median(img4))))
+
+    plt.suptitle('Base-Full Bias Difference Images (DIT=33$\mu$s, NDIT=100)')
+    plt.show()
+    plt.tight_layout()
+
+def fringing_analysis():
+
+ #   fig,axs = plt.subplots(nrows=1,ncols=3)
+
+    def fringing_stack(folder,T,band):
+
+        os.chdir(folder)
+        img_list = glob.glob('*.fits*')
+
+        bias = cam.get_master_bias(T)
+        bias = bias.astype(np.int32)
+
+        stack = np.zeros((naxis1,naxis2),dtype=np.int32)
+        for i in img_list:
+                hdu = fits.open(i)
+                frame = hdu[0].data
+                frame = frame.astype(np.int32)
+                frame = frame - bias
+                stack = np.dstack((stack,frame))
+
+        stack = stack[:,:,1:] #Slice off base layer
+        img = np.median(stack, axis=2)
+        img_save = np.copy(img)
+        masked = cam.roi_circle(img)
+        norm_masked = masked/np.max(masked)
+       # plt.hist(norm_masked,bins=300,label=band)
+
+        return img_save
+    
+    h_img = fringing_stack('//merger.anu.edu.au/mbirch/images/images22-07-2020/hnarrowband_0.8s_1',-40,'H-band (1650$\pm$10nm)')
+   # j_img = fringing_stack('//merger.anu.edu.au/mbirch/images/images22-07-2020/jnarrowband_0.8s_1',-40,'J-band (1250$\pm$10nm)')
+
+
+
+    # plt.yscale('log')
+    # plt.legend(loc='best')
+    # plt.grid(True)
+    # plt.xlabel('Normalised Pixel Intensity')
+    # plt.ylabel('# of Pixels')
+    # plt.title('Pixel distribution with J/H narrowband filters')
+    # plt.show()
+
+    # h_norm = h_img/np.max(h_img)
+    # j_norm = j_img/np.max(j_img)
+
+    # diff_map = j_norm - h_norm
+    # diff_eq = exposure.equalize_hist(diff_map)
+
+    # axs[0].imshow(diff_eq)
+    # axs[0].set_title('J/H difference image')
+    # axs[0].axis('off')
+
+    diff_h = exposure.equalize_hist(h_img)
+    # axs[1].imshow(diff_h)
+    # axs[1].set_title('H-band median-stacked image')
+    # axs[1].axis('off')
+
+    # diff_j = exposure.equalize_hist(j_img)
+    # axs[2].imshow(diff_j)
+    # axs[2].set_title('J-band median-stacked image')
+    # axs[2].axis('off')
+
+    # plt.suptitle('J/H Narrowpass images')
+    # plt.show()
+
+    plt.imshow(diff_h)
+    plt.axis('off')
+    plt.show()
+
+def dark_gain_method(dk_folder,ff_folder):
+    
+    os.chdir(dk_folder)
+    dk_list = glob.glob('*.fits*')
+
+    os.chdir(ff_folder)
+    ff_list = glob.glob('*.fits*')
+    gains = []
+    for i in range(0,len(dk_list),2):
+        
+        os.chdir(dk_folder)
+        dk_hdu1 = fits.open(dk_list[i])
+        dk_hdu2 = fits.open(dk_list[i+1])
+        
+        dk_img1 = dk_hdu1[0].data
+        dk_img1 = dk_img1.astype(np.int32)
+
+        
+        dk_img2 = dk_hdu2[0].data
+        dk_img2 = dk_img2.astype(np.int32)
+
+
+        os.chdir(ff_folder)
+        ff_hdu1 = fits.open(ff_list[i])
+        ff_hdu2 = fits.open(ff_list[i+1])
+        
+        ff_img1 = ff_hdu1[0].data
+        ff_img1 = ff_img1.astype(np.int32)
+
+
+        ff_img2 = ff_hdu2[0].data
+        ff_img2 = ff_img2.astype(np.int32)
+
+        dk_img1 = dk_img1[500:700,500:700]
+        dk_img2 = dk_img2[500:700,500:700]
+        ff_img1 = ff_img1[500:700,500:700]
+        ff_img2 = ff_img2[500:700,500:700]
+
+        ff_diff = ff_img2 - ff_img1
+        dk_diff = dk_img2 - dk_img1
+
+        ff_var = np.var(ff_diff)
+        dk_var = np.var(dk_diff)
+        var_denom = (ff_var - dk_var)/2
+
+        ff_med1 = np.median(ff_img1)
+        ff_med2 = np.median(ff_img2)
+        
+        dk_med1 = np.median(dk_img1)
+        dk_med2 = np.median(dk_img2)
+
+        ff_med = ff_med1 + ff_med2
+        dk_med = dk_med1 + dk_med2
+        med_numer = (ff_med - dk_med)/2
+        
+        k = med_numer/var_denom
+        gains.append(k)
+    print(gains)
+    print("Gain[ADU/e]: {}".format(np.mean(gains)))
+    #create flat diff imgs
+    #create dark diff imgs
+    #subtract variance of diff imgs and divide by 2
+
+    #median of each pair and add for flat
+    #median of each pair and add for dark
+    #subtract the added dark median from the added flat median and divide by 2
+
+    #divide this by the variance product
+    #output is K[ADU/election]
+
+def crosstalk(folder):
+    img = '/crosstalk_2.fits'
+    img_dir = folder+img
+    hdu = fits.open(img_dir)
+    frame = hdu[0].data
+    bias = cam.get_master_bias(-40)
+    bias = bias.astype(np.int32)
+    dark = cam.get_master_dark(20,-40)
+    dark = dark.astype(np.int32)
+
+    frame = frame - bias - dark
+    
+    fig,axs = plt.subplots(nrows=1,ncols=2)
+
+    cut_region = range(200,205)
+    cuts = frame[:,199]
+    for i in cut_region:
+        cut = frame[:,i]
+        cuts = np.vstack((cuts,cut))
+
+    cut_median = np.median(cuts,axis=0)
+    axs[1].plot(cut_median)
+    axs[1].set_ylabel('ADUs')
+    axs[1].set_xlabel('y-Index')
+    axs[0].imshow(frame)
+
+    plt.suptitle('Vertical Profile at x = {}'.format(cut_region[0]))
+    plt.show()
+
+def dark_nonuniformity(folder):
+    os.chdir(folder)
+    dk_list = glob.glob('*.fits*')
+    dk_list.sort()
+    
+    bias_20 = cam.get_master_bias(-20)
+    bias_40 = cam.get_master_bias(-40)
+    bias_60 = cam.get_master_bias(-60)
+
+    img_20 = cam.fits_extract(dk_list[0])
+    img_40 = cam.fits_extract(dk_list[1])
+    img_60 = cam.fits_extract(dk_list[2])
+
+    img_20 -= bias_20
+    img_40 -= bias_40
+    img_60 -= bias_60
+
+    norm_20 = img_20/np.mean(img_20)
+    norm_40 = img_40/np.mean(img_40)
+    norm_60 = img_60/np.mean(img_60)
+
+    norm_20 = norm_20[100:1000,100:1000]
+    norm_40 = norm_40[100:1000,100:1000]
+    norm_60 = norm_60[100:1000,100:1000]
+    
+    xx, yy = np.mgrid[0:norm_20.shape[0], 0:norm_20.shape[1]] #coords for images
+
+    fig = plt.figure()
+
+    ax = fig.add_subplot(1, 3, 1, projection='3d')
+    surf = ax.plot_surface(xx,yy,norm_20, cmap='twilight_shifted', linewidth=0.2)
+    ax.set_zlim(0.5,1.5)
+    ax.axes.xaxis.set_ticks([])
+    ax.axes.yaxis.set_ticks([])
+    ax.set_title('FPA: -20$^\circ$C, $\sigma$={}'.format(round(np.std(norm_20),1)))
+    ax.set_zlabel('Normalised Pixel Intensity')
+
+    ax = fig.add_subplot(1, 3, 2, projection='3d')
+    surf = ax.plot_surface(xx,yy,norm_40, cmap='twilight_shifted', linewidth=0.2)
+    ax.set_title('FPA: -40$^\circ$C, $\sigma$={}'.format(round(np.std(norm_40),1)))
+    ax.axes.xaxis.set_ticks([])
+    ax.axes.yaxis.set_ticks([])
+    ax.set_zlabel('Normalised Pixel Intensity')
+
+    ax = fig.add_subplot(1, 3, 3, projection='3d')
+    surf = ax.plot_surface(xx,yy,norm_60, cmap='twilight_shifted', linewidth=0.2)
+    ax.set_title('FPA: -60$^\circ$C, $\sigma$={}'.format(round(np.std(norm_60),1)))
+    ax.axes.xaxis.set_ticks([])
+    ax.axes.yaxis.set_ticks([])
+    ax.set_zlabel('Normalised Pixel Intensity')
+    
+    plt.tight_layout()
+    plt.suptitle('Dark Current Spatial Non-uniformity with FPA Temperature')
+    plt.show()
+
+
+
+dark_nonuniformity('//merger.anu.edu.au/mbirch/data/dark_current/non_uniformity')

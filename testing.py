@@ -18,40 +18,6 @@ naxis2 = 1296
 
 
     
-def saturation_ramp(loops,n,tag):
-    int_times = np.round(np.linspace(1001,25000,points),0)
-    means, medians, buf_times, variances, modes, maxs = map(np.zeros,[points]*6)
-    cam.printProgressBar(0, loops*points, prefix = 'Progress:', suffix = 'Complete', length = 50)
-    y=0
-    for j in range(points):
-        cam.set_int_time(int_times[j])
-        cam.set_frame_time(int_times[j]+20)
-        empty_array = np.zeros(shape = (naxis1,naxis2)) #Initiate array for coadding
-        buf_time_per = np.zeros(shape = loops) #Array for averaging buffer time
-        for l in range(loops):
-            cap, _ = cam.img_cap(routine,img_dir,'f')
-            hdu_img = fits.open(unsorted_img)
-            fits_img = hdu_img[0]
-            buf_time_per[l] = fits_img.header['BUFTIM'] #Grab time to fill buffer
-            empty_array += fits_img.data
-            hdu_img.close() #Close image so it can be sorted
-            os.remove(unsorted_img) #Delete image after data retrieval 
-            y = y + 1
-            cam.printProgressBar(y,loops*points, prefix = 'Progress:', \
-                suffix = 'Complete', length = 50)
-        empty_array = empty_array / loops
-        buf_times[j] = np.mean(buf_time_per)
-        means[j] = np.mean(empty_array)
-        medians[j] = np.median(empty_array)
-        variances[j] = np.var(empty_array)
-        mode_entry, _ = stats.mode(empty_array,axis=None)
-        modes[j] = mode_entry[0]
-        maxs[j] = np.max(empty_array)
-    #Code to save all data to numpy array in txt
-    results_path = testing_dir +'saturation_testing/' + \
-                    tag + '_results.txt'
-    np.savetxt(results_path,(means,medians,buf_times,variances,modes,maxs,int_times))
-    print('PROGRAM HAS COMPLETED')
 
 def read_ramp(n):
     int_times = np.round(np.linspace(0.033,0.5,n),3)
@@ -115,8 +81,8 @@ def read_noise_estimate(n):
     Output histogram of final pair with RN estimate as average
     of all pairs
     '''
-    int_t = cam.set_int_time(0.033)
-    frame_t = cam.set_frame_time(20.033)
+    cam.set_int_time(0.033)
+    cam.set_frame_time(100)
     cam.printProgressBar(0, 2*n, prefix = 'Progress:', suffix = 'Complete', length = 50)
     y = 0
     RNs = []
@@ -247,13 +213,12 @@ def bias_temp(n,loops):
     plt.show()
     
 def dark_current(n,T,tag='',amb_temp=''):
-    int_times = np.round(np.linspace(1001,40000,n),0) 
+    int_times = np.round(np.linspace(5,500,n),0) 
     
     cam.printProgressBar(0, sum(int_times))
     y=0
     
     for j in int_times:
-        
         cam.set_int_time(j)
         cam.set_frame_time(j+20)
         
@@ -274,4 +239,56 @@ def dark_current(n,T,tag='',amb_temp=''):
         cam.printProgressBar(y,sum(int_times))
     print('PROGRAM HAS COMPLETED')
 
-dark_current(60,-40,'dark_current_-40_20',20)
+def full_well(n,int_t,tag=''):
+    dit = cam.set_int_time(int_t)
+    cam.set_frame_time(int_t+20)
+    cam.printProgressBar(0, n)
+
+    for j in range(n):   
+        cap, _ = cam.img_cap(routine,img_dir,'f')
+        cam.file_sorting(img_dir,dit,dit+20,tag=tag)
+        cam.printProgressBar(j,n)
+    
+def pair_ramp(n,tag=''):
+    
+    int_times = np.round(np.linspace(400,700,n),3)
+
+    for j in int_times:
+        cam.set_int_time(j)
+        cam.set_frame_time(j+250)
+        #Take pair of images
+        cam.img_cap(routine,img_dir,'f')
+        cam.file_sorting(img_dir,j,j+250,tag=tag)
+    print('PROGRAM COMPLETE')
+
+def ramp(n,tag=''):
+    int_times = np.round(np.linspace(50,5000,n),0)
+    for j in int_times:
+        cam.set_int_time(j)
+        cam.set_frame_time(j+20)
+        cam.img_cap(routine,img_dir,'f')
+        cam.file_sorting(img_dir,j,j+20,tag=tag)
+    print('PROGRAM COMPLETE')
+
+def frame_int_comp():
+    dit = 400
+    cam.set_int_time(dit)
+    deltas = np.linspace(-50,50,100)
+    amps = []
+    for i in deltas:
+        cam.set_frame_time(dit+i)
+        frame,_ = cam.simple_cap()
+        amps.append(np.median(frame))
+
+    plt.scatter(deltas,amps)
+    plt.xlabel('Frame Time - Integration Time')
+    plt.ylabel('Median Pixel Intensity (ADUs)')
+    plt.grid(True)
+    plt.show()
+
+#read_noise_estimate(100)
+frame_int_comp()
+
+#full_well(50,20100,'full_well_base_test')
+
+#dark_current(60,0,'dark_current_0_20_1',20)

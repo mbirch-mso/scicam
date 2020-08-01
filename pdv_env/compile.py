@@ -7,6 +7,7 @@ import shutil
 parser = argparse.ArgumentParser(prog='Compile File', description='Compiles file and moves it to Framegrabber API')
 parser.add_argument('n', type=str, help='Name of file to compile')
 parser.add_argument('-v', action='store_true', help='Verbose mode')
+parser.add_argument('-p', action='store_true', help='Compile C++')
 args = parser.parse_args()
 
 #Add file to makefile if not already
@@ -33,5 +34,8 @@ output, _ = compiler.communicate()
 
 #Copy File and script to Framegrabber API
 shutil.copy(path + '//' + targ, 'C:/EDT/pdv//'+targ)
-shutil.copy(path + '//' + args.n +'.c', 'C:/EDT/pdv//'+args.n +'.c')
+if args.p:
+    shutil.copy(path + '//' + args.n +'.cpp', 'C:/EDT/pdv//'+args.n +'.cpp')
+else:
+    shutil.copy(path + '//' + args.n +'.c', 'C:/EDT/pdv//'+args.n +'.c')
 print('{} has been successfully compiled and sent to EDT API'.format(targ))
