@@ -3,6 +3,7 @@ import crcmod
 import ctypes
 import binascii
 import struct
+import pandas as pd
 import subprocess
 import sys
 import os
@@ -10,6 +11,7 @@ import datetime
 import numpy as np
 import glob
 from astropy.io import fits
+from scipy.stats import sigmaclip
 from ftplib import FTP
 import xml.etree.ElementTree as ET
 from astral import moon
@@ -298,7 +300,6 @@ def file_sorting(loc,i,t,ext='.fits',routine='capture',tag=''):
             os.chdir('images' + today)
             os.mkdir(tag)
         os.chdir(os.path.dirname(os.path.realpath(__file__))) #Reset to script path
-        print(os.getcwd())
         while os.path.exists(folder_name + image_name) == True:
             k = k + 1
             image_name = '/' + routine + '_' + str(i) + '_' + str(t) + '_' + str(k) + ext
@@ -492,7 +493,7 @@ def weather_to_fits(target):
         print(target_head)
 
 # Print progress
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+def printProgressBar (iteration, total, prefix = 'Progress', suffix = 'Complete', decimals = 1, length = 50, fill = '█', printEnd = "\r"):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
@@ -541,12 +542,20 @@ def get_master_bias(temp):
     master_bias = fits.open(bias_file)[0]
     return master_bias.data
 
-def simple_capture():
+def get_master_dark(int_time):
+    bias_dir = '//merger.anu.edu.au/mbirch/data/master_dark/dark_'
+    bias_file = bias_dir + str(int_time) + '.fits'
+    master_bias = fits.open(bias_file)[0]
+    return master_bias.data
+
+
+def simple_cap():
     '''
     Take single image and return numpy array and header
     '''
     img_dir = '//merger.anu.edu.au/mbirch/images'
-    cap, _ = cam.img_cap('capture',img_dir,'f')
+    unsorted_img = img_dir +'/image_unsorted.fits'
+    cap, _ = img_cap('capture',img_dir,'f')
     hdu_img = fits.open(unsorted_img)
     data = hdu_img[0].data
     header = hdu_img[0].header
@@ -561,6 +570,9 @@ def expose(i,n,path=False,tag=''):
     Adds recent Canberra BOM weather to header
     Can save to custom file path or auto-sort
     '''
+    unsorted_img = img_dir +'/image_unsorted.fits'
+    img_dir = '//merger.anu.edu.au/mbirch/images'
+
     int_t = set_int_time(i)
     frame_t = set_frame_time(i+25)
     array = np.zeros(shape = (naxis1,naxis2)) #Initiate array for coadding
@@ -587,3 +599,49 @@ def expose(i,n,path=False,tag=''):
         weather_to_fits(unsorted_img)
         file_sorting(img_dir,int_t,frame_t,tag=tag)
     print('EXPOSE COMPLETE')
+
+
+def window(data,n):
+    '''
+    Return central square numpy array from
+    input array
+    Output array has square shape (n,n) centered 
+    on central element
+    '''
+    x , y = data.shape
+    x1 = x//2 - n//2
+    x2 = x//2 + n//2
+    y1 = y//2 - n//2
+    y2 = y//2 + n//2
+    return data[x1:x2,y1:y2]
+
+
+def read_thermocouple():
+    thermocouple = pd.read_csv('//merger.anu.edu.au/mbirch/data/nstf_temperature_data/20200619_temp_sensor3.csv',usecols=(0,1))
+    t0 = thermocouple['19/06/2020'][0]
+    t0 = datetime.datetime(2020,6,19,int(t0[0:2]),int(t0[3:5]))
+    deltas = thermocouple['Date'][6:]
+    temps = thermocouple['19/06/2020'][6:]
+    times = [t0 + datetime.timedelta(0,round(float(i))) for i in deltas]
+    return times,temps
+
+def assign_temp(img_file):
+    '''
+    Input list of file names (rel or absolute paths)
+    Input thermocouple log
+    Modify FITS headers in each file to assign temperature
+    at time of capture
+    '''
+    def nearest(items, pivot):
+        return min(items, key=lambda x: abs(x - pivot))
+    times,temps = read_thermocouple()
+    for i in img_file:
+        with fits.open(i, 'update') as hdu:
+            head = hdu[0].header
+            img_time = head['TIME']
+            img_time_obj = datetime.datetime.strptime(img_time, '%Y-%m-%d %H:%M:%S')
+            cap_time = nearest(times,img_time_obj)
+            s = times.index(cap_time)
+            rel_temp = round(float(temps[s]),3)
+            hdu[0].header['AMBTEMP'] = rel_temp
+            print('ambient temp adjusted:{}'.format(rel_temp))

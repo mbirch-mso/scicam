@@ -1,6 +1,6 @@
 {
     "python.autoComplete.addBrackets": true,
-    "python.pythonPath": "C:\\Users\\Marcus\\Anaconda3\\python.exe",
+    "python.pythonPath": "C:\\Users\\mbirch\\Anaconda3\\python.exe",
     "python.testing.unittestArgs": [
         "-v",
         "-s",
